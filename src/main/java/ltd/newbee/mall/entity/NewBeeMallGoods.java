@@ -20,11 +20,13 @@ public class NewBeeMallGoods {
     private Integer originalPrice;
 
     private Integer sellingPrice;
-
+    private Integer  profit;
+    private Integer  price;
     private Integer stockNum;
 
     private String tag;
-
+    private String createSno;
+    private String goodsSno;
     private Byte goodsSellStatus;
 
     private Integer createUser;
@@ -181,7 +183,11 @@ public class NewBeeMallGoods {
         sb.append(", originalPrice=").append(originalPrice);
         sb.append(", sellingPrice=").append(sellingPrice);
         sb.append(", stockNum=").append(stockNum);
+        sb.append(", profit=").append(profit);
+        sb.append(", price=").append(price);
         sb.append(", tag=").append(tag);
+        sb.append(", goodsSno=").append(goodsSno);
+        sb.append(", createSno=").append(createSno);
         sb.append(", goodsSellStatus=").append(goodsSellStatus);
         sb.append(", createUser=").append(createUser);
         sb.append(", createTime=").append(createTime);
@@ -190,5 +196,37 @@ public class NewBeeMallGoods {
         sb.append(", goodsDetailContent=").append(goodsDetailContent);
         sb.append("]");
         return sb.toString();
+    }
+
+    public Integer getProfit() {
+        return profit;
+    }
+
+    public void setProfit(Integer profit) {
+        this.profit = profit;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public String getCreateSno() {
+        return createSno;
+    }
+
+    public void setCreateSno(String createSno) {
+        this.createSno = createSno;
+    }
+
+    public String getGoodsSno() {
+        return goodsSno;
+    }
+
+    public void setGoodsSno(String goodsSno) {
+        this.goodsSno = goodsSno;
     }
 }

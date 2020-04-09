@@ -11,6 +11,10 @@
         <result column="original_price" jdbcType="INTEGER" property="originalPrice"/>
         <result column="selling_price" jdbcType="INTEGER" property="sellingPrice"/>
         <result column="stock_num" jdbcType="INTEGER" property="stockNum"/>
+        <result column="price" jdbcType="INTEGER" property="price"/>
+        <result column="profit" jdbcType="INTEGER" property="profit"/>
+        <result column="goods_sno" jdbcType="VARCHAR" property="goodsSno"/>
+        <result column="create_sno" jdbcType="VARCHAR" property="createSno"/>
         <result column="tag" jdbcType="VARCHAR" property="tag"/>
         <result column="goods_sell_status" jdbcType="TINYINT" property="goodsSellStatus"/>
         <result column="create_user" jdbcType="INTEGER" property="createUser"/>
@@ -23,7 +27,8 @@
     </resultMap>
     <sql id="Base_Column_List">
     goods_id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
-    selling_price, stock_num, tag, goods_sell_status, create_user, create_time, update_user, 
+    selling_price, stock_num, tag, goods_sell_status, create_user, create_time, update_user, price,profit,
+    goods_sno,create_sno,
     update_time
   </sql>
     <sql id="Blob_Column_List">
@@ -31,13 +36,14 @@
   </sql>
 
     <insert id="batchInsert">
-        INSERT INTO tb_newbee_mall_goods_info(goods_name, goods_intro, goods_category_id,goods_cover_img,
+        INSERT INTO tb_goods_info(goods_name, goods_intro, goods_category_id,goods_cover_img,
         goods_carousel,
         goods_detail_content,original_price,
-        selling_price, stock_num)
+        selling_price, price, profit, stock_num)
         VALUES
         <foreach collection="newBeeMallGoodsList" item="goods" separator=",">
-            (#{goods.goodsName},#{goods.goodsIntro},#{goods.goodsCategoryId},#{goods.goodsCoverImg},#{goods.goodsCarousel},#{goods.goodsDetailContent},#{goods.originalPrice},#{goods.sellingPrice},#{goods.stockNum})
+            (#{goods.goodsName},#{goods.goodsIntro},#{goods.goodsCategoryId},#{goods.goodsCoverImg},#{goods.goodsCarousel},#{goods.goodsDetailContent},#{goods.originalPrice},#{goods.sellingPrice}
+            ,#{goods.price},#{goods.profit},#{goods.stockNum})
         </foreach>
     </insert>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
@@ -45,17 +51,17 @@
         <include refid="Base_Column_List"/>
         ,
         <include refid="Blob_Column_List"/>
-        from tb_newbee_mall_goods_info
+        from tb_goods_info
         where goods_id = #{goodsId,jdbcType=BIGINT}
     </select>
     <update id="updateStockNum">
         <foreach collection="stockNumDTOS" item="stockNumDTO">
-            update tb_newbee_mall_goods_info set stock_num = stock_num-#{stockNumDTO.goodsCount}
+            update tb_goods_info set stock_num = stock_num-#{stockNumDTO.goodsCount}
             where goods_id = #{stockNumDTO.goodsId} and stock_num>=#{stockNumDTO.goodsCount} and goods_sell_status = 0;
         </foreach>
     </update>
     <update id="batchUpdateSellStatus">
-        update tb_newbee_mall_goods_info
+        update tb_goods_info
         set goods_sell_status=#{sellStatus},update_time=now() where goods_id in
         <foreach item="id" collection="orderIds" open="(" separator="," close=")">
             #{id}
@@ -64,7 +70,7 @@
     <select id="findNewBeeMallGoodsList" parameterType="Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from tb_newbee_mall_goods_info
+        from tb_goods_info
         <where>
             <if test="goodsName!=null and goodsName!=''">
                 and goods_name like CONCAT('%','#{goodsName}','%')
@@ -88,7 +94,7 @@
     <select id="findNewBeeMallGoodsListBySearch" parameterType="Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from tb_newbee_mall_goods_info
+        from tb_goods_info
         <where>
             <if test="keyword!=null and keyword!=''">
                 and (goods_name like CONCAT('%',#{keyword},'%') or goods_intro like CONCAT('%',#{keyword},'%'))
@@ -119,7 +125,7 @@
     </select>
 
     <select id="getTotalNewBeeMallGoodsBySearch" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_goods_info
+        select count(*) from tb_goods_info
         <where>
             <if test="keyword!=null and keyword!=''">
                 and (goods_name like CONCAT('%',#{keyword},'%') or goods_intro like CONCAT('%',#{keyword},'%'))
@@ -133,7 +139,7 @@
     <select id="selectByPrimaryKeys" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from tb_newbee_mall_goods_info
+        from tb_goods_info
         where goods_id in
         <foreach item="id" collection="list" open="(" separator="," close=")">
             #{id}
@@ -145,7 +151,7 @@
         );
     </select>
     <select id="getTotalNewBeeMallGoods" parameterType="Map" resultType="int">
-        select count(*) from tb_newbee_mall_goods_info
+        select count(*) from tb_goods_info
         <where>
             <if test="goodsName!=null and goodsName!=''">
                 and goods_name like CONCAT('%','#{goodsName}','%')
@@ -162,25 +168,25 @@
         </where>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from tb_newbee_mall_goods_info
+    delete from tb_goods_info
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </delete>
     <insert id="insert" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
-    insert into tb_newbee_mall_goods_info (goods_id, goods_name, goods_intro, 
+    insert into tb_goods_info (goods_id, goods_name, goods_intro, 
       goods_cover_img, goods_carousel, original_price, 
-      selling_price, stock_num, tag, 
+      selling_price, stock_num, tag, price,profit
       goods_sell_status, create_user, create_time, 
       update_user, update_time, goods_detail_content
       )
     values (#{goodsId,jdbcType=BIGINT}, #{goodsName,jdbcType=VARCHAR}, #{goodsIntro,jdbcType=VARCHAR}, 
       #{goodsCoverImg,jdbcType=VARCHAR}, #{goodsCarousel,jdbcType=VARCHAR}, #{originalPrice,jdbcType=INTEGER}, 
-      #{sellingPrice,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, 
+      #{sellingPrice,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, #{price,jdbcType=VARCHAR}, #{profit,jdbcType=VARCHAR}
       #{goodsSellStatus,jdbcType=TINYINT}, #{createUser,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{goodsDetailContent,jdbcType=LONGVARCHAR}
       )
   </insert>
     <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
-        insert into tb_newbee_mall_goods_info
+        insert into tb_goods_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">
                 goods_id,
@@ -205,6 +211,12 @@
             </if>
             <if test="sellingPrice != null">
                 selling_price,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="profit != null">
+                profit,
             </if>
             <if test="stockNum != null">
                 stock_num,
@@ -256,6 +268,12 @@
             <if test="sellingPrice != null">
                 #{sellingPrice,jdbcType=INTEGER},
             </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="profit != null">
+                profit,
+            </if>
             <if test="stockNum != null">
                 #{stockNum,jdbcType=INTEGER},
             </if>
@@ -283,7 +301,7 @@
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
-        update tb_newbee_mall_goods_info
+        update tb_goods_info
         <set>
             <if test="goodsName != null">
                 goods_name = #{goodsName,jdbcType=VARCHAR},
@@ -305,6 +323,12 @@
             </if>
             <if test="sellingPrice != null">
                 selling_price = #{sellingPrice,jdbcType=INTEGER},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=INTEGER},
+            </if>
+            <if test="profit != null">
+                profit = #{profit,jdbcType=INTEGER},
             </if>
             <if test="stockNum != null">
                 stock_num = #{stockNum,jdbcType=INTEGER},
@@ -334,7 +358,7 @@
         where goods_id = #{goodsId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKeyWithBLOBs" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
-    update tb_newbee_mall_goods_info
+    update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},
       goods_cover_img = #{goodsCoverImg,jdbcType=VARCHAR},
@@ -352,7 +376,7 @@
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </update>
     <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
-    update tb_newbee_mall_goods_info
+    update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},
       goods_cover_img = #{goodsCoverImg,jdbcType=VARCHAR},

@@ -269,10 +269,10 @@
                 #{sellingPrice,jdbcType=INTEGER},
             </if>
             <if test="price != null">
-                price,
+                #{price,jdbcType=INTEGER},
             </if>
             <if test="profit != null">
-                profit,
+                #{profit,jdbcType=INTEGER},
             </if>
             <if test="stockNum != null">
                 #{stockNum,jdbcType=INTEGER},

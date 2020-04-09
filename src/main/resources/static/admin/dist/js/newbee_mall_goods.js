@@ -4,11 +4,12 @@ $(function () {
         datatype: "json",
         colModel: [
             {label: '商品编号', name: 'goodsId', index: 'goodsId', width: 60, key: true},
-            {label: '商品名', name: 'goodsName', index: 'goodsName', width: 120},
-            {label: '商品简介', name: 'goodsIntro', index: 'goodsIntro', width: 120},
-            {label: '商品图片', name: 'goodsCoverImg', index: 'goodsCoverImg', width: 120, formatter: coverImageFormatter},
+            {label: '商品名', name: 'goodsName', index: 'goodsName', width: 100},
+            {label: '商品简介', name: 'goodsIntro', index: 'goodsIntro', width: 100},
+            {label: '商品图片', name: 'goodsCoverImg', index: 'goodsCoverImg', width: 100, formatter: coverImageFormatter},
             {label: '商品库存', name: 'stockNum', index: 'stockNum', width: 60},
             {label: '商品售价', name: 'sellingPrice', index: 'sellingPrice', width: 60},
+            {label: '平台利润', name: 'profit', index: 'profit', width: 60},
             {
                 label: '上架状态',
                 name: 'goodsSellStatus',

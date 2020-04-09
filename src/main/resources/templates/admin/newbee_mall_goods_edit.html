@@ -77,19 +77,19 @@
                             <div class="form-group" style="display:flex;">
                                 <input type="number" class="form-control col-sm-6" id="originalPrice"
                                        name="originalPrice"
-                                       placeholder="*请输入商品价格"
-                                       th:value="${goods!=null and goods.originalPrice!=null }?${goods.originalPrice}: 1"
+                                       placeholder="*请输入原始价格"
+                                       th:value="${goods!=null and goods.originalPrice!=null }?${goods.originalPrice}: ''"
                                        required="true">
                                 &nbsp;&nbsp;
                                 <input type="number" class="form-control col-sm-6" id="sellingPrice"
                                        name="sellingPrice"
-                                       placeholder="*请输入商品售卖价"
-                                       th:value="${goods!=null and goods.sellingPrice!=null }?${goods.sellingPrice}: 1"
+                                       placeholder="*请输入供货价"
+                                       th:value="${goods!=null and goods.sellingPrice!=null }?${goods.sellingPrice}: ''"
                                        required="true">
                             </div>
                             <div class="form-group" style="display:flex;">
                                 <input type="number" class="form-control col-sm-6" id="stockNum" name="stockNum"
-                                       placeholder="*请输入商品库存数"
+                                       placeholder="*"
                                        th:value="${goods!=null and goods.stockNum!=null }?${goods.stockNum}: 0"
                                        required="true">
                                 &nbsp;&nbsp;
@@ -97,6 +97,17 @@
                                        placeholder="*请输入商品小标签"
                                        th:value="${goods!=null and goods.tag!=null }?${goods.tag}: ''"
                                        required="true">
+                            </div>
+                            <div class="form-group" style="display:flex;">
+                                <input type="text" class="form-control col-sm-6" id="profit" name="profit"
+                                       placeholder="*平台利润"
+                                       th:value="${goods!=null and goods.profit!=null }?${goods.profit}: ''"
+                                       required="false">
+                                &nbsp;&nbsp;
+                                <input type="text" class="form-control col-sm-6" id="price" name="price"
+                                       placeholder="*实际价格"
+                                       th:value="${goods!=null and goods.price!=null }?${goods.price}: ''"
+                                       required="false">
                             </div>
                             <div class="form-group">
                                 <label class="control-label">上架状态:&nbsp;</label>

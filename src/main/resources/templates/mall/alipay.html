@@ -34,11 +34,11 @@
         <div class="qrcode-img-wrapper" data-role="qrPayImgWrapper">
             <div data-role="qrPayImg" class="qrcode-img-area">
                 <div class="ui-loading qrcode-loading" data-role="qrPayImgLoading"></div>
-                <div style="position: relative;display: inline-block;">
-                    <img width="300" height="300"
-                         th:src="@{/mall/image/pay/alipay_qrcode.png}"
-                         title="请尽快支付~"
-                         style="display: block;">
+                <div style="position: relative;display: inline-block;" id="qrcode">
+                    <!--<img width="300" height="300"-->
+                    <!--th:src="@{/mall/image/pay/alipay_qrcode.png}"-->
+                    <!--title="请尽快支付~"-->
+                    <!--style="display: block;">-->
                 </div>
             </div>
         </div>
@@ -73,24 +73,63 @@
     <div class="foot">
     </div>
 </div>
+<script th:src="@{/mall/js/jquery-qrcode.js}"></script>
+<script th:src="@{/mall/js/qrcode-diy.js}"></script>
 <script type="text/javascript">
-    function payOrderSuccess() {
-        var orderNo = $("#orderNoValue").val();
-        $.ajax({
-            type: 'GET',
-            url: '/paySuccess?payType=1&orderNo=' + orderNo,
-            success: function (result) {
-                if (result.resultCode == 200) {
-                    window.location.href = '/orders/' + orderNo;
-                } else {
-                    alert(result.message);
-                }
-            },
-            error: function () {
-                alert("操作失败");
-            }
+    var message = [[${totalPrice}]];
+    var orderNo = $("#orderNoValue").val();
+    var intervalCount = 0;
+    console.log(message);
+    (function createQr() {
+        $('#qrcode').qrcode({
+            width: 360,
+            height: 360,
+            correctLevel: 0,
+            text: 'www.baidu.com',
+            correctLevel: 0,
         });
-    }
+    })();
+    var interval = setInterval(function () {
+        intervalCount++;
+        if (intervalCount > 100) {
+            alert("长时间未支付，请到订单列表页面，重新支付");
+            window.location.href = '/orders/' + orderNo;
+            clearInterval(interval);
+        }
+        $.ajax({
+            type: "post",
+            url: URI + "/order/validateOrderPay",
+            dataType: "json",
+            data: JSON.stringify({
+                "sign": "",
+                "body": {
+                    "orderCodeList": orderNo
+                }
+            })
+        })
+                .done(function (data) {
+                    // window.location.href = '/orders/' + orderNo;
+                })
+                .fail(function (error) {
+                });
+    }, 3000)
+        function payOrderSuccess() {
+            var orderNo = $("#orderNoValue").val();
+            $.ajax({
+                type: 'GET',
+                url: '/paySuccess?payType=1&orderNo=' + orderNo,
+                success: function (result) {
+                    if (result.resultCode == 200) {
+                        window.location.href = '/orders/' + orderNo;
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function () {
+                    alert("操作失败");
+                }
+            });
+        }
 </script>
 </body>
 </html>

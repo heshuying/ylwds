@@ -22,6 +22,9 @@ public class NewBeeMallGoodsDetailVO implements Serializable {
 
     private Integer originalPrice;
 
+    private Integer  profit;
+    private Integer  price;
+
     private String goodsDetailContent;
 
     public Long getGoodsId() {
@@ -86,5 +89,21 @@ public class NewBeeMallGoodsDetailVO implements Serializable {
 
     public void setGoodsCarouselList(String[] goodsCarouselList) {
         this.goodsCarouselList = goodsCarouselList;
+    }
+
+    public Integer getProfit() {
+        return profit;
+    }
+
+    public void setProfit(Integer profit) {
+        this.profit = profit;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 }

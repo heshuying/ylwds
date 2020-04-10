@@ -227,6 +227,16 @@ $('#saveButton').click(function () {
 $('#cancelButton').click(function () {
     window.location.href = "/admin/goods";
 });
+$('#profit').blur(function () {
+    var sPrice = $('#sellingPrice').val() === '' ? 0 : $('#sellingPrice').val();
+    var calPrice = parseFloat( $('#profit').val()) + parseFloat( sPrice);
+    $('#price').val(calPrice);
+});
+$('#sellingPrice').blur(function () {
+    var sPrice = $('#profit').val() === '' ? 0 : $('#profit').val();
+    var calPrice = parseFloat( $('#sellingPrice').val()) + parseFloat( sPrice);
+    $('#price').val(calPrice);
+});
 
 $('#levelOne').on('change', function () {
     $.ajax({

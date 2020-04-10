@@ -18,7 +18,8 @@ public class NewBeeMallShoppingCartItemVO implements Serializable {
     private String goodsCoverImg;
 
     private Integer sellingPrice;
-
+    private Integer  profit;
+    private Integer  price;
     public Long getGoodsId() {
         return goodsId;
     }
@@ -65,5 +66,21 @@ public class NewBeeMallShoppingCartItemVO implements Serializable {
 
     public void setGoodsCount(Integer goodsCount) {
         this.goodsCount = goodsCount;
+    }
+
+    public Integer getProfit() {
+        return profit;
+    }
+
+    public void setProfit(Integer profit) {
+        this.profit = profit;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 }

@@ -111,6 +111,8 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
                     }
                     newBeeMallShoppingCartItemVO.setGoodsName(goodsName);
                     newBeeMallShoppingCartItemVO.setSellingPrice(newBeeMallGoodsTemp.getSellingPrice());
+                    newBeeMallShoppingCartItemVO.setPrice(newBeeMallGoodsTemp.getPrice());
+                    newBeeMallShoppingCartItemVO.setProfit(newBeeMallGoodsTemp.getProfit());
                     newBeeMallShoppingCartItemVOS.add(newBeeMallShoppingCartItemVO);
                 }
             }

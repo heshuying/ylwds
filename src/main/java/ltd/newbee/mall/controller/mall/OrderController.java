@@ -114,13 +114,13 @@ public class OrderController {
     }
 
     @GetMapping("/payPage")
-    public String payOrder(HttpServletRequest request, @RequestParam("orderNo") String orderNo, HttpSession httpSession, @RequestParam("payType") int payType) {
+    public String payOrder(HttpServletRequest request, @RequestParam("orderNo") String orderNo, HttpSession httpSession, @RequestParam("payType") String payType) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         NewBeeMallOrder newBeeMallOrder = newBeeMallOrderService.getNewBeeMallOrderByOrderNo(orderNo);
         //todo 判断订单userId
         //todo 判断订单状态
         CreatePayQrcodeTo to=new CreatePayQrcodeTo();
-        to.setPayType(String.valueOf(payType));
+        to.setPayType(payType);
         List<String> list=new ArrayList<>();
         list.add(orderNo);
         to.setOrderCodeList(list);
@@ -128,7 +128,7 @@ public class OrderController {
         request.setAttribute("orderNo", orderNo);
         request.setAttribute("qrUrl", result.getData().getPayData());
         request.setAttribute("totalPrice", newBeeMallOrder.getTotalPrice());
-        if (payType == 1) {
+        if (payType.equals("04") ) {
             return "mall/alipay";
         } else {
             return "mall/wxpay";

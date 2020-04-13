@@ -22,13 +22,19 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <lombok.version>1.16.20</lombok.version>
-        <google.gson.version>2.6.2</google.gson.version>
         <maven.boot.dubbo.version>2.0.0</maven.boot.dubbo.version>
         <com.alibaba.dubbo.version>2.5.3</com.alibaba.dubbo.version>
         <org.apache.zookeeper.version>3.4.6</org.apache.zookeeper.version>
         <gateway.common.version>1.0.0</gateway.common.version>
         <gateway.domain.version>1.0.0</gateway.domain.version>
         <fastjson.version>1.2.47</fastjson.version>
+        <bcprov.version>1.45</bcprov.version>
+        <bcmail.version>1.45</bcmail.version>
+        <gateway.common.version>1.0.0</gateway.common.version>
+        <gateway.domain.version>1.0.0</gateway.domain.version>
+        <commons.codec.version>1.6</commons.codec.version>
+        <commons.lang3.version>3.8.1</commons.lang3.version>
+        <com.google.zxing.core>3.3.0</com.google.zxing.core>
     </properties>
 
     <dependencies>
@@ -51,61 +57,68 @@
         </dependency>
         <!-- 验证码 -->
 
-        <!--二维码-start-->
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-        </dependency>
-        <!--二维码-end-->
         <!--快捷通-start-->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
+            <version>${bcprov.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15</artifactId>
+            <version>${bcmail.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.kjtpay.gateway.common</groupId>
             <artifactId>gateway-common</artifactId>
+            <version>${gateway.common.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.kjtpay.gateway.common</groupId>
             <artifactId>gateway-domain</artifactId>
+            <version>${gateway.domain.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+            <version>${commons.codec.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
         </dependency>
-
         <!--快捷通-end-->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${com.google.zxing.core}</version>
         </dependency>
+
+        <!--http-start-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.9</version>
+            <version>4.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <!--http-end-->
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${google.gson.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba.spring.boot</groupId>
@@ -145,11 +158,39 @@
             <version>${fastjson.version}</version>
         </dependency>
 
+        <!-- 引入json依赖-start-->
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
+            <classifier>jdk15</classifier>
         </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ezmorph</groupId>
+            <artifactId>ezmorph</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <!--json-end-->
     </dependencies>
 
     <build>

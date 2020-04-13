@@ -413,7 +413,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
 
         //生成支付二维码
 
-            String payResult = kjtService.instantTrade(order.getOrderNo(), order.getExtraInfo(),
+            String payResult = kjtService.instantTrade(order.getOrderNo(), "华为手机",
                     order.getTotalPrice().toString(), "1",
                     order.getTotalPrice().toString(), payerIp, type.getKey());
             ResponseParameter responseParameter = JSON.parseObject(payResult, new TypeReference<ResponseParameter>() {

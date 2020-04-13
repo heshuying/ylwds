@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  thymeleaf:
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.138.26.200:3909/YLW_mall_db?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowMultiQueries=true
+    username: sorcl_wz
+    password: s23Ec1dSuk
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: hikariCP
+      max-lifetime: 30000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+# mybatis config
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+
+kjt:
+  payeeidentity: 200001725622
+  privatekey: MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAKKHI0yprLceP6cvoxEuEM84DxHmEceaN5aMmiZrlAQE8RIBnsRpdV7ImffYgFS+KKBCKKue4GVSSuvLYI9EXV6S37TDreOKUFu9OHQrHu37oX2YiJHpYr+gyHaC64ZQlIQu1Uk4ti+2Tcnrg06bzat+sZTAH0l99pviR7VljOz7AgMBAAECgYBfBXtR2vGrrfexG1zPMouJW1EUOdqzRCqzzkhhpgvHvcvjpybX1oBUhhvel6mP4g2GhKeajyzKkC5VZXZyzJl5PF2DRFVMd5nZCsfsDNVk+/x0b1WjLjGJJrUJQBLPNxyUCws98sR3pN1DASDSr2690Vf/2+VMBsNcsJPbvMVxoQJBAOzkwEnqESqIVJVw2fRiNUAWBcOvVm3yCw/nz5SUitxF3T2mjQxBsif/aQmkk9hguUoxjFOBPIAhzz4ISed8BR8CQQCvouzEN6SkNX1iFmVYsfdJchOPZyBAGw5A+0VFHaleXgZTnbDviEcUx+zaQSjQ1QFiZtmMkqqW1jFXn4V3DmClAkEAp3PTkOwKElyoHbLV/m/lYFWw4XBx0eoEc8vS6h5OQgKIr2mpzn4p5ygeIZjagVtt3spDfUufbpt3mUvWofEC1QJBAJjui60bKlAVh1SmXZ7Kb6FTJHcEe891/4ZThHB3MGfMBUQ/lbYseoA8yR8OB6U3I9pz5dACUWm/nf1HGKafLUUCQQDo9dZD0PbEAkzKGP1UF5X3eOT+DlF/z8Wan7S9HoKMYlixbSHuReRbvnRDZuG/wbLBjt/0yE4bnnNFv65NN262
+  kjtpublickey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7phOZ9PHIivfzC6xzqJuF7935YG+j5LYnHnkex0I+Lw3oYOIKIESIrDMMbyNiBeezm3zh6Um+LzgGaaCzP0aV4bTFsS6RCveXFqG+dwHXE8e+YoxS4BTrjDzcZqDnbwNLsZz7wuSm6fSjV4YDL5zc2Ho1eV6OAzcITEfcBGxizaUmzP8s5bXqccWdPBOGVcoLOsvUugmNvmrhr1UL54LH0boZ5CAuOvCDaocBn/Fo7FNcomWnlG24Dynni/iGVTIS3DGU6fEY97JuSodZ4tCtnSnqzwksWaxy+7e+pv4ObFHSxAiTq3tVIaSFY5hJ9Dz3+Dm+RdF4LnyvZVIP3fcrQIDAQAB
+  recv: https://zgateway.kjtpay.com/recv.do
+  instantTradeAsyncNotify: http://10.190.176.150:8888/api/pay/instantTradeAsyncNotify
+  transferToCardAsyncNotify: http://10.190.176.150:8888/api/pay/transferToCardAsyncNotify
+  tradeRefundAsyncNotify: http://10.190.176.150:8888/api/pay/tradeRefundAsyncNotify
+  transferToAccountAsyncNotify: http://10.190.176.150:8888/api/pay/transferToAccountAsyncNotify
+  recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
+  verifyFlag: 0
+  productCode: 10311

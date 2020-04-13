@@ -32,6 +32,18 @@
         from tb_order
         where order_no = #{orderNo,jdbcType=VARCHAR} and is_deleted=0 limit 1
     </select>
+
+
+    <select id="selectByOrderNos" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_order
+        where order_no in
+        <foreach collection="orderNos" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+    </select>
+
     <select id="selectByPrimaryKeys" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

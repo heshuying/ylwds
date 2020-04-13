@@ -1,26 +1,39 @@
 package ltd.newbee.mall.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.kjtpay.gateway.common.domain.base.ResponseParameter;
+import com.kjtpay.gateway.common.domain.instanttrade.TradeRes;
+import com.kjtpay.gateway.common.util.JsonMapUtil;
 import ltd.newbee.mall.common.*;
 import ltd.newbee.mall.controller.vo.*;
 import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
 import ltd.newbee.mall.dao.NewBeeMallOrderItemMapper;
 import ltd.newbee.mall.dao.NewBeeMallOrderMapper;
 import ltd.newbee.mall.dao.NewBeeMallShoppingCartItemMapper;
+import ltd.newbee.mall.dto.CreatePayQrcodeTo;
+import ltd.newbee.mall.dto.PayQrcodeVo;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.entity.NewBeeMallOrder;
 import ltd.newbee.mall.entity.NewBeeMallOrderItem;
 import ltd.newbee.mall.entity.StockNumDTO;
+import ltd.newbee.mall.service.KjtService;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
+import ltd.newbee.mall.util.AmountUtils;
 import ltd.newbee.mall.util.BeanUtil;
+import ltd.newbee.mall.util.Const;
 import ltd.newbee.mall.util.NumberUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
+import ltd.newbee.mall.util.Result;
+import ltd.newbee.mall.util.ResultGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,6 +51,9 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     private NewBeeMallShoppingCartItemMapper newBeeMallShoppingCartItemMapper;
     @Autowired
     private NewBeeMallGoodsMapper newBeeMallGoodsMapper;
+
+    @Autowired
+    private KjtService kjtService;
 
     @Override
     public PageResult getNewBeeMallOrdersPage(PageQueryUtil pageUtil) {
@@ -365,5 +381,68 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             }
         }
         return null;
+    }
+
+    @Override
+    public Result createPayQrcode(CreatePayQrcodeTo to, String payerIp) {
+        Const.EnumPayType type = Const.EnumPayType.getByKey(to.getPayType());
+        if (type == null) {
+            return ResultGenerator.genFailResult( "支付类型异常");
+        }
+        if (type != Const.EnumPayType.PAY_TYPE_03 && type != Const.EnumPayType.PAY_TYPE_04) {
+            return ResultGenerator.genFailResult( "支付类型不支持");
+        }
+        List<String> orderCodeList = to.getOrderCodeList();
+        List<NewBeeMallOrder> orderList = newBeeMallOrderMapper.selectByOrderNos(orderCodeList);
+        if (orderList == null) {
+            return ResultGenerator.genFailResult("订单不存在");
+        }
+        String orderAmount = "0.00";
+        HashSet<String> orderSet=new HashSet<>();//判断订单是否已经存在 如果不存在金额可以处理
+        List<NewBeeMallOrder> newOrderList =new ArrayList<>();
+        for (NewBeeMallOrder order : orderList) {
+            if(orderSet.contains(order.getOrderNo())){
+                continue;
+            }else{
+                orderSet.add(order.getOrderNo());
+                newOrderList.add(order);
+                orderAmount = AmountUtils.add(orderAmount, order.getOrderNo());
+            }
+        }
+        NewBeeMallOrder order = newOrderList.get(0);
+
+        //生成支付二维码
+
+            String payResult = kjtService.instantTrade(order.getOrderNo(), order.getExtraInfo(),
+                    order.getTotalPrice().toString(), "1",
+                    order.getTotalPrice().toString(), payerIp, type.getKey());
+            ResponseParameter responseParameter = JSON.parseObject(payResult, new TypeReference<ResponseParameter>() {
+            });
+            String code = responseParameter.getCode();
+            if ("S10000".equals(code)) {
+                String tradeResStr = responseParameter.getBizContent().toString();
+                TradeRes tradeRes = JsonMapUtil.gsonToObj(tradeResStr, TradeRes.class);
+                String status = tradeRes.getStatus();//return_url out_trade_no trade_no
+                if (!"P".equals(status)) {
+                    return ResultGenerator.genFailResult("生成付款码失败，请稍后重试");
+                }
+                String tradeNo = tradeRes.getTradeNo();
+                String returnUrl = tradeRes.getReturnUrl();
+                PayQrcodeVo vo = new PayQrcodeVo();
+                vo.setOrderCode(order.getOrderNo());
+                vo.setPayType(to.getPayType());
+                vo.setTradeNo(tradeNo);
+                vo.setPayData(returnUrl);
+                vo.setPayAmount(AmountUtils.toYuan(order.getTotalPrice()));
+
+                Result<PayQrcodeVo> result=ResultGenerator.genSuccessResult();
+                result.setData(vo);
+                return result;
+            } else {
+                return ResultGenerator.genFailResult("生成付款码失败，请稍后重试");
+            }
+
+
+
     }
 }

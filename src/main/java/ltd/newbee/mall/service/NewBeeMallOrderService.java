@@ -4,9 +4,11 @@ import ltd.newbee.mall.controller.vo.NewBeeMallOrderDetailVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallOrderItemVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallShoppingCartItemVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallUserVO;
+import ltd.newbee.mall.dto.CreatePayQrcodeTo;
 import ltd.newbee.mall.entity.NewBeeMallOrder;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
+import ltd.newbee.mall.util.Result;
 
 import java.util.List;
 
@@ -106,4 +108,7 @@ public interface NewBeeMallOrderService {
     String paySuccess(String orderNo, int payType);
 
     List<NewBeeMallOrderItemVO> getOrderItems(Long id);
+
+    Result createPayQrcode(CreatePayQrcodeTo to, String payerIp);
+
 }

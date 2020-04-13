@@ -7,6 +7,7 @@ import ltd.newbee.mall.controller.vo.NewBeeMallOrderDetailVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallShoppingCartItemVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallUserVO;
 import ltd.newbee.mall.dto.CreatePayQrcodeTo;
+import ltd.newbee.mall.dto.PayQrcodeVo;
 import ltd.newbee.mall.entity.NewBeeMallOrder;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
 import ltd.newbee.mall.service.NewBeeMallShoppingCartService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +119,14 @@ public class OrderController {
         NewBeeMallOrder newBeeMallOrder = newBeeMallOrderService.getNewBeeMallOrderByOrderNo(orderNo);
         //todo 判断订单userId
         //todo 判断订单状态
+        CreatePayQrcodeTo to=new CreatePayQrcodeTo();
+        to.setPayType(String.valueOf(payType));
+        List<String> list=new ArrayList<>();
+        list.add(orderNo);
+        to.setOrderCodeList(list);
+        Result<PayQrcodeVo> result= newBeeMallOrderService.createPayQrcode(to,"27.223.70.2");
         request.setAttribute("orderNo", orderNo);
+        request.setAttribute("qrUrl", result.getData().getPayData());
         request.setAttribute("totalPrice", newBeeMallOrder.getTotalPrice());
         if (payType == 1) {
             return "mall/alipay";

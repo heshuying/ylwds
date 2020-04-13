@@ -35,3 +35,10 @@ kjt:
   recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
   verifyFlag: 0
   productCode: 10311
+
+ftp:
+  host: zsftp.kjtpay.com
+  port: 5473
+  username: 200001725622
+  password: Pk43K6_yTj
+  basePath: /opt/jsh/200001725622/photo

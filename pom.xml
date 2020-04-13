@@ -191,6 +191,13 @@
             <version>2.6.2</version>
         </dependency>
         <!--json-end-->
+
+        <dependency>
+            <groupId>com.haier.openplatform.hfs</groupId>
+            <artifactId>hfs-service-client</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

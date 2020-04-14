@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.newbee.mall.dao.TbUserDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbUser">
+        <id column="user_id" property="userId" />
+        <result column="nick_name" property="nickName" />
+        <result column="login_name" property="loginName" />
+        <result column="password_md5" property="passwordMd5" />
+        <result column="introduce_sign" property="introduceSign" />
+        <result column="address" property="address" />
+        <result column="cellphone" property="cellphone" />
+        <result column="user_type" property="userType" />
+        <result column="user_status" property="userStatus" />
+        <result column="check_msg" property="checkMsg" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+</mapper>

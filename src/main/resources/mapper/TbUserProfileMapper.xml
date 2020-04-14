@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.newbee.mall.dao.TbUserProfileDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbUserProfile">
+        <id column="profile_id" property="profileId" />
+        <result column="user_id" property="userId" />
+        <result column="company_name" property="companyName" />
+        <result column="tax_no" property="taxNo" />
+        <result column="comp_legal_no" property="compLegalNo" />
+        <result column="comp_legal_url" property="compLegalUrl" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="area" property="area" />
+        <result column="detail" property="detail" />
+        <result column="comp_addr" property="compAddr" />
+        <result column="contactor" property="contactor" />
+        <result column="contactor_phone" property="contactorPhone" />
+        <result column="contactor_email" property="contactorEmail" />
+        <result column="financer" property="financer" />
+        <result column="financer_phone" property="financerPhone" />
+        <result column="tax_type" property="taxType" />
+        <result column="bank_holder" property="bankHolder" />
+        <result column="bank_acc_no" property="bankAccNo" />
+        <result column="bank_name" property="bankName" />
+        <result column="bank_code" property="bankCode" />
+        <result column="promise_uri" property="promiseUri" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+</mapper>

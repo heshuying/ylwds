@@ -8,13 +8,15 @@
         <result column="password_md5" jdbcType="VARCHAR" property="passwordMd5"/>
         <result column="introduce_sign" jdbcType="VARCHAR" property="introduceSign"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
-        <result column="is_deleted" jdbcType="TINYINT" property="isDeleted"/>
-        <result column="locked_flag" jdbcType="TINYINT" property="lockedFlag"/>
+        <result column="cellphone" jdbcType="VARCHAR" property="cellphone"/>
+        <result column="user_type" jdbcType="VARCHAR" property="userType"/>
+        <result column="check_msg" jdbcType="VARCHAR" property="checkMsg"/>
+        <result column="user_status" jdbcType="TINYINT" property="userStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    user_id, nick_name, login_name, password_md5, introduce_sign, address, is_deleted, 
-    locked_flag, create_time
+    user_id, nick_name, login_name, password_md5, introduce_sign, address, cellphone, check_msg, user_type,
+    user_status, create_time
   </sql>
 
     <select id="findMallUserList" parameterType="Map" resultMap="BaseResultMap">

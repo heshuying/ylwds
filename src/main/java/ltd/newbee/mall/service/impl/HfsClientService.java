@@ -1,17 +1,18 @@
-package ltd.newbee.mall.hfs;
+package ltd.newbee.mall.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.haier.openplatform.hfs.client.dto.FileRequest;
 import com.haier.openplatform.hfs.client.dto.FileResult;
 import com.haier.openplatform.hfs.client.service.FileServiceClient;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
 /**
  * @author zhp.dts
  * @date 2019/2/14.
  */
-@Component
+@Service
 public class HfsClientService {
 
     private final static String HFS_APP_NAME="ylwds";

@@ -51,7 +51,7 @@ public class NewBeeMallUserServiceImpl implements NewBeeMallUserService {
     public String login(String loginName, String passwordMD5, HttpSession httpSession) {
         MallUser user = mallUserMapper.selectByLoginNameAndPasswd(loginName, passwordMD5);
         if (user != null && httpSession != null) {
-            if (user.getLockedFlag() == 1) {
+            if (user.getUserStatus() == 2) {
                 return ServiceResultEnum.LOGIN_USER_LOCKED.getResult();
             }
             //昵称太长 影响页面展示

@@ -16,10 +16,13 @@ public class MallUser {
     private String introduceSign;
 
     private String address;
+    private String cellphone;
 
-    private Byte isDeleted;
+    private String userType;
 
-    private Byte lockedFlag;
+    private Integer userStatus;
+
+    private String checkMsg;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
@@ -72,22 +75,6 @@ public class MallUser {
         this.address = address;
     }
 
-    public Byte getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Byte isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public Byte getLockedFlag() {
-        return lockedFlag;
-    }
-
-    public void setLockedFlag(Byte lockedFlag) {
-        this.lockedFlag = lockedFlag;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -108,10 +95,40 @@ public class MallUser {
         sb.append(", passwordMd5=").append(passwordMd5);
         sb.append(", introduceSign=").append(introduceSign);
         sb.append(", address=").append(address);
-        sb.append(", isDeleted=").append(isDeleted);
-        sb.append(", lockedFlag=").append(lockedFlag);
         sb.append(", createTime=").append(createTime);
         sb.append("]");
         return sb.toString();
+    }
+
+    public String getCellphone() {
+        return cellphone;
+    }
+
+    public void setCellphone(String cellphone) {
+        this.cellphone = cellphone;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public Integer getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(Integer userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public String getCheckMsg() {
+        return checkMsg;
+    }
+
+    public void setCheckMsg(String checkMsg) {
+        this.checkMsg = checkMsg;
     }
 }

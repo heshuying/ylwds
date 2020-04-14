@@ -1,12 +1,11 @@
 package ltd.newbee.mall.controller.common;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.fastjson.JSON;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.haier.openplatform.hfs.client.dto.FileResult;
 import ltd.newbee.mall.common.Constants;
-import ltd.newbee.mall.hfs.HfsClientService;
+import ltd.newbee.mall.service.impl.HfsClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,8 +1,7 @@
 package ltd.newbee.mall.controller.common;
 
 import com.haier.openplatform.hfs.client.dto.FileResult;
-import ltd.newbee.mall.common.Constants;
-import ltd.newbee.mall.hfs.HfsClientService;
+import ltd.newbee.mall.service.impl.HfsClientService;
 import ltd.newbee.mall.util.NewBeeMallUtils;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;

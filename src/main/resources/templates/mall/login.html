@@ -1,82 +1,168 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>NewBee商城-登录</title>
-    <link rel="stylesheet" th:href="@{mall/css/common.css}">
-    <link rel="stylesheet" th:href="@{mall/styles/login.css}">
-    <link rel="stylesheet" th:href="@{mall/styles/header.css}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>衣联网会员 | Log in</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" th:href="@{/admin/dist/img/favicon.png}"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" th:href="@{/admin/dist/css/font-awesome.min.css}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" th:href="@{/admin/dist/css/ionicons.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/admin/dist/css/adminlte.min.css}">
     <link rel="stylesheet" th:href="@{/admin/plugins/sweetalert/sweetalert.css}"/>
+    <style>
+        .login-page {
+            background-color: #fff;
+        }
+        canvas {
+            display: block;
+            vertical-align: bottom;
+        }
+        .login-box-margin {
+            margin-left: 60%;
+        }
+        .login-header {
+            width: 100%;
+            height: 65px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        .header-right .phone-line {
+            margin-left: 15px;
+            font-weight: bold;
+        }
+        #loginParticles {
+            background: url(mall/image/login_new_bg.png) no-repeat;
+            background-size: 100%;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+        }
+        #loginParticles .form-group {
+            margin-bottom: 20px;
+        }
+        #loginParticles .login-box-msg {
+            font-weight: bold;
+        }
+        .login-row-center {
+            justify-content: center;
+            margin: 25px 0;
+        }
+        .login-reg-area {
+            padding: 15px 0;
+            border-top: #E3E4E5 1px solid;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            align-items: center;
+        }
+        .login-reg-area .login-reg-btn{
+            padding: 3px 20px;
+            border: #1875F0 1px solid;
+            border-radius: 14px;
+            cursor: pointer;
+            color: #1875F0 !important;
+        }
+        .login-footer {
+            width: 100%;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
-<body>
-<div class="top center">
-    <div class="logo center">
-        <a href="./index.html" target="_blank"><img src="mall/image/login-logo-2.png" alt=""></a>
+<body class="hold-transition login-page">
+<div class="login-header">
+    <div>
+        <img src="mall/image/login-new-header.png" alt="">
     </div>
-</div>
-<div class="form center">
-    <div class="login">
-        <div class="login_center">
-            <div class="login_top">
-                <div class="left fl">会员登录</div>
-                <div class="right fr">您还不是我们的会员？<a href="register.html" target="_self">立即注册</a></div>
-                <div class="clear"></div>
-                <div class="under-line center"></div>
-            </div>
-            <form id="loginForm" onsubmit="return false;" action="##">
-                <div class="login_main center">
-                    <div class="login-info">手机号:&nbsp;<input class="login-info-input" type="text" name="loginName"
-                                                             id="loginName"
-                                                             placeholder="请输入你的手机号"/>
-                    </div>
-                    <div class="login-info">密&nbsp;&nbsp;&nbsp;&nbsp;码:&nbsp;<input class="login-info-input"
-                                                                                    id="password"
-                                                                                    type="password"
-                                                                                    name="password"
-                                                                                    placeholder="请输入你的密码"/></div>
-                    <div class="login-info">
-                        验证码:&nbsp;
-                        <input class="login-info-input verify-code" type="text" name="verifyCode"
-                               placeholder="请输入验证码" id="verifyCode"/>
-                        <img alt="单击图片刷新！" style="top: 14px;position: relative;" th:src="@{/common/mall/kaptcha}"
-                             onclick="this.src='/common/mall/kaptcha?d='+new Date()*1">
-                    </div>
-                </div>
-                <div class="login_submit">
-                    <input class="submit" type="submit" onclick="login()" value="立即登录">
-                </div>
-            </form>
+    <div class="header-right">
+        <div>
+            <img src="mall/image/new-phone.png" alt="">
+        </div>
+        <div class="phone-line">
+            <div>189-5457-8644</div>
+            <div>0532-88936220</div>
         </div>
     </div>
 </div>
-</body>
+<div id="loginParticles">
+    <div class="login-box login-box-margin">
+        <!-- /.login-logo -->
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">
+                    会员登录
+                </p>
+                <form id="loginForm" onsubmit="return false;">
+                    <!--<div th:if="${not #strings.isEmpty(session.errorMsg)}" class="form-group">-->
+                        <!--<div class="alert alert-info" th:text="${session.errorMsg}"></div>-->
+                    <!--</div>-->
+                    <div class="form-group has-feedback">
+                        <input type="text" id="loginName" name="loginName" class="form-control" placeholder="公司名称"
+                               required="true">
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="密码"
+                               required="true">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="text" class="form-control" name="verifyCode" placeholder="请输入验证码" required="true">
+                        </div>
+                        <div class="col-6">
+                            <img alt="单击图片刷新！" class="pointer" th:src="@{/common/kaptcha}"
+                                 onclick="this.src='/common/kaptcha?d='+new Date()*1">
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback"></div>
+                    <div class="row login-row-center">
+                        <div class="col-8">
+                            <button type="submit" class="btn btn-primary btn-block btn-flat" onclick="login()">下一步
+                            </button>
+                        </div>
+                    </div>
+                    <div class="login-reg-area">
+                        <div>
+                            还没有账号?
+                        </div>
+                        <div>
+                            <a class="login-reg-btn" th:href="@{'http://localhost:8002/outer/#/registerCustom/customIndex'}">注册</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.login-card-body -->
+        </div>
+    </div>
+</div>
+<div class="login-footer">
+    <!--<img src="../mall/image/login-new-footer.png" alt="">-->
+</div>
+<!-- /.login-box -->
+
 <!-- jQuery -->
 <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
-<script th:src="@{/admin/dist/js/public.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/admin/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- sweetalert -->
 <script th:src="@{/admin/plugins/sweetalert/sweetalert.min.js}"></script>
+<!--<script th:src="@{/admin/dist/js/plugins/particles.js}"></script>-->
+<!--<script th:src="@{/admin/dist/js/plugins/login-bg-particles.js}"></script>-->
 <script type="text/javascript">
     function login() {
-        var loginName = $("#loginName").val();
-        if (!validPhoneNumber(loginName)) {
-            swal('请输入正确的登录名(即手机号)', {
-                icon: "error",
-            });
-            return false;
-        }
-        var password = $("#password").val();
-        if (!validPassword(password)) {
-            swal('请输入正确的密码格式(6-20位字符和数字组合)', {
-                icon: "error",
-            });
-            return false;
-        }
-        var verifyCode = $("#verifyCode").val();
-        if (!validLength(verifyCode, 7)) {
-            swal('请输入正确的验证码', {
-                icon: "error",
-            });
-            return false;
-        }
         //验证
         var params = $("#loginForm").serialize();
         var url = '/login';
@@ -102,4 +188,5 @@
         });
     }
 </script>
+</body>
 </html>

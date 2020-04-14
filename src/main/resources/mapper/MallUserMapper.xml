@@ -45,19 +45,19 @@
         select
         <include refid="Base_Column_List"/>
         from tb_user
-        where user_id = #{userId,jdbcType=BIGINT} and is_deleted = 0
+        where user_id = #{userId,jdbcType=BIGINT}
     </select>
     <select id="selectByLoginName" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_user
-        where login_name = #{loginName} and is_deleted = 0
+        where login_name = #{loginName}
     </select>
     <select id="selectByLoginNameAndPasswd" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_user
-        where login_name = #{loginName} and password_md5 = #{password} and is_deleted = 0
+        where login_name = #{loginName} and password_md5 = #{password}
     </select>
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
     update tb_user set is_deleted = 1
@@ -65,12 +65,11 @@
   </update>
     <insert id="insert" parameterType="ltd.newbee.mall.entity.MallUser">
     insert into tb_user (user_id, nick_name, login_name, 
-      password_md5, introduce_sign, address, 
-      is_deleted, locked_flag, create_time
+      password_md5, introduce_sign, address, user_status,  create_time
       )
     values (#{userId,jdbcType=BIGINT}, #{nickName,jdbcType=VARCHAR}, #{loginName,jdbcType=VARCHAR}, 
       #{passwordMd5,jdbcType=VARCHAR}, #{introduceSign,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
-      #{isDeleted,jdbcType=TINYINT}, #{lockedFlag,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}
+      1, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
     <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.MallUser">
@@ -93,12 +92,6 @@
             </if>
             <if test="address != null">
                 address,
-            </if>
-            <if test="isDeleted != null">
-                is_deleted,
-            </if>
-            <if test="lockedFlag != null">
-                locked_flag,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -123,12 +116,6 @@
             <if test="address != null">
                 #{address,jdbcType=VARCHAR},
             </if>
-            <if test="isDeleted != null">
-                #{isDeleted,jdbcType=TINYINT},
-            </if>
-            <if test="lockedFlag != null">
-                #{lockedFlag,jdbcType=TINYINT},
-            </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -152,12 +139,6 @@
             <if test="address != null">
                 address = #{address,jdbcType=VARCHAR},
             </if>
-            <if test="isDeleted != null">
-                is_deleted = #{isDeleted,jdbcType=TINYINT},
-            </if>
-            <if test="lockedFlag != null">
-                locked_flag = #{lockedFlag,jdbcType=TINYINT},
-            </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
@@ -171,14 +152,12 @@
       password_md5 = #{passwordMd5,jdbcType=VARCHAR},
       introduce_sign = #{introduceSign,jdbcType=VARCHAR},
       address = #{address,jdbcType=VARCHAR},
-      is_deleted = #{isDeleted,jdbcType=TINYINT},
-      locked_flag = #{lockedFlag,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where user_id = #{userId,jdbcType=BIGINT}
   </update>
     <update id="lockUserBatch">
         update tb_user
-        set locked_flag=#{lockStatus} where user_id in
+        set user_status=2 where user_id in
         <foreach item="id" collection="ids" open="(" separator="," close=")">
             #{id}
         </foreach>

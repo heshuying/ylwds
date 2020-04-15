@@ -22,6 +22,8 @@ public class ProfileDto {
      */
     private String taxNo;
 
+    private String regCellphone;
+
     /**
      * 营业执照号
      */

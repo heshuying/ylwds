@@ -95,7 +95,12 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         BeanUtils.copyProperties(dto, tbUserProfile);
         profileService.update(tbUserProfile, new QueryWrapper<TbUserProfile>()
                 .eq("user_id",dto.getUserId()));
-
+        if(StringUtils.isNoneBlank(dto.getRegCellphone())){
+            TbUser user=new TbUser();
+            user.setUserId(dto.getUserId());
+            user.setCellphone(dto.getRegCellphone());
+            baseMapper.updateById(user);
+        }
         TbUserAddr tbUserAddr=new TbUserAddr();
         tbUserAddr.setProvince(dto.getDeliveryProv());
         tbUserAddr.setCity(dto.getDeliveryCity());

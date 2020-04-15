@@ -43,5 +43,5 @@ public class AuthController {
     public Result updateProfile(@RequestBody ProfileDto dto){
         return userService.updateUserProfile(dto);
     }
-    
+
 }

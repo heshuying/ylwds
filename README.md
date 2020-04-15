@@ -66,12 +66,6 @@
 
 ![newbee-mall-info](https://images.gitee.com/uploads/images/2019/1106/173406_5d7ace62_5249807.png)
 
-## 感谢
-
-- [spring-projects](https://github.com/spring-projects/spring-boot)
-- [thymeleaf](https://github.com/thymeleaf/thymeleaf)
-- [mybatis](https://github.com/mybatis/mybatis-3)
-- [ColorlibHQ](https://github.com/ColorlibHQ/AdminLTE)
-- [tonytomov](https://github.com/tonytomov/jqGrid)
-- [t4t5](https://github.com/t4t5/sweetalert)
-- [skytotwo](https://github.com/skytotwo/Alipay-WeChat-HTML)
+## 码值
+用户类型： 01:个人客户;02:商户；03平台；04：供应商
+用户状态：0-待审核 1-正常 2-锁定；3-审核不通过；4-禁用

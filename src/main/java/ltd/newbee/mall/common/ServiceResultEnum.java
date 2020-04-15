@@ -11,6 +11,11 @@ public enum ServiceResultEnum {
 
     SUCCESS("success"),
 
+    FAIL_ILLEGAL("参数校验失败"),
+    FAIL_PWD("密码不一致"),
+    FAIL_EXISTS("数据已存在"),
+    FAIL_LOGIN("用户名密码错误"),
+
     DATA_NOT_EXIST("未查询到记录！"),
 
     SAME_CATEGORY_EXIST("有同级同名的分类！"),

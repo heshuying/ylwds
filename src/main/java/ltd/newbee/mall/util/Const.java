@@ -41,4 +41,34 @@ public class Const {
             return null;
         }
     }
+
+    public static enum UserStatus {
+        Uncheck(0),
+        Normal(1),
+        Lock(2),
+        CheckFail(3),
+        Disable(4);
+        private Integer key;
+        UserStatus(Integer key){
+            this.key = key;
+        }
+
+        public Integer getKey() {
+            return key;
+        }
+
+        public void setKey(Integer key) {
+            this.key = key;
+        }
+
+
+        public static UserStatus getByKey(Integer key){
+            for(UserStatus type: UserStatus.values()){
+                if(type.getKey()==key){
+                    return type;
+                }
+            }
+            return null;
+        }
+    }
 }

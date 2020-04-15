@@ -26,6 +26,7 @@ public class Constants {
     public final static int SHOPPING_CART_ITEM_LIMIT_NUMBER = 5;//购物车中单个商品的最大购买数量(可根据自身需求修改)
 
     public final static String MALL_VERIFY_CODE_KEY = "mallVerifyCode";//验证码key
+    public final static String Registe_Verify = "Registe_Verify";//验证码key
 
     public final static String MALL_USER_SESSION_KEY = "newBeeMallUser";//session中user的key
 

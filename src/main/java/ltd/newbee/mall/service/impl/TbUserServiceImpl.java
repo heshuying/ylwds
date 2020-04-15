@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.plugin.util.UserProfile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 
@@ -38,7 +39,7 @@ import java.util.Date;
 @Service
 public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements TbUserService {
     @Autowired
-    private HttpSession httpSession;
+    private HttpServletRequest httpServletRequest;
     @Autowired
     private TbUserProfileService profileService;
     @Autowired
@@ -52,7 +53,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_PWD.getResult());
         }
         //校验验证码
-        String kaptchaCode = httpSession.getAttribute(Constants.MALL_VERIFY_CODE_KEY) + "";
+        String kaptchaCode = httpServletRequest.getSession().getAttribute(Constants.Registe_Verify) + "";
         if (StringUtils.isBlank(registerFirstDto.getValidCode())
                 || !registerFirstDto.getValidCode().equals(kaptchaCode)) {
             return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_ERROR.getResult());

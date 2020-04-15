@@ -3,10 +3,13 @@ package ltd.newbee.mall.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
+import ltd.newbee.mall.dto.ProfileDto;
 import ltd.newbee.mall.dto.RegisterFirstDto;
 import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.dao.TbUserDao;
+import ltd.newbee.mall.entity.TbUserAddr;
 import ltd.newbee.mall.entity.TbUserProfile;
+import ltd.newbee.mall.service.TbUserAddrService;
 import ltd.newbee.mall.service.TbUserProfileService;
 import ltd.newbee.mall.service.TbUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +19,7 @@ import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.netty.util.internal.StringUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.plugin.util.UserProfile;
@@ -37,6 +41,8 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
     private HttpSession httpSession;
     @Autowired
     private TbUserProfileService profileService;
+    @Autowired
+    private TbUserAddrService userAddrService;
     @Override
     public Result register(RegisterFirstDto registerFirstDto) {
         if(registerFirstDto==null|| StringUtils.isBlank(registerFirstDto.getLoginName())){
@@ -75,6 +81,55 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         profile.setCreateTime(new Date());
         profileService.save(profile);
 
+        Result<Long> result= ResultGenerator.genSuccessResult();
+        result.setData(user.getUserId());
+        return result;
+    }
+
+    @Override
+    public Result updateUserProfile(ProfileDto dto) {
+        if(dto==null||dto.getUserId()==null){
+            return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
+        }
+        TbUserProfile tbUserProfile=new TbUserProfile();
+        BeanUtils.copyProperties(dto, tbUserProfile);
+        profileService.update(tbUserProfile, new QueryWrapper<TbUserProfile>()
+                .eq("user_id",dto.getUserId()));
+
+        TbUserAddr tbUserAddr=new TbUserAddr();
+        tbUserAddr.setProvince(dto.getDeliveryProv());
+        tbUserAddr.setCity(dto.getDeliveryCity());
+        tbUserAddr.setArea(dto.getDeliveryArea());
+        tbUserAddr.setDetail(dto.getDeliveryDetail());
+        tbUserAddr.setPhone(dto.getDeliveryPhone());
+        tbUserAddr.setUserId(dto.getUserId());
+        userAddrService.update(tbUserAddr,new QueryWrapper<TbUserAddr>()
+                .eq("user_id",dto.getUserId()));
         return ResultGenerator.genSuccessResult();
+    }
+
+    @Override
+    public Result getProfile(Long userId) {
+        if(userId==null){
+            return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
+        }
+        TbUserProfile tbUserProfile=profileService.getOne(
+                new QueryWrapper<TbUserProfile>().eq("user_id",userId)
+        );
+        TbUserAddr tbUserAddr=userAddrService.getOne(
+                new QueryWrapper<TbUserAddr>().eq("user_id",userId)
+        );
+        ProfileDto profileDto=new ProfileDto();
+        BeanUtils.copyProperties(tbUserProfile, profileDto);
+        if(tbUserAddr!=null){
+            profileDto.setDeliveryProv(tbUserAddr.getProvince());
+            profileDto.setDeliveryCity(tbUserAddr.getCity());
+            profileDto.setDeliveryArea(tbUserAddr.getArea());
+            profileDto.setDeliveryDetail(tbUserAddr.getDetail());
+            profileDto.setDeliveryPhone(tbUserAddr.getPhone());
+        }
+        Result<ProfileDto> result= ResultGenerator.genSuccessResult();
+        result.setData(profileDto);
+        return result;
     }
 }

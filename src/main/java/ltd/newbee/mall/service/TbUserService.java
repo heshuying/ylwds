@@ -1,5 +1,6 @@
 package ltd.newbee.mall.service;
 
+import ltd.newbee.mall.dto.ProfileDto;
 import ltd.newbee.mall.dto.RegisterFirstDto;
 import ltd.newbee.mall.entity.TbUser;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -15,4 +16,8 @@ import ltd.newbee.mall.util.Result;
  */
 public interface TbUserService extends IService<TbUser> {
     public Result register(RegisterFirstDto registerFirstDto);
+
+    public Result updateUserProfile(ProfileDto dto);
+
+    public Result getProfile(Long userId);
 }

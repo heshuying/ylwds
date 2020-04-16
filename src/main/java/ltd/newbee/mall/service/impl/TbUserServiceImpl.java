@@ -53,7 +53,13 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_PWD.getResult());
         }
         //校验验证码
-        String kaptchaCode = httpServletRequest.getSession().getAttribute(Constants.Registe_Verify) + "";
+        String kaptchaCode = "";
+        if(Const.UserType.Cus_Company.getKey().equals(registerFirstDto.getUserType())){
+            kaptchaCode=httpServletRequest.getSession().getAttribute(Constants.MALL_VERIFY_CODE_KEY) + "";
+        }else{
+            kaptchaCode= httpServletRequest.getSession().getAttribute(Constants.Manage_Verify_Code) + "";
+        }
+
         if (StringUtils.isBlank(registerFirstDto.getValidCode())
                 || !registerFirstDto.getValidCode().equals(kaptchaCode)) {
             return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_ERROR.getResult());
@@ -102,6 +108,10 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             user.setCellphone(dto.getRegCellphone());
             baseMapper.updateById(user);
         }
+
+        TbUserAddr existUserAddr=userAddrService.getOne(
+                new QueryWrapper<TbUserAddr>().eq("user_id",dto.getUserId())
+        );
         TbUserAddr tbUserAddr=new TbUserAddr();
         tbUserAddr.setProvince(dto.getDeliveryProv());
         tbUserAddr.setCity(dto.getDeliveryCity());
@@ -109,8 +119,15 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         tbUserAddr.setDetail(dto.getDeliveryDetail());
         tbUserAddr.setPhone(dto.getDeliveryPhone());
         tbUserAddr.setUserId(dto.getUserId());
-        userAddrService.update(tbUserAddr,new QueryWrapper<TbUserAddr>()
-                .eq("user_id",dto.getUserId()));
+        tbUserAddr.setAcceptor(dto.getAcceptor());
+        if(existUserAddr==null){
+            userAddrService.save(tbUserAddr);
+        }else{
+            tbUserAddr.setAddrId(existUserAddr.getAddrId());
+            userAddrService.updateById(tbUserAddr);
+        }
+
+
         return ResultGenerator.genSuccessResult();
     }
 
@@ -133,6 +150,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             profileDto.setDeliveryArea(tbUserAddr.getArea());
             profileDto.setDeliveryDetail(tbUserAddr.getDetail());
             profileDto.setDeliveryPhone(tbUserAddr.getPhone());
+            profileDto.setAcceptor(tbUserAddr.getAcceptor());
         }
         Result<ProfileDto> result= ResultGenerator.genSuccessResult();
         result.setData(profileDto);

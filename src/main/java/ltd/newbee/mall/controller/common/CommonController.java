@@ -43,7 +43,7 @@ public class CommonController {
         try {
             //生产验证码字符串并保存到session中
             String verifyCode = captchaProducer.createText();
-            httpServletRequest.getSession().setAttribute(Constants.Registe_Verify, verifyCode);
+            httpServletRequest.getSession().setAttribute(Constants.Manage_Verify_Code, verifyCode);
             BufferedImage challenge = captchaProducer.createImage(verifyCode);
             ImageIO.write(challenge, "jpg", imgOutputStream);
         } catch (IllegalArgumentException e) {

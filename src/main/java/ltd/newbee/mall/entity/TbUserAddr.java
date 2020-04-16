@@ -61,6 +61,11 @@ public class TbUserAddr extends Model<TbUserAddr> {
     private String phone;
 
     /**
+     * 收货人
+     */
+    private String acceptor;
+
+    /**
      * 状态
      */
     private Integer status;

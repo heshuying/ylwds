@@ -141,4 +141,9 @@ public class ProfileDto {
      * 收货地址-收货人手机号
      */
     private String deliveryPhone;
+
+    /**
+     * 收货人
+     */
+    private String acceptor;
 }

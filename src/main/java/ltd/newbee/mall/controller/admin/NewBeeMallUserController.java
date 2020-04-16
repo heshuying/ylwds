@@ -1,29 +1,32 @@
 package ltd.newbee.mall.controller.admin;
 
 import ltd.newbee.mall.service.NewBeeMallUserService;
+import ltd.newbee.mall.service.TbUserService;
 import ltd.newbee.mall.util.PageQueryUtil;
+import ltd.newbee.mall.util.PageUtils;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Map;
 
-/**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
- */
 @Controller
 @RequestMapping("/admin")
 public class NewBeeMallUserController {
 
     @Resource
     private NewBeeMallUserService newBeeMallUserService;
+
+   @Autowired
+   private TbUserService userService;
+
 
     @GetMapping("/users")
     public String usersPage(HttpServletRequest request) {
@@ -40,26 +43,23 @@ public class NewBeeMallUserController {
         if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallUserService.getNewBeeMallUsersPage(pageUtil));
+        PageUtils pageUtil= userService.queryUserList(params);
+        return ResultGenerator.genSuccessResult(pageUtil);
     }
 
     /**
-     * 用户禁用与解除禁用(0-未锁定 1-已锁定)
+     * 用户禁用与解除禁用(1-正常 4-已锁定)
      */
     @RequestMapping(value = "/users/lock/{lockStatus}", method = RequestMethod.POST)
     @ResponseBody
-    public Result delete(@RequestBody Integer[] ids, @PathVariable int lockStatus) {
+    public Result delete(@RequestBody Long[] ids, @PathVariable Integer lockStatus) {
         if (ids.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        if (lockStatus != 0 && lockStatus != 1) {
+        if (lockStatus != 1 && lockStatus != 4) {
             return ResultGenerator.genFailResult("操作非法！");
         }
-        if (newBeeMallUserService.lockUsers(ids, lockStatus)) {
-            return ResultGenerator.genSuccessResult();
-        } else {
-            return ResultGenerator.genFailResult("禁用失败");
-        }
+        userService.updateUserStatus(lockStatus, Arrays.asList(ids));
+        return ResultGenerator.genSuccessResult();
     }
 }

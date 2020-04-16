@@ -42,6 +42,35 @@ public class Const {
         }
     }
 
+    public static enum UserType {
+        Cus_Person("01"),
+        Cus_Company("02"),
+        Plateform("03"),
+        Supplier("04");
+        private String key;
+        UserType(String key){
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+
+        public static UserType getByKey(String key){
+            for(UserType type: UserType.values()){
+                if(type.getKey()==key){
+                    return type;
+                }
+            }
+            return null;
+        }
+    }
+
     public static enum UserStatus {
         Uncheck(0),
         Normal(1),

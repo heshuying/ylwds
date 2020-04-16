@@ -25,8 +25,8 @@ public class Constants {
 
     public final static int SHOPPING_CART_ITEM_LIMIT_NUMBER = 5;//购物车中单个商品的最大购买数量(可根据自身需求修改)
 
-    public final static String MALL_VERIFY_CODE_KEY = "mallVerifyCode";//验证码key
-    public final static String Registe_Verify = "Registe_Verify";//验证码key
+    public final static String MALL_VERIFY_CODE_KEY = "mallVerifyCode";//会员页面验证码
+    public final static String Manage_Verify_Code = "manaVerifyCode";//管理系统验证码
 
     public final static String MALL_USER_SESSION_KEY = "newBeeMallUser";//session中user的key
 
@@ -36,5 +36,21 @@ public class Constants {
 
     public final static int SELL_STATUS_UP = 0;//商品上架状态
     public final static int SELL_STATUS_DOWN = 1;//商品下架状态
+    /**
+     * 当前页码
+     */
+    public static final String PAGE = "page";
+    /**
+     * 每页显示记录数
+     */
+    public static final String LIMIT = "limit";
 
+    /**
+     * 排序方式
+     */
+    public static final String ORDER = "order";
+    /**
+     *  升序
+     */
+    public static final String ASC = "asc";
 }

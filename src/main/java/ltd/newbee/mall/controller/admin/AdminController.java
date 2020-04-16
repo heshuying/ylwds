@@ -1,9 +1,15 @@
 package ltd.newbee.mall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.entity.AdminUser;
+import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.service.AdminUserService;
 
+import ltd.newbee.mall.service.TbUserService;
+import ltd.newbee.mall.util.MD5Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +18,15 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-/**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
- */
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     @Resource
     private AdminUserService adminUserService;
+
+    @Autowired
+    private TbUserService userService;
 
     @GetMapping({"/login"})
     public String login() {
@@ -61,22 +64,34 @@ public class AdminController {
             session.setAttribute("errorMsg", "用户名或密码不能为空");
             return "admin/login";
         }
-        String kaptchaCode = session.getAttribute("verifyCode") + "";
+        String kaptchaCode = session.getAttribute(Constants.Manage_Verify_Code) + "";
         if (StringUtils.isEmpty(kaptchaCode) || !verifyCode.equals(kaptchaCode)) {
             session.setAttribute("errorMsg", "验证码错误");
             return "admin/login";
         }
-        AdminUser adminUser = adminUserService.login(userName, password);
-        if (adminUser != null) {
-            session.setAttribute("loginUser", adminUser.getNickName());
-            session.setAttribute("loginUserId", adminUser.getAdminUserId());
-            //session过期时间设置为7200秒 即两小时
-            //session.setMaxInactiveInterval(60 * 60 * 2);
-            return "redirect:/admin/index";
-        } else {
-            session.setAttribute("errorMsg", "登陆失败，请联系作者获得测试账号");
+        TbUser adminUser = userService.getOne(new QueryWrapper<TbUser>()
+        .eq("login_name",userName)
+        .eq("password_md5", MD5Util.MD5Encode(password, "UTF-8"))
+        .in("user_type",new String[]{"03","04"}));
+
+        if (adminUser == null) {
+            session.setAttribute("errorMsg", "用户名或密码错误");
             return "admin/login";
         }
+        if(adminUser.getUserStatus()==4) {
+            session.setAttribute("errorMsg", "用户名或密码错误");
+            return "admin/login";
+        }
+        if(adminUser.getUserStatus()==2) {
+            session.setAttribute("errorMsg", "用户已被锁定");
+            return "admin/login";
+        }
+        session.setAttribute("loginUser", adminUser.getNickName());
+        session.setAttribute("loginUserId", adminUser.getUserId());
+        //session过期时间设置为7200秒 即两小时
+        //session.setMaxInactiveInterval(60 * 60 * 2);
+        return "redirect:/admin/index";
+
     }
 
     @GetMapping("/profile")

@@ -3,6 +3,9 @@ package ltd.newbee.mall.service.impl;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallSearchGoodsVO;
 import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
+import ltd.newbee.mall.dao.TbUserDao;
+import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
+import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.service.NewBeeMallGoodsService;
 import ltd.newbee.mall.util.BeanUtil;
@@ -21,10 +24,12 @@ public class NewBeeMallGoodsServiceImpl implements NewBeeMallGoodsService {
 
     @Autowired
     private NewBeeMallGoodsMapper goodsMapper;
+    @Autowired
+    private TbUserDao tbUserDao;
 
     @Override
     public PageResult getNewBeeMallGoodsPage(PageQueryUtil pageUtil) {
-        List<NewBeeMallGoods> goodsList = goodsMapper.findNewBeeMallGoodsList(pageUtil);
+        List<GoodsAndCompayResDTO> goodsList = goodsMapper.findNewBeeMallGoodsList(pageUtil);
         int total = goodsMapper.getTotalNewBeeMallGoods(pageUtil);
         PageResult pageResult = new PageResult(goodsList, total, pageUtil.getLimit(), pageUtil.getPage());
         return pageResult;
@@ -91,5 +96,13 @@ public class NewBeeMallGoodsServiceImpl implements NewBeeMallGoodsService {
         }
         PageResult pageResult = new PageResult(newBeeMallSearchGoodsVOS, total, pageUtil.getLimit(), pageUtil.getPage());
         return pageResult;
+    }
+
+    @Override
+    public List<UserListDto> queryCompanyNameList(){
+        UserListDto dto = new UserListDto();
+        dto.setUserType("04");
+        dto.setUserStatus(1);
+        return tbUserDao.queryCompanyNameList(dto);
     }
 }

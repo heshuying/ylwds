@@ -1,5 +1,6 @@
 package ltd.newbee.mall.service;
 
+import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
@@ -62,4 +63,6 @@ public interface NewBeeMallGoodsService {
      * @return
      */
     PageResult searchNewBeeMallGoods(PageQueryUtil pageUtil);
+
+    List<UserListDto> queryCompanyNameList();
 }

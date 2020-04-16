@@ -1,5 +1,6 @@
 package ltd.newbee.mall.controller.admin;
 
+import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.entity.AdminUser;
 import ltd.newbee.mall.service.AdminUserService;
@@ -61,7 +62,7 @@ public class AdminController {
             session.setAttribute("errorMsg", "用户名或密码不能为空");
             return "admin/login";
         }
-        String kaptchaCode = session.getAttribute("verifyCode") + "";
+        String kaptchaCode = session.getAttribute(Constants.Manage_Verify_Code) + "";
         if (StringUtils.isEmpty(kaptchaCode) || !verifyCode.equals(kaptchaCode)) {
             session.setAttribute("errorMsg", "验证码错误");
             return "admin/login";

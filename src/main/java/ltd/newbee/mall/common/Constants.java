@@ -36,5 +36,21 @@ public class Constants {
 
     public final static int SELL_STATUS_UP = 0;//商品上架状态
     public final static int SELL_STATUS_DOWN = 1;//商品下架状态
+    /**
+     * 当前页码
+     */
+    public static final String PAGE = "page";
+    /**
+     * 每页显示记录数
+     */
+    public static final String LIMIT = "limit";
 
+    /**
+     * 排序方式
+     */
+    public static final String ORDER = "order";
+    /**
+     *  升序
+     */
+    public static final String ASC = "asc";
 }

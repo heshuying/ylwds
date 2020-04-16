@@ -1,10 +1,12 @@
 package ltd.newbee.mall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.dto.ProfileDto;
 import ltd.newbee.mall.dto.RegisterFirstDto;
+import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.dao.TbUserDao;
 import ltd.newbee.mall.entity.TbUserAddr;
@@ -15,18 +17,19 @@ import ltd.newbee.mall.service.TbUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ltd.newbee.mall.util.Const;
 import ltd.newbee.mall.util.MD5Util;
+import ltd.newbee.mall.util.PageUtils;
+import ltd.newbee.mall.util.Query;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.netty.util.internal.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.plugin.util.UserProfile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -155,5 +158,29 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         Result<ProfileDto> result= ResultGenerator.genSuccessResult();
         result.setData(profileDto);
         return result;
+    }
+
+    @Override
+    public PageUtils queryUserList(Map<String, Object> params) {
+        UserListDto queryDto =new UserListDto();
+        if(params.containsKey("loginName")){
+            queryDto.setLoginName((String) params.get("loginName"));
+        }
+        if(params.containsKey("userType")){
+            queryDto.setUserType((String) params.get("userType"));
+        }
+        if(params.containsKey("userStatus")){
+            queryDto.setUserStatus(Integer.valueOf((String)params.get("userStatus")));
+        }
+        IPage<UserListDto> result= baseMapper.queryUser(
+                new Query<UserListDto>().getPage(params),
+                queryDto);
+
+        return new PageUtils(result);
+    }
+
+    @Override
+    public Integer updateUserStatus(Integer userStatus, List<Long> userIds) {
+        return baseMapper.updateUserStatus(userStatus, userIds);
     }
 }

@@ -31,7 +31,8 @@ public class NewBeeMallUserController {
     @GetMapping("/users")
     public String usersPage(HttpServletRequest request) {
         request.setAttribute("path", "users");
-        return "admin/newbee_mall_user";
+        // return "admin/newbee_mall_user";
+        return "admin/userManage";
     }
 
     /**

@@ -14,15 +14,15 @@ public enum GoodsStatusEnum {
     OFF_INSTORE(6, "已下架仓库中");
 
 
-    private int goodsStatus;
+    private Integer goodsStatus;
     private String name;
 
-    GoodsStatusEnum(int goodsStatus, String name){
+    GoodsStatusEnum(Integer goodsStatus, String name){
         this.goodsStatus = goodsStatus;
         this.name = name;
     }
 
-    public int getGoodsStatus() {
+    public Integer getGoodsStatus() {
         return goodsStatus;
     }
 

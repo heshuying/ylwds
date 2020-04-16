@@ -1,6 +1,8 @@
 package ltd.newbee.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ltd.newbee.mall.common.GoodsStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -18,11 +20,11 @@ public class NewBeeMallGoods {
 
     private String goodsCarousel;
 
-    private BigDecimal originalPrice;
+    private Integer originalPrice;
 
-    private BigDecimal sellingPrice;
-    private BigDecimal  profit;
-    private BigDecimal  price;
+    private Integer sellingPrice;
+    private Integer profit;
+    private Integer price;
     private Integer stockNum;
 
     private String tag;
@@ -66,9 +68,66 @@ public class NewBeeMallGoods {
     /**
      * 上架时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date onlineTime;
 
     private String goodsDetailContent;
+
+    /**
+     * 商品状态显示（平台方）
+     * @return
+     */
+    public String getGoodsStatusPT(){
+        if(this.getGoodsSellStatus() == null){
+            return "";
+        }
+
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "/";
+        }
+        if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "待上架";
+        }
+        if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "销售中";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "待下架";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+            return "前端下架";
+        }
+        if(GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+            return "已下架";
+        }
+
+        return "";
+    }
+
+    /**
+     * 商品状态显示（资源方）
+     * @return
+     */
+    public String getGoodsStatusZYF(){
+        if(this.getGoodsSellStatus() == null){
+            return "";
+        }
+
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+            return "仓库中";
+        }
+        if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "审核中";
+        }
+        if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "销售中";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+            return "下架中";
+        }
+
+        return "";
+    }
 
     public Long getGoodsId() {
         return goodsId;
@@ -274,39 +333,39 @@ public class NewBeeMallGoods {
         this.onlineTime = onlineTime;
     }
 
-    public BigDecimal getOriginalPrice() {
+    public Integer getGoodsSellStatus() {
+        return goodsSellStatus;
+    }
+
+    public Integer getOriginalPrice() {
         return originalPrice;
     }
 
-    public void setOriginalPrice(BigDecimal originalPrice) {
+    public void setOriginalPrice(Integer originalPrice) {
         this.originalPrice = originalPrice;
     }
 
-    public BigDecimal getSellingPrice() {
+    public Integer getSellingPrice() {
         return sellingPrice;
     }
 
-    public void setSellingPrice(BigDecimal sellingPrice) {
+    public void setSellingPrice(Integer sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 
-    public BigDecimal getProfit() {
+    public Integer getProfit() {
         return profit;
     }
 
-    public void setProfit(BigDecimal profit) {
+    public void setProfit(Integer profit) {
         this.profit = profit;
     }
 
-    public BigDecimal getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Integer price) {
         this.price = price;
-    }
-
-    public Integer getGoodsSellStatus() {
-        return goodsSellStatus;
     }
 }

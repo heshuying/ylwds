@@ -83,6 +83,8 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
+logging:
+  config: classpath:log/log-config-dev.xml
 
 kjt:
   payeeidentity: 200001725622

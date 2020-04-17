@@ -1,6 +1,7 @@
 package ltd.newbee.mall.controller.admin;
 
 import ltd.newbee.mall.common.Constants;
+import ltd.newbee.mall.common.GoodsStatusEnum;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.dto.UserListDto;
@@ -132,7 +133,8 @@ public class NewBeeMallGoodsController {
     }
 
     /**
-     * goodsStatus=1,2&limit=20&page=1&sidx=saleTotal&order=asc
+     * tab: waiton, waitdown, selling, havedown
+     * tab=categoryId=15&goodsStatus=1,2&companyName=莫某公司&limit=20&page=1&sidx=saleTotal&order=asc
      * 列表
      */
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
@@ -145,6 +147,22 @@ public class NewBeeMallGoodsController {
         if(!StringUtils.isEmpty(goodsStatus)){
             params.put("statusList", Arrays.asList(goodsStatus.split(",")));
         }
+        String tab = (String)params.get("tab");
+        if(!StringUtils.isEmpty(tab)){
+            if("waitOn".equalsIgnoreCase(tab)){
+                params.put("statusList", Arrays.asList(GoodsStatusEnum.AUDITTING.getGoodsStatus()));
+            }else if("waitDown".equalsIgnoreCase(tab)){
+                params.put("statusList", Arrays.asList(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus(), GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus()));
+            }else if("selling".equalsIgnoreCase(tab)){
+                params.put("statusList", Arrays.asList(GoodsStatusEnum.SELLING.getGoodsStatus(),GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus(), GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus()));
+            }else if("havedown".equalsIgnoreCase(tab)){
+                params.put("statusList", Arrays.asList(GoodsStatusEnum.OFF_INSTORE.getGoodsStatus()));
+            }
+        }
+        if(!StringUtils.isEmpty(params.get("categoryId"))){
+            params.put("categoryIdList", newBeeMallCategoryService.getThirdLevelByFirstLevelId(Long.valueOf((String)params.get("categoryId"))));
+        }
+
         PageQueryUtil pageUtil = new PageQueryUtil(params);
         return ResultGenerator.genSuccessResult(newBeeMallGoodsService.getNewBeeMallGoodsPage(pageUtil));
     }

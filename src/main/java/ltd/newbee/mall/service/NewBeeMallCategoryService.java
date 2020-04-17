@@ -48,4 +48,6 @@ public interface NewBeeMallCategoryService {
      * @return
      */
     List<GoodsCategory> selectByLevelAndParentIdsAndNumber(List<Long> parentIds, int categoryLevel);
+
+    List<Long> getThirdLevelByFirstLevelId(Long categoryId);
 }

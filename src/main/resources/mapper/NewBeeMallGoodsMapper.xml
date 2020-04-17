@@ -85,59 +85,70 @@
         g.goods_id, g.goods_name, g.goods_intro, g.goods_category_id, g.goods_cover_img, g.goods_carousel, g.original_price,
         g.selling_price, g.transit_money, g.stock_num, g.sale_total, g.goods_sno, g.tag, g.gooods_attribute, g.goods_sell_status, g.create_sno,
         g.msg_offline, g.msg_reject, g.price, g.profit, g.online_time, g.user_id, p.company_name
-        from tb_goods_info g left join tb_user u on g.user_id = u.user_id join tb_user_profile p on p.user_id = u.user_id
+        from tb_goods_info g
+        left join tb_user u on g.user_id = u.user_id
+        join tb_user_profile p on p.user_id = u.user_id
         <where>
             <if test="goodsName!=null and goodsName!=''">
-                and goods_name like CONCAT('%','#{goodsName}','%')
+                and g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="companyName!=null and companyName!=''">
+                and p.company_name like CONCAT('%',#{companyName},'%')
             </if>
             <if test="statusList!=null and statusList.size > 0">
-                and goods_sell_status in
+                and g.goods_sell_status in
                 <foreach item="statusValue" collection="statusList" open="(" separator="," close=")">
                     #{statusValue}
                 </foreach>
             </if>
+            <if test="categoryIdList!=null and categoryIdList.size > 0">
+                and g.goods_category_id in
+                <foreach item="categoryId" collection="categoryIdList" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
 
             <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
+                and g.create_time &gt; #{startTime}
             </if>
             <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
+                and g.create_time &lt; #{endTime}
             </if>
         </where>
         <if test="sidx!=null and sidx=='stockNum'">
             <if test="order == 'asc'">
-                order by stock_num asc
+                order by g.stock_num asc
             </if>
             <if test="order == 'desc'">
-                order by stock_num desc
+                order by g.stock_num desc
             </if>
         </if>
         <if test="sidx!=null and sidx=='saleTotal'">
             <if test="order == 'asc'">
-                order by sale_total asc
+                order by g.sale_total asc
             </if>
             <if test="order == 'desc'">
-                order by sale_total desc
+                order by g.sale_total desc
             </if>
         </if>
         <if test="sidx!=null and sidx=='onlineTime'">
             <if test="order == 'asc'">
-                order by online_time asc
+                order by g.online_time asc
             </if>
             <if test="order == 'desc'">
-                order by online_time desc
+                order by g.online_time desc
             </if>
         </if>
         <if test="sidx!=null and sidx=='price'">
             <if test="order == 'asc'">
-                order by price asc
+                order by g.price asc
             </if>
             <if test="order == 'desc'">
-                order by price desc
+                order by g.price desc
             </if>
         </if>
         <if test="sidx==null or sidx==''">
-            order by goods_id desc
+            order by g.goods_id desc
         </if>
 
         <if test="start!=null and limit!=null">
@@ -205,23 +216,35 @@
         );
     </select>
     <select id="getTotalNewBeeMallGoods" parameterType="Map" resultType="int">
-        select count(*) from tb_goods_info
+        select count(*)
+        from tb_goods_info g
+        left join tb_user u on g.user_id = u.user_id
+        join tb_user_profile p on p.user_id = u.user_id
         <where>
             <if test="goodsName!=null and goodsName!=''">
-                and goods_name like CONCAT('%','#{goodsName}','%')
+                and g.goods_name like CONCAT('%',#{goodsName},'%')
+            </if>
+            <if test="companyName!=null and companyName!=''">
+                and p.company_name like CONCAT('%',#{companyName},'%')
             </if>
             <if test="statusList!=null and statusList.size > 0">
-                and goods_sell_status in
+                and g.goods_sell_status in
                 <foreach item="statusValue" collection="statusList" open="(" separator="," close=")">
                     #{statusValue}
                 </foreach>
             </if>
+            <if test="categoryIdList!=null and categoryIdList.size > 0">
+                and g.goods_category_id in
+                <foreach item="categoryId" collection="categoryIdList" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
 
             <if test="startTime != null and startTime.trim() != ''">
-                and create_time &gt; #{startTime}
+                and g.create_time &gt; #{startTime}
             </if>
             <if test="endTime != null and endTime.trim() != ''">
-                and create_time &lt; #{endTime}
+                and g.create_time &lt; #{endTime}
             </if>
         </where>
     </select>

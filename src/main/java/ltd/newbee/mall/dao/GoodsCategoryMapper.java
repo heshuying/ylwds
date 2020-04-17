@@ -5,6 +5,7 @@ import ltd.newbee.mall.util.PageQueryUtil;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GoodsCategoryMapper {
     int deleteByPrimaryKey(Long categoryId);
@@ -28,4 +29,6 @@ public interface GoodsCategoryMapper {
     int deleteBatch(Integer[] ids);
 
     List<GoodsCategory> selectByLevelAndParentIdsAndNumber(@Param("parentIds") List<Long> parentIds, @Param("categoryLevel") int categoryLevel, @Param("number") int number);
+
+    List<Long> getThirdLevelByFirstLevelId( @Param("categoryId") Long categoryId);
 }

@@ -13,6 +13,7 @@ import ltd.newbee.mall.service.NewBeeMallCategoryService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -155,5 +156,10 @@ public class NewBeeMallCategoryServiceImpl implements NewBeeMallCategoryService 
     @Override
     public List<GoodsCategory> selectByLevelAndParentIdsAndNumber(List<Long> parentIds, int categoryLevel) {
         return goodsCategoryMapper.selectByLevelAndParentIdsAndNumber(parentIds, categoryLevel, 0);//0代表查询所有
+    }
+
+    @Override
+    public List<Long> getThirdLevelByFirstLevelId(Long categoryId){
+        return goodsCategoryMapper.getThirdLevelByFirstLevelId(categoryId);
     }
 }

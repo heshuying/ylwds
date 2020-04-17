@@ -40,7 +40,7 @@
             <if test='dto.userType!=null and dto.userType!=""'>
                 and tu.user_type=#{dto.userType}
             </if>
-            <if test='dto.userStatus!=null and dto.userStatus!=""'>
+            <if test='dto.userStatus!=null'>
                 and tu.user_status=#{dto.userStatus}
             </if>
 

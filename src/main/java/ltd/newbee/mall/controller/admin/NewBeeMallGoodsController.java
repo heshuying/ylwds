@@ -176,14 +176,12 @@ public class NewBeeMallGoodsController {
     @ResponseBody
     public Result save(@RequestBody NewBeeMallGoods newBeeMallGoods) {
         if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsIntro())
-                || StringUtils.isEmpty(newBeeMallGoods.getTag())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())
-                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
                 || Objects.isNull(newBeeMallGoods.getSellingPrice())
+                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
                 || Objects.isNull(newBeeMallGoods.getStockNum())
                 || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
+//                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -205,14 +203,12 @@ public class NewBeeMallGoodsController {
     public Result update(@RequestBody NewBeeMallGoods newBeeMallGoods) {
         if (Objects.isNull(newBeeMallGoods.getGoodsId())
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsIntro())
-                || StringUtils.isEmpty(newBeeMallGoods.getTag())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())
                 || Objects.isNull(newBeeMallGoods.getSellingPrice())
                 || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
                 || Objects.isNull(newBeeMallGoods.getStockNum())
                 || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
+//                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -242,7 +238,7 @@ public class NewBeeMallGoodsController {
      */
     @RequestMapping(value = "/goods/status/{sellStatus}", method = RequestMethod.PUT)
     @ResponseBody
-    public Result delete(@RequestBody GoodsStatusUpdateReqDTO requestBean, @PathVariable("sellStatus") Integer sellStatus) {
+    public Result statusUpdate(@RequestBody GoodsStatusUpdateReqDTO requestBean, @PathVariable("sellStatus") Integer sellStatus) {
         if (requestBean.getIds().length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }

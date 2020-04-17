@@ -42,7 +42,7 @@
                 and tu.user_type=#{dto.userType}
             </when>
             <otherwise>
-                and user_type in('02','04')
+                and tu.user_type in('02','04')
             </otherwise>
         </choose>
             <if test='dto.userType!=null and dto.userType!=""'>

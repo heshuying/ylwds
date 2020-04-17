@@ -33,13 +33,22 @@
         select tu.user_id, tu.login_name,tu.user_type,tu.user_status,'' as mdm_code,
         tup.company_name,tup.contactor,tup.contactor_phone from tb_user tu
         join tb_user_profile tup on tu.user_id=tup.user_id
-        where user_type in('02','04')
+        where 1=1
             <if test='dto.loginName!=null and dto.loginName!=""'>
                 and tu.login_name like CONCAT('%',#{dto.loginName},'%')
             </if>
+        <choose>
+            <when test='dto.userType!=null and dto.userType!=""'>
+                and tu.user_type=#{dto.userType}
+            </when>
+            <otherwise>
+                and user_type in('02','04')
+            </otherwise>
+        </choose>
             <if test='dto.userType!=null and dto.userType!=""'>
                 and tu.user_type=#{dto.userType}
             </if>
+
             <if test='dto.userStatus!=null'>
                 and tu.user_status=#{dto.userStatus}
             </if>

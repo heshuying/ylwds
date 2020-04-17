@@ -57,9 +57,6 @@ public class NewBeeMallUserController {
         if (ids.length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        if (lockStatus != 1 && lockStatus != 4) {
-            return ResultGenerator.genFailResult("操作非法！");
-        }
         userService.updateUserStatus(lockStatus, Arrays.asList(ids));
         return ResultGenerator.genSuccessResult();
     }

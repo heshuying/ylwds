@@ -1,15 +1,15 @@
-package ltd.newbee.mall.entity;
+package ltd.newbee.mall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ltd.newbee.mall.common.GoodsStatusEnum;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class NewBeeMallGoods {
+public class GoodsAndCompayResDTO {
     private Long goodsId;
 
+    private Long userId;
     private String goodsName;
 
     private String goodsIntro;
@@ -35,7 +35,6 @@ public class NewBeeMallGoods {
      */
     private Integer goodsSellStatus;
 
-    private Integer createUser;
     /**
      * 运费
      */
@@ -58,13 +57,6 @@ public class NewBeeMallGoods {
      */
     private String msgReject;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime;
-
-    private Integer updateUser;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime;
     /**
      * 上架时间
      */
@@ -72,6 +64,64 @@ public class NewBeeMallGoods {
     private Date onlineTime;
 
     private String goodsDetailContent;
+
+    private String companyName;
+
+    /**
+     * 商品状态显示（平台方）
+     * @return
+     */
+    public String getGoodsStatusPT(){
+        if(this.getGoodsSellStatus() == null){
+            return "";
+        }
+
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "/";
+        }
+        if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "待上架";
+        }
+        if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "销售中";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "待下架";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+            return "前端下架";
+        }
+        if(GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+            return "已下架";
+        }
+
+        return "";
+    }
+
+    /**
+     * 商品状态显示（资源方）
+     * @return
+     */
+    public String getGoodsStatusZYF(){
+        if(this.getGoodsSellStatus() == null){
+            return "";
+        }
+
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+            return "仓库中";
+        }
+        if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "审核中";
+        }
+        if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
+            return "销售中";
+        }
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+            return "下架中";
+        }
+
+        return "";
+    }
 
     public Long getGoodsId() {
         return goodsId;
@@ -135,38 +185,6 @@ public class NewBeeMallGoods {
 
     public void setTag(String tag) {
         this.tag = tag == null ? null : tag.trim();
-    }
-
-    public Integer getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(Integer createUser) {
-        this.createUser = createUser;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(Integer updateUser) {
-        this.updateUser = updateUser;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     public String getGoodsDetailContent() {
@@ -281,35 +299,19 @@ public class NewBeeMallGoods {
         this.price = price;
     }
 
-    @Override
-    public String toString() {
-        return "NewBeeMallGoods{" +
-                "goodsId=" + goodsId +
-                ", goodsName='" + goodsName + '\'' +
-                ", goodsIntro='" + goodsIntro + '\'' +
-                ", goodsCategoryId=" + goodsCategoryId +
-                ", goodsCoverImg='" + goodsCoverImg + '\'' +
-                ", goodsCarousel='" + goodsCarousel + '\'' +
-                ", originalPrice=" + originalPrice +
-                ", sellingPrice=" + sellingPrice +
-                ", profit=" + profit +
-                ", price=" + price +
-                ", stockNum=" + stockNum +
-                ", tag='" + tag + '\'' +
-                ", createSno='" + createSno + '\'' +
-                ", goodsSno='" + goodsSno + '\'' +
-                ", goodsSellStatus=" + goodsSellStatus +
-                ", createUser=" + createUser +
-                ", transitMoney=" + transitMoney +
-                ", saleTotal=" + saleTotal +
-                ", gooodsAttribute='" + gooodsAttribute + '\'' +
-                ", msgOffline='" + msgOffline + '\'' +
-                ", msgReject='" + msgReject + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser=" + updateUser +
-                ", updateTime=" + updateTime +
-                ", onlineTime=" + onlineTime +
-                ", goodsDetailContent='" + goodsDetailContent + '\'' +
-                '}';
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

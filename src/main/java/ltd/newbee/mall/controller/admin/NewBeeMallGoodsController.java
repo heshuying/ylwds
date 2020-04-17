@@ -3,6 +3,7 @@ package ltd.newbee.mall.controller.admin;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
+import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
@@ -36,6 +37,18 @@ public class NewBeeMallGoodsController {
 
     @GetMapping("/goods")
     public String goodsPage(HttpServletRequest request) {
+        //查询所有的一级分类
+        List<UserListDto> companyList = newBeeMallGoodsService.queryCompanyNameList();
+        List<GoodsCategory> firstLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(0L), NewBeeMallCategoryLevelEnum.LEVEL_ONE.getLevel());
+        Map<String,String> goodsStatus = new HashMap<>();
+        goodsStatus.put("仓库中", "1,6");
+        goodsStatus.put("审核中", "2");
+        goodsStatus.put("销售中", "3");
+        goodsStatus.put("下架中", "4，5");
+
+        request.setAttribute("companyList", companyList);
+        request.setAttribute("firstLevelCategories", firstLevelCategories);
+        request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
         return "admin/newbee_mall_goods";
     }
@@ -119,6 +132,7 @@ public class NewBeeMallGoodsController {
     }
 
     /**
+     * goodsStatus=1,2&limit=20&page=1&sidx=saleTotal&order=asc
      * 列表
      */
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
@@ -136,6 +150,7 @@ public class NewBeeMallGoodsController {
     }
 
     /**
+     * 选择暂存仓库 goodsSellStatus=1，选择申请上架 goodsSellStatus=2
      * 添加
      */
     @RequestMapping(value = "/goods/save", method = RequestMethod.POST)
@@ -163,6 +178,7 @@ public class NewBeeMallGoodsController {
 
 
     /**
+     * 选择暂存仓库 goodsSellStatus=1，选择申请上架 goodsSellStatus=2
      * 修改
      */
     @RequestMapping(value = "/goods/update", method = RequestMethod.POST)

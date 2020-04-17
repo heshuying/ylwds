@@ -1,5 +1,6 @@
 package ltd.newbee.mall.dao;
 
+import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.entity.StockNumDTO;
 import ltd.newbee.mall.util.PageQueryUtil;
@@ -22,7 +23,7 @@ public interface NewBeeMallGoodsMapper {
 
     int updateByPrimaryKey(NewBeeMallGoods record);
 
-    List<NewBeeMallGoods> findNewBeeMallGoodsList(PageQueryUtil pageUtil);
+    List<GoodsAndCompayResDTO> findNewBeeMallGoodsList(PageQueryUtil pageUtil);
 
     int getTotalNewBeeMallGoods(PageQueryUtil pageUtil);
 

@@ -20,4 +20,6 @@ public interface TbUserDao extends BaseMapper<TbUser> {
     IPage<UserListDto> queryUser(@Param("pg") IPage<?> page, @Param("dto") UserListDto dto);
 
     Integer updateUserStatus(@Param("userStatus")Integer userStatus, @Param("userIds") List<Long> userIds);
+
+    List<UserListDto> queryCompanyNameList(@Param("dto") UserListDto dto);
 }

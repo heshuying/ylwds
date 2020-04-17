@@ -21,6 +21,42 @@
         margin-top: 30px;
         min-height: 440px;
     }
+
+    .dialog-all-div {
+        padding: 0px 10px 10px;
+    }
+
+    .dialog-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .dialog-content-line {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .check-append {
+        color: #477fff;
+        line-height: 40px;
+        margin-right: 10px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-style: normal;
+    }
+
+    .dialog-content-label {
+        width: 100px;
+        text-align: right;
+        margin-right: 15px;
+    }
+
+    .dialog-content-input {
+        width: 350px;
+    }
 </style>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -105,11 +141,9 @@
                                     v-if="activeName=='first'"
                                     size="mini"
                                     type="primary"
-                                    @click="queryRegInfo(scope.row)">核对注册信息</el-button>
-                            <el-button
-                                    v-else
-                                    size="mini"
-                                    @click="handleEdit(scope.$index, scope.row)">{{scope.row.companyName}}</el-button>
+                                    @click="queryRegInfo(scope.row)">核对注册信息
+                            </el-button>
+                            <span v-else>{{scope.row.companyName}}</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -122,16 +156,32 @@
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
                             <el-button
+                                    v-if="activeName=='first'"
                                     size="mini"
-                                    @click="handleEdit(scope.$index, scope.row)">通过</el-button>
+                                    @click="handleUpdate('1', scope.row)">通过
+                            </el-button>
                             <el-button
+                                    v-if="activeName=='first'"
                                     size="mini"
                                     type="danger"
-                                    @click="handleDelete(scope.$index, scope.row)">不通过</el-button>
+                                    @click="handleUpdate('3', scope.row)">不通过
+                            </el-button>
+                            <el-button
+                                    v-if="activeName=='second'"
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleUpdate('4', scope.row)">禁用
+                            </el-button>
+                            <el-button
+                                    v-if="activeName=='third'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="handleUpdate('1', scope.row)">解除禁用
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
-                <div style="text-align: center;margin: 20px 0;">
+                <div style="text-align: center;padding: 20px 0;">
                     <el-pagination
                             background
                             layout="prev, pager, next"
@@ -139,6 +189,217 @@
                             @current-change="current_change">
                     </el-pagination>
                 </div>
+            </div>
+            <!--dialog 区域-->
+            <div>
+                <!--商家模态框-->
+                <el-dialog :visible.sync="busiMoralShow" width="45%" center>
+                    <div class="dialog-all-div">
+                        <div>
+                            <div class="dialog-title">公司基本信息</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">公司全称</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.companyName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">纳税人识别号</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.taxNo"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">注册地址</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.address"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">营业执照</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.compLegalNo">
+                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                    </el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="dialog-title">联系人信息</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">业务联系人</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactor"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">电话</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactorPhone"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">邮箱</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactorEmail"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="dialog-title">银行信息</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">公司全称</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.companyName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">银行账户</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankAccNo"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">开户行名称</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">开户行代码</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankCode"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">财务联系人</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.financer"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">财务联系电话</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.financerPhone"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">供应商承诺书</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.promiseUri">
+                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                    </el-input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--会员模态框-->
+                <el-dialog :visible.sync="customMoralShow" width="45%" center>
+                    <div class="dialog-all-div">
+                        <div>
+                            <div class="dialog-title">联系人信息</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">业务联系人</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactor"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">联系电话</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactorPhone"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">联系邮箱</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.contactorEmail"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="dialog-title">收货地址</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">收货地址</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.deliveryAddress"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">收货人</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.acceptor"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">联系电话</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.deliveryPhone"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="dialog-title">发票信息</div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">发票类型</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.taxTypeName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">公司名称</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.companyName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">纳税人识别号</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.taxNo"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">注册地址</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.address"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">注册电话</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.regCellphone"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">开户账号</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankAccNo"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">开户行</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankName"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">开户行代码</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.bankCode"></el-input>
+                                </div>
+                            </div>
+                            <div class="dialog-content-line">
+                                <div class="dialog-content-label">营业执照附件</div>
+                                <div class="dialog-content-input">
+                                    <el-input readonly v-model="regisInfoAll.compLegalNo">
+                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                    </el-input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -172,8 +433,11 @@
                 tableData: [],
                 multipleSelection: [],
                 total: 0,
-                pagesize:10,
-                currentPage:1
+                pagesize: 10,
+                currentPage: 1,
+                busiMoralShow: false, // 商家模态框
+                customMoralShow: false, // 会员模态框,
+                regisInfoAll: {}
             };
         },
         mounted() {
@@ -189,53 +453,52 @@
                 this.multipleSelection = val;
             },
             // 换页
-            current_change:function(currentPage){
+            current_change: function (currentPage) {
                 this.currentPage = currentPage;
+            },
+            // 会员营业执照下载
+            downloadCustom() {
+                console.log('custom download');
             },
             // 查询表格数据
             queryTableData() {
                 var userStatus = 0;
                 var _this = this;
-                if(this.activeName === 'second') {
+                if (this.activeName === 'second') {
                     userStatus = 1;
-                } else if(this.activeName === 'third') {
+                } else if (this.activeName === 'third') {
                     userStatus = 4;
                 }
                 $.ajax({
-                    url: '/admin/users/list?page='+this.currentPage+'&limit='+this.pagesize+''+'&userStatus='+userStatus+
-                    '&userType='+this.userType+'&loginName='+this.loginName,
+                    url: '/admin/users/list?page=' + this.currentPage + '&limit=' + this.pagesize + '' + '&userStatus=' + userStatus +
+                    '&userType=' + this.userType + '&loginName=' + this.loginName,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {
                             _this.total = result.data.totalCount || 0;
-                            for(var i in result.data.list) {
-                                if(result.data.list[i].userType === '02') {
+                            for (var i in result.data.list) {
+                                if (result.data.list[i].userType === '02') {
                                     result.data.list[i].userTypeName = '采购用户';
-                                }else if(result.data.list[i].userType === '04') {
+                                } else if (result.data.list[i].userType === '04') {
                                     result.data.list[i].userTypeName = '供货用户';
                                 }
-                                if(result.data.list[i].userStatus == '0') {
+                                if (result.data.list[i].userStatus == '0') {
                                     result.data.list[i].userStatusName = '待审核';
-                                }else if(result.data.list[i].userType == '1') {
+                                } else if (result.data.list[i].userStatus == '1') {
                                     result.data.list[i].userStatusName = '正常';
-                                }else if(result.data.list[i].userType == '4') {
+                                } else if (result.data.list[i].userStatus == '4') {
                                     result.data.list[i].userStatusName = '禁用';
                                 }
-                                result.data.list[i].contactType = result.data.list[i].contactor + '|' + result.data.list[i].contactorPhone;
+                                result.data.list[i].contactType = result.data.list[i].contactor + '-' + result.data.list[i].contactorPhone;
                             }
                             _this.tableData = result.data.list || [];
-                            console.log(_this.tableData);
                         } else {
-                            swal(result.message, {
-                                icon: "error",
-                            });
+                            _this.$message.error(result.message);
                         }
                         ;
                     },
                     error: function () {
-                        swal("操作失败", {
-                            icon: "error",
-                        });
+                        _this.$message.error('操作失败');
                     }
                 });
             },
@@ -243,22 +506,68 @@
             queryRegInfo(valObj) {
                 var _this = this;
                 $.ajax({
-                    url: '/api/profile/info?userId='+valObj.userId,
+                    url: '/api/profile/info?userId=' + valObj.userId,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {
-
+                            if (valObj.userType === '04') { // 审核商家信息
+                                _this.busiMoralShow = true;
+                            } else if (valObj.userType === '02') {
+                                _this.customMoralShow = true;
+                            }
+                            result.data.deliveryAddress = result.data.deliveryProv + result.data.deliveryCity + result.data.deliveryArea + result.data.deliveryDetail;
+                            result.data.taxTypeName = result.data.taxType === '01' ? '增值税发票' : '普通发票';
+                            result.data.address = result.data.province + result.data.city + result.data.area + result.data.detail;
+                            _this.regisInfoAll = result.data;
                         } else {
-                            swal(result.message, {
-                                icon: "error",
-                            });
+                            _this.$message.error(result.message);
                         }
                         ;
                     },
                     error: function () {
-                        swal("操作失败", {
-                            icon: "error",
-                        });
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 更改用户状态 0-待审核 1-正常 2-锁定；3-审核不通过；4-禁用
+            handleUpdate(status, valObj) {
+                var postArr = [];
+                var _this = this;
+                postArr.push(valObj.userId);
+                var confimMsg = '';
+                if (status === '3') {
+                    confimMsg = '此用户将无法正常登陆，需要修改注册信息后再次提交审核，请尽快与业务联系人沟通修改意见';
+                } else if (status === '4') {
+                    confimMsg = '确定禁用吗？禁用后此账户将不能登录';
+                }
+                if (confimMsg === '') {
+                    this.updateService(status, postArr);
+                } else {
+                    this.$confirm(confimMsg, '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '我再想想',
+                        type: 'warning'
+                    }).then(function () {
+                        _this.updateService(status, postArr);
+                    }).
+                    catch(function () {});
+                }
+            },
+            // 更改用户状态服务
+            updateService(status, postArr) {
+                var _this = this;
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/users/lock/" + status,
+                    contentType: "application/json",
+                    data: JSON.stringify(postArr),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
                     }
                 });
             }

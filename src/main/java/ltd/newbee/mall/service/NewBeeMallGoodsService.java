@@ -1,5 +1,6 @@
 package ltd.newbee.mall.service;
 
+import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.util.PageQueryUtil;
@@ -54,7 +55,7 @@ public interface NewBeeMallGoodsService {
      * @param ids
      * @return
      */
-    Boolean batchUpdateSellStatus(Long[] ids,int sellStatus);
+    Boolean batchUpdateSellStatus(GoodsStatusUpdateReqDTO requstBean, int sellStatus);
 
     /**
      * 商品搜索

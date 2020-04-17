@@ -4,6 +4,7 @@ import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.GoodsStatusEnum;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
+import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
@@ -241,14 +242,16 @@ public class NewBeeMallGoodsController {
      */
     @RequestMapping(value = "/goods/status/{sellStatus}", method = RequestMethod.PUT)
     @ResponseBody
-    public Result delete(@RequestBody Long[] ids, @PathVariable("sellStatus") int sellStatus) {
-        if (ids.length < 1) {
+    public Result delete(@RequestBody GoodsStatusUpdateReqDTO requestBean, @PathVariable("sellStatus") Integer sellStatus) {
+        if (requestBean.getIds().length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        if (sellStatus != Constants.SELL_STATUS_UP && sellStatus != Constants.SELL_STATUS_DOWN) {
+        if (!sellStatus.equals(GoodsStatusEnum.INSTORE.getGoodsStatus()) && !sellStatus.equals(GoodsStatusEnum.AUDITTING.getGoodsStatus())
+                && !sellStatus.equals(GoodsStatusEnum.SELLING.getGoodsStatus()) && !sellStatus.equals(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus())
+                && !sellStatus.equals(GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus()) && !sellStatus.equals(GoodsStatusEnum.OFF_INSTORE.getGoodsStatus())) {
             return ResultGenerator.genFailResult("状态异常！");
         }
-        if (newBeeMallGoodsService.batchUpdateSellStatus(ids, sellStatus)) {
+        if (newBeeMallGoodsService.batchUpdateSellStatus(requestBean, sellStatus)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("修改失败");

@@ -1,14 +1,16 @@
 package ltd.newbee.mall.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.entity.StockNumDTO;
+import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.util.PageQueryUtil;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface NewBeeMallGoodsMapper {
+public interface NewBeeMallGoodsMapper extends BaseMapper<NewBeeMallGoods> {
     int deleteByPrimaryKey(Long goodsId);
 
     int insert(NewBeeMallGoods record);
@@ -37,6 +39,6 @@ public interface NewBeeMallGoodsMapper {
 
     int updateStockNum(@Param("stockNumDTOS") List<StockNumDTO> stockNumDTOS);
 
-    int batchUpdateSellStatus(@Param("orderIds")Long[] orderIds,@Param("sellStatus") int sellStatus);
+    int batchUpdateSellStatus(@Param("orderIds")Long[] orderIds, @Param("msgOffline") String msgOffline, @Param("msgReject") String msgReject, @Param("sellStatus") int sellStatus);
 
 }

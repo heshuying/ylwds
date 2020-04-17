@@ -75,7 +75,18 @@
     </update>
     <update id="batchUpdateSellStatus">
         update tb_goods_info
-        set goods_sell_status=#{sellStatus},update_time=now() where goods_id in
+        set goods_sell_status=#{sellStatus}
+        <if test="msgOffline!=null and msgOffline!=''">
+            ,msg_offline=#{msgOffline}
+        </if>
+        <if test="msgReject!=null and msgReject!=''">
+            ,msg_reject=#{msgReject}
+        </if>
+        <if test="sellStatus == 3">
+            ,online_time=now()
+        </if>
+        , update_time=now()
+        where goods_id in
         <foreach item="id" collection="orderIds" open="(" separator="," close=")">
             #{id}
         </foreach>

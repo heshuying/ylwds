@@ -1,10 +1,12 @@
 package ltd.newbee.mall.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallSearchGoodsVO;
 import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
 import ltd.newbee.mall.dao.TbUserDao;
 import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
+import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.service.NewBeeMallGoodsService;
@@ -20,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class NewBeeMallGoodsServiceImpl implements NewBeeMallGoodsService {
+public class NewBeeMallGoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeMallGoods> implements NewBeeMallGoodsService {
 
     @Autowired
     private NewBeeMallGoodsMapper goodsMapper;
@@ -69,8 +71,8 @@ public class NewBeeMallGoodsServiceImpl implements NewBeeMallGoodsService {
     }
     
     @Override
-    public Boolean batchUpdateSellStatus(Long[] ids, int sellStatus) {
-        return goodsMapper.batchUpdateSellStatus(ids, sellStatus) > 0;
+    public Boolean batchUpdateSellStatus(GoodsStatusUpdateReqDTO requstBean, int sellStatus) {
+        return goodsMapper.batchUpdateSellStatus(requstBean.getIds(), requstBean.getMsgOffline(), requstBean.getMsgReject(), sellStatus) > 0;
     }
 
     @Override

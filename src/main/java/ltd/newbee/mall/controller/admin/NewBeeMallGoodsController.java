@@ -247,4 +247,22 @@ public class NewBeeMallGoodsController {
         }
     }
 
+    /**
+     * 批量修改销售状态
+     */
+    @PostMapping(value = "/goods/updatePrice")
+    @ResponseBody
+    public Result statusUpdate(@RequestBody NewBeeMallGoods reqBean) {
+        if (reqBean == null || reqBean.getGoodsId() == null || reqBean.getProfit() == null || reqBean.getPrice() == null) {
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+
+        String result = newBeeMallGoodsService.updateNewBeeMallGoods(reqBean);
+        if (result.equalsIgnoreCase(ServiceResultEnum.SUCCESS.getResult())) {
+            return ResultGenerator.genSuccessResult();
+        } else {
+            return ResultGenerator.genFailResult("更新失败");
+        }
+    }
+
 }

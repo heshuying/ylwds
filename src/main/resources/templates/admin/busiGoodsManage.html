@@ -58,12 +58,32 @@
     input[type="number"] {
         -moz-appearance: textfield;
     }
-
+    .bg-common {
+        padding: 2px 5px;
+        color: #fff;
+    }
+    .blue-bg {
+        background-color: #477FFF;
+    }
+    .red-bg {
+        background-color:#FF4600;
+    }
+    .green-bg {
+        background-color: #1FC990;
+    }
+    .purple-bg {
+        background-color: #CF39C0;
+    }
     .tab-line {
         margin-top: 30px;
         min-height: 440px;
     }
-
+    .goods-operiton-line {
+        color: #477FFF;
+        text-align: right;
+        margin: 15px 0;
+        cursor: pointer;
+    }
     .dialog-all-div {
         padding: 0px 10px 10px;
     }
@@ -86,17 +106,6 @@
         <div id="app" class="plat-goods-manage-main-page">
             <div class="query-condition-line">
                 <div>
-                    <label>供应商</label>
-                    <el-select v-model="companyName" placeholder="请选择">
-                        <el-option
-                                v-for="item in compOptions"
-                                :key="item.companyName"
-                                :label="item.companyName"
-                                :value="item.companyName">
-                        </el-option>
-                    </el-select>
-                </div>
-                <div>
                     <label>系统分类</label>
                     <el-select v-model="categoryId" placeholder="请选择">
                         <el-option
@@ -104,6 +113,17 @@
                                 :key="item.categoryId"
                                 :label="item.categoryName"
                                 :value="item.categoryId">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div>
+                    <label>商品状态</label>
+                    <el-select v-model="goodsStatus" placeholder="请选择">
+                        <el-option
+                                v-for="item in statusOptions"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </div>
@@ -117,12 +137,10 @@
                 <el-button type="primary" @click="queryTableData">搜索</el-button>
             </div>
             <div class="tab-line">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
-                    <el-tab-pane label="待上架" name="waiton"></el-tab-pane>
-                    <el-tab-pane label="待下架" name="waitdown"></el-tab-pane>
-                    <el-tab-pane label="销售中" name="selling"></el-tab-pane>
-                    <el-tab-pane label="已下架" name="havedown"></el-tab-pane>
-                </el-tabs>
+                <div class="goods-operiton-line" @click="addGoods">
+                   <span>+</span>
+                    新增商品
+                </div>
                 <el-table
                         ref="multipleTable"
                         :data="tableData"
@@ -134,17 +152,13 @@
                             width="55">
                     </el-table-column>
                     <el-table-column
+                            prop="goodsName"
                             label="商品名称"
                             align="center"
                             width="120">
                         <template slot-scope="scope">
                             <span style="color:#477FFF">{{scope.row.goodsName}}</span>
                         </template>
-                    </el-table-column>
-                    <el-table-column
-                            prop="companyName"
-                            label="供应商"
-                            align="center">
                     </el-table-column>
                     <el-table-column
                             prop="sellingPriceShow"
@@ -154,73 +168,63 @@
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
-                            label="原价"
+                            prop="stockNum"
+                            label="库存"
                             align="center"
                             width="100"
                             show-overflow-tooltip>
-                        <template slot-scope="scope">
-                            <span style="text-decoration: line-through;">{{scope.row.originalPriceShow}}</span>
-                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="saleTotal"
+                            label="销量"
+                            align="center"
+                            width="100"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            prop="onlineTime"
+                            label="上架时间"
+                            align="center"
+                            show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
                             prop="priceShow"
-                            label="售价"
+                            label="状态"
                             align="center"
                             width="100"
                             show-overflow-tooltip>
                         <template slot-scope="scope">
-                            <span>{{scope.row.priceShow}}</span>
+                            <span v-if="scope.row.goodsStatusZYF=='仓库中'" class="bg-common red-bg">{{scope.row.goodsStatusZYF}}</span>
+                            <span v-if="scope.row.goodsStatusZYF=='审核中'" class="bg-common blue-bg">{{scope.row.goodsStatusZYF}}</span>
+                            <span v-if="scope.row.goodsStatusZYF=='销售中'" class="bg-common green-bg">{{scope.row.goodsStatusZYF}}</span>
+                            <span v-if="scope.row.goodsStatusZYF=='下架中'" class="bg-common purple-bg">{{scope.row.goodsStatusZYF}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="平台利润" align="center">
-                        <template slot-scope="scope">
-                            <template v-if="activeName=='waiton'">
-                                <el-input type="number" v-model="scope.row.profit" @change="calSale(scope.row)"></el-input>
-                                <el-button type="success" icon="el-icon-check" circle @click="saveProfit(scope.row)"></el-button>
-                            </template>
-                            <span v-else>{{scope.row.profitShow}}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                            v-if="activeName!='waiton'"
-                            prop="saleTotal"
-                            label="销量"
-                            width="80"
-                            align="center"
-                            show-overflow-tooltip>
-                    </el-table-column>
-                    <el-table-column
-                            v-if="activeName=='waitdown'|| activeName=='havedown'"
-                            prop="msgOffline"
-                            label="下架原因"
-                            width="100"
-                            align="center"
-                            show-overflow-tooltip>
-                    </el-table-column>
-                    <el-table-column label="操作" align="center" v-if="activeName!='havedown'" width="180">
+                    <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
                             <el-button
-                                    v-if="activeName=='waiton'"
+                                    v-if="scope.row.goodsStatusZYF=='仓库中'||scope.row.goodsStatusZYF=='审核中'"
                                     size="mini"
-                                    @click="handleUpdate('3', scope.row)">上架
+                                    type="primary"
+                                    @click="editGoods(scope.row)">编辑商品
                             </el-button>
                             <el-button
-                                    v-if="activeName=='waiton'"
+                                    v-if="scope.row.goodsStatusZYF=='仓库中'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="handleUpdate('2', scope.row)">申请上架
+                            </el-button>
+                            <el-button
+                                    v-if="scope.row.goodsStatusZYF=='销售中'"
                                     size="mini"
                                     type="danger"
-                                    @click="handleUpdate('1', scope.row)">打回
+                                    @click="handleUpdate('4', scope.row)">申请下架
                             </el-button>
                             <el-button
-                                    v-if="activeName=='waitdown'|| activeName=='selling'"
+                                    v-if="scope.row.goodsStatusZYF=='下架中'"
                                     size="mini"
                                     type="primary"
-                                    @click="handleUpdate('5', scope.row)">前端下架
-                            </el-button>
-                            <el-button
-                                    v-if="activeName=='waitdown'|| activeName=='selling'"
-                                    size="mini"
-                                    type="primary"
-                                    @click="handleUpdate('6', scope.row)">下架
+                                    @click="handleUpdate('3', scope.row)">取消下架
                             </el-button>
                         </template>
                     </el-table-column>
@@ -248,11 +252,10 @@
         el: '#app',
         data() {
             return {
-                companyName: '', // 供应商
-                activeName: 'waiton',
+                goodsStatus: '', // 供应商
                 categoryId: '', // 系统分类
                 goodsName: '',
-                compOptions: [],
+                statusOptions: [],
                 sysTypeOptions: [],
                 tableData: [],
                 multipleSelection: [],
@@ -262,47 +265,19 @@
             };
         },
         mounted() {
-            this.compOptions = [[${companyList}]] || '';
-            this.compOptions.unshift({companyName: ''});
+            var _this = this;
+            var statusObj = [[${goodsStatus}]] || {};
+            Object.keys(statusObj).forEach(function(key){
+                console.log(key,statusObj[key]);
+                _this.statusOptions.push({label:key,value:statusObj[key]});
+            });
+            this.statusOptions.unshift({label: '',value: ''});
+            console.log(this.statusOptions);
             this.sysTypeOptions = [[${firstLevelCategories}]] || '';
             this.sysTypeOptions.unshift({categoryId: '',categoryName: ""});
             this.queryTableData();
         },
         methods: {
-            // 切换标签页
-            handleClick() {
-                this.queryTableData();
-            },
-            calSale(valObj) {
-                valObj.price = parseFloat(valObj.sellingPrice) + parseFloat(valObj.profit);
-                valObj.priceShow = '¥' + valObj.price;
-            },
-            // 保存平台利润、售价
-            saveProfit(valObj) {
-                var postObj = {
-                    goodsId: valObj.goodsId,
-                    profit: valObj.profit,
-                    price: valObj.price,
-                }
-                if(valObj.profit === '') {
-                    return;
-                }
-                var _this = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/admin/goods/updatePrice",
-                    contentType: "application/json",
-                    data: JSON.stringify(postObj),
-                    success: function (result) {
-                        if (result.resultCode == 200) {
-                            _this.$message.success('保存成功');
-                            _this.queryTableData();
-                        } else {
-                            _this.$message.error(result.message);
-                        }
-                    }
-                });
-            },
             // 表格数据勾选修改
             handleTableSelectionChange(val) {
                 this.multipleSelection = val;
@@ -311,16 +286,20 @@
             current_change: function (currentPage) {
                 this.currentPage = currentPage;
             },
-            // 会员营业执照下载
-            downloadCustom() {
-                console.log('custom download');
+            // 新增商品
+            addGoods() {
+                console.log('add goods');
+            },
+            // 编辑商品
+            editGoods(valObj) {
+              console.log('edit goods');
             },
             // 查询供应商和系统分类下拉内容
             queryTableData() {
                 var _this = this;
                 $.ajax({
-                    url: '/admin/goods/list?_search=true&nd=1587021247684&page=' + this.currentPage + '&limit=' + this.pagesize + '' + '&tab=' + this.activeName +
-                    '&companyName=' + this.companyName + '&categoryId=' + this.categoryId + '&goodsName=' + this.goodsName,
+                    url: '/admin/goods/list?_search=true&nd=1587021247684&page=' + this.currentPage + '&limit=' + this.pagesize  +
+                    '&goodsStatus=' + this.goodsStatus + '&categoryId=' + this.categoryId + '&goodsName=' + this.goodsName,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {
@@ -328,6 +307,7 @@
                             for (var i in result.data.list) {
                                 result.data.list[i].sellingPriceShow = '¥' + result.data.list[i].sellingPrice;
                                 result.data.list[i].originalPriceShow = '¥' + result.data.list[i].originalPrice;
+                                result.data.list[i].priceShowSpecial = '¥';
                                 result.data.list[i].priceShow = '¥' + result.data.list[i].price;
                                 result.data.list[i].profitShow = '¥' + result.data.list[i].profit;
                                 result.data.list[i].profitInput = "";
@@ -343,6 +323,7 @@
                     }
                 });
             },
+            // 更改商品状态
             handleUpdate(status, valObj) {
                 var postArr = [];
                 var _this = this;
@@ -352,31 +333,16 @@
                     msgOffline: '',
                     msgReject: ''
                 }
-                var confimMsg = '';
-                if (status === '5') {
-                    confimMsg = '前端下架后，商品仍在处在销售中，但是用户端不可见';
-                } else if (status === '6') {
-                    confimMsg = '确定允许这些商品下架吗？如果商品仍在推荐位上，将影响用户购买';
-                }
-                if(status === '1') { // 打回
-                    this.$prompt('打回原因', '提示', {
+                if(status === '4') { // 申请下架
+                    this.$prompt('下架原因', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '我再想想',
                     }).then(function (value)  {
-                        postObj.msgReject = value.value;
+                        postObj.msgOffline = value.value;
                         _this.updateService(status, postObj);
                     }).catch(function () {});
-                } else if (confimMsg === '') { // 上架
+                } else { // 取消下架或申请上架
                     _this.updateService(status, postObj);
-                } else { // 两种下架
-                    this.$confirm(confimMsg, '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '我再想想',
-                        type: 'warning'
-                    }).then(function () {
-                        _this.updateService(status, postObj);
-                    }).catch(function () {
-                    });
                 }
             },
             // 更改用户状态服务
@@ -391,8 +357,8 @@
                         if (result.resultCode == 200) {
                             _this.$message.success('操作成功');
                             _this.queryTableData();
-                            if(status === '3') {
-                                _this.$confirm('上架成功！可到运营管理页面对该商品进行推荐', '提示', {
+                            if(status === '2') {
+                                _this.$confirm('您的上架申请已经提交到平台管理员，请耐心等待或与业务对接人沟通', '提示', {
                                     confirmButtonText: '我知道了',
                                     type: 'success',
                                     showCancelButton: false

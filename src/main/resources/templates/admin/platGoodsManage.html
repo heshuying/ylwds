@@ -42,7 +42,9 @@
     .cell .el-input {
         width: 80px;
     }
-
+    .el-message-box .el-input {
+        width: 100%;
+    }
     .el-button.is-circle {
         padding: 5px;
         margin-left: 5px;
@@ -165,16 +167,14 @@
                             width="100"
                             show-overflow-tooltip>
                         <template slot-scope="scope">
-                            <span v-if="activeName=='waiton'">{{scope.row.priceShowSpecial}}</span>
-                            <span v-else>{{scope.row.priceShow}}</span>
+                            <span>{{scope.row.priceShow}}</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="平台利润" align="center">
                         <template slot-scope="scope">
                             <template v-if="activeName=='waiton'">
-                                <el-input type="number" v-model="scope.row.profitInput"
-                                          @change="calPrice(scope.row)"></el-input>
-                                <el-button type="success" icon="el-icon-check" circle></el-button>
+                                <el-input type="number" v-model="scope.row.profit" @change="calSale(scope.row)"></el-input>
+                                <el-button type="success" icon="el-icon-check" circle @click="saveProfit(scope.row)"></el-button>
                             </template>
                             <span v-else>{{scope.row.profitShow}}</span>
                         </template>
@@ -200,25 +200,25 @@
                             <el-button
                                     v-if="activeName=='waiton'"
                                     size="mini"
-                                    @click="handleUpdate('1', scope.row)">上架
+                                    @click="handleUpdate('3', scope.row)">上架
                             </el-button>
                             <el-button
                                     v-if="activeName=='waiton'"
                                     size="mini"
                                     type="danger"
-                                    @click="handleUpdate('3', scope.row)">打回
+                                    @click="handleUpdate('1', scope.row)">打回
                             </el-button>
                             <el-button
                                     v-if="activeName=='waitdown'|| activeName=='selling'"
                                     size="mini"
                                     type="primary"
-                                    @click="handleUpdate('4', scope.row)">前端下架
+                                    @click="handleUpdate('5', scope.row)">前端下架
                             </el-button>
                             <el-button
                                     v-if="activeName=='waitdown'|| activeName=='selling'"
                                     size="mini"
                                     type="primary"
-                                    @click="handleUpdate('1', scope.row)">下架
+                                    @click="handleUpdate('6', scope.row)">下架
                             </el-button>
                         </template>
                     </el-table-column>
@@ -271,10 +271,35 @@
             handleClick() {
                 this.queryTableData();
             },
-            // 计算售价
-            calPrice(valObj) {
-                valObj.price = parseFloat(valObj.sellingPrice) + parseFloat(valObj.profitInput);
-                valObj.priceShowSpecial += valObj.price;
+            calSale(valObj) {
+                valObj.price = parseFloat(valObj.sellingPrice) + parseFloat(valObj.profit);
+                valObj.priceShow = '¥' + valObj.price;
+            },
+            // 保存平台利润、售价
+            saveProfit(valObj) {
+                var postObj = {
+                    goodsId: valObj.goodsId,
+                    profit: valObj.profit,
+                    price: valObj.price,
+                }
+                if(valObj.profit === '') {
+                    return;
+                }
+                var _this = this;
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/goods/updatePrice",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('保存成功');
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
             },
             // 表格数据勾选修改
             handleTableSelectionChange(val) {
@@ -287,10 +312,6 @@
             // 会员营业执照下载
             downloadCustom() {
                 console.log('custom download');
-            },
-            // 点击查询按钮查询信息
-            queryInfo() {
-
             },
             // 查询供应商和系统分类下拉内容
             queryTableData() {
@@ -305,7 +326,6 @@
                             for (var i in result.data.list) {
                                 result.data.list[i].sellingPriceShow = '¥' + result.data.list[i].sellingPrice;
                                 result.data.list[i].originalPriceShow = '¥' + result.data.list[i].originalPrice;
-                                result.data.list[i].priceShowSpecial = '¥';
                                 result.data.list[i].priceShow = '¥' + result.data.list[i].price;
                                 result.data.list[i].profitShow = '¥' + result.data.list[i].profit;
                                 result.data.list[i].profitInput = "";
@@ -325,38 +345,59 @@
             handleUpdate(status, valObj) {
                 var postArr = [];
                 var _this = this;
-                postArr.push(valObj.userId);
-                var confimMsg = '';
-                if (status === '3') {
-                    confimMsg = '此用户将无法正常登陆，需要修改注册信息后再次提交审核，请尽快与业务联系人沟通修改意见';
-                } else if (status === '4') {
-                    confimMsg = '确定禁用吗？禁用后此账户将不能登录';
+                postArr.push(valObj.goodsId);
+                var postObj = {
+                    ids: postArr,
+                    msgOffline: '',
+                    msgReject: ''
                 }
-                if (confimMsg === '') {
-                    this.updateService(status, postArr);
-                } else {
+                var confimMsg = '';
+                if (status === '5') {
+                    confimMsg = '前端下架后，商品仍在处在销售中，但是用户端不可见';
+                } else if (status === '6') {
+                    confimMsg = '确定允许这些商品下架吗？如果商品仍在推荐位上，将影响用户购买';
+                }
+                if(status === '1') { // 打回
+                    this.$prompt('打回原因', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '我再想想',
+                    }).then(function (value)  {
+                        postObj.msgReject = value.value;
+                        _this.updateService(status, postObj);
+                    }).catch(function () {});
+                } else if (confimMsg === '') { // 上架
+                    _this.updateService(status, postObj);
+                } else { // 两种下架
                     this.$confirm(confimMsg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '我再想想',
                         type: 'warning'
                     }).then(function () {
-                        _this.updateService(status, postArr);
+                        _this.updateService(status, postObj);
                     }).catch(function () {
                     });
                 }
             },
             // 更改用户状态服务
-            updateService(status, postArr) {
+            updateService(status, postObj) {
                 var _this = this;
                 $.ajax({
-                    type: "POST",
-                    url: "/admin/users/lock/" + status,
+                    type: "PUT",
+                    url: "/admin/goods/status/" + status,
                     contentType: "application/json",
-                    data: JSON.stringify(postArr),
+                    data: JSON.stringify(postObj),
                     success: function (result) {
                         if (result.resultCode == 200) {
                             _this.$message.success('操作成功');
                             _this.queryTableData();
+                            if(status === '3') {
+                                _this.$confirm('上架成功！可到运营管理页面对该商品进行推荐', '提示', {
+                                    confirmButtonText: '我知道了',
+                                    type: 'success',
+                                    showCancelButton: false
+                                }).then(function () {
+                                })
+                            }
                         } else {
                             _this.$message.error(result.message);
                         }

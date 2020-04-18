@@ -202,15 +202,7 @@ public class NewBeeMallGoodsController {
     @RequestMapping(value = "/goods/update", method = RequestMethod.POST)
     @ResponseBody
     public Result update(@RequestBody NewBeeMallGoods newBeeMallGoods) {
-        if (Objects.isNull(newBeeMallGoods.getGoodsId())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || Objects.isNull(newBeeMallGoods.getOriginalPrice())
-                || Objects.isNull(newBeeMallGoods.getSellingPrice())
-                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
-                || Objects.isNull(newBeeMallGoods.getStockNum())
-                || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-//                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
+        if (Objects.isNull(newBeeMallGoods.getGoodsId())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
         String result = newBeeMallGoodsService.updateNewBeeMallGoods(newBeeMallGoods);

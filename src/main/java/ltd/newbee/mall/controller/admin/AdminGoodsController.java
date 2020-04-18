@@ -42,7 +42,7 @@ public class AdminGoodsController {
         goodsStatus.put("仓库中", "1,6");
         goodsStatus.put("审核中", "2");
         goodsStatus.put("销售中", "3");
-        goodsStatus.put("下架中", "4，5");
+        goodsStatus.put("下架中", "4,5");
 
         request.setAttribute("companyList", companyList);
         request.setAttribute("firstLevelCategories", firstLevelCategories);

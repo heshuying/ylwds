@@ -87,10 +87,10 @@ public class GoodsAndCompayResDTO {
         if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "待下架";
         }
-        if(GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "前端下架";
         }
-        if(GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.OFF_INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "已下架";
         }
 
@@ -106,7 +106,7 @@ public class GoodsAndCompayResDTO {
             return "";
         }
 
-        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "仓库中";
         }
         if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
@@ -115,7 +115,7 @@ public class GoodsAndCompayResDTO {
         if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "销售中";
         }
-        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "下架中";
         }
 

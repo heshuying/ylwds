@@ -1,6 +1,5 @@
 package ltd.newbee.mall.controller.admin;
 
-import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.GoodsStatusEnum;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -9,7 +8,7 @@ import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
-import ltd.newbee.mall.service.NewBeeMallGoodsService;
+import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -23,17 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
+ * 商品管理
  */
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallGoodsController {
+public class AdminGoodsController {
 
     @Resource
-    private NewBeeMallGoodsService newBeeMallGoodsService;
+    private GoodsService newBeeMallGoodsService;
     @Resource
     private NewBeeMallCategoryService newBeeMallCategoryService;
 
@@ -248,7 +244,7 @@ public class NewBeeMallGoodsController {
     }
 
     /**
-     * 批量修改销售状态
+     * 更新商品价格
      */
     @PostMapping(value = "/goods/updatePrice")
     @ResponseBody

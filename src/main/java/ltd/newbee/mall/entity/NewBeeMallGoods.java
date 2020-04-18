@@ -1,8 +1,6 @@
 package ltd.newbee.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ltd.newbee.mall.common.GoodsStatusEnum;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,11 +18,15 @@ public class NewBeeMallGoods {
 
     private String goodsCarousel;
 
-    private Integer originalPrice;
+    /**原价*/
+    private BigDecimal originalPrice;
+    /**供货价*/
+    private BigDecimal sellingPrice;
+    /**平台利润*/
+    private BigDecimal profit;
+    /**售价*/
+    private BigDecimal price;
 
-    private Integer sellingPrice;
-    private Integer profit;
-    private Integer price;
     private Integer stockNum;
 
     private String tag;
@@ -249,67 +251,35 @@ public class NewBeeMallGoods {
         return goodsSellStatus;
     }
 
-    public Integer getOriginalPrice() {
+    public BigDecimal getOriginalPrice() {
         return originalPrice;
     }
 
-    public void setOriginalPrice(Integer originalPrice) {
+    public void setOriginalPrice(BigDecimal originalPrice) {
         this.originalPrice = originalPrice;
     }
 
-    public Integer getSellingPrice() {
+    public BigDecimal getSellingPrice() {
         return sellingPrice;
     }
 
-    public void setSellingPrice(Integer sellingPrice) {
+    public void setSellingPrice(BigDecimal sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 
-    public Integer getProfit() {
+    public BigDecimal getProfit() {
         return profit;
     }
 
-    public void setProfit(Integer profit) {
+    public void setProfit(BigDecimal profit) {
         this.profit = profit;
     }
 
-    public Integer getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return "NewBeeMallGoods{" +
-                "goodsId=" + goodsId +
-                ", goodsName='" + goodsName + '\'' +
-                ", goodsIntro='" + goodsIntro + '\'' +
-                ", goodsCategoryId=" + goodsCategoryId +
-                ", goodsCoverImg='" + goodsCoverImg + '\'' +
-                ", goodsCarousel='" + goodsCarousel + '\'' +
-                ", originalPrice=" + originalPrice +
-                ", sellingPrice=" + sellingPrice +
-                ", profit=" + profit +
-                ", price=" + price +
-                ", stockNum=" + stockNum +
-                ", tag='" + tag + '\'' +
-                ", createSno='" + createSno + '\'' +
-                ", goodsSno='" + goodsSno + '\'' +
-                ", goodsSellStatus=" + goodsSellStatus +
-                ", createUser=" + createUser +
-                ", transitMoney=" + transitMoney +
-                ", saleTotal=" + saleTotal +
-                ", gooodsAttribute='" + gooodsAttribute + '\'' +
-                ", msgOffline='" + msgOffline + '\'' +
-                ", msgReject='" + msgReject + '\'' +
-                ", createTime=" + createTime +
-                ", updateUser=" + updateUser +
-                ", updateTime=" + updateTime +
-                ", onlineTime=" + onlineTime +
-                ", goodsDetailContent='" + goodsDetailContent + '\'' +
-                '}';
     }
 }

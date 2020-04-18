@@ -2,6 +2,7 @@ package ltd.newbee.mall.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class NewBeeMallOrder {
@@ -11,7 +12,7 @@ public class NewBeeMallOrder {
 
     private Long userId;
 
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 
     private Byte payStatus;
 
@@ -56,11 +57,11 @@ public class NewBeeMallOrder {
         this.userId = userId;
     }
 
-    public Integer getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Integer totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 

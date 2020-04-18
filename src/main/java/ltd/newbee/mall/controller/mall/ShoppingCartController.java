@@ -10,12 +10,12 @@ import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -29,7 +29,7 @@ public class ShoppingCartController {
                                HttpSession httpSession) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         int itemsTotal = 0;
-        int priceTotal = 0;
+        BigDecimal priceTotal = BigDecimal.ZERO;
         List<NewBeeMallShoppingCartItemVO> myShoppingCartItems = newBeeMallShoppingCartService.getMyShoppingCartItems(user.getUserId());
         if (!CollectionUtils.isEmpty(myShoppingCartItems)) {
             //购物项总数
@@ -39,9 +39,9 @@ public class ShoppingCartController {
             }
             //总价
             for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : myShoppingCartItems) {
-                priceTotal += newBeeMallShoppingCartItemVO.getGoodsCount() * newBeeMallShoppingCartItemVO.getPrice();
+                priceTotal = priceTotal.add(BigDecimal.valueOf(newBeeMallShoppingCartItemVO.getGoodsCount()).multiply(newBeeMallShoppingCartItemVO.getPrice()));
             }
-            if (priceTotal < 1) {
+            if (priceTotal.compareTo(new BigDecimal(1)) < 0) {
                 return "error/error_5xx";
             }
         }
@@ -100,7 +100,7 @@ public class ShoppingCartController {
     @GetMapping("/shop-cart/settle")
     public String settlePage(HttpServletRequest request,
                              HttpSession httpSession) {
-        int priceTotal = 0;
+        BigDecimal priceTotal = BigDecimal.ZERO;
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         List<NewBeeMallShoppingCartItemVO> myShoppingCartItems = newBeeMallShoppingCartService.getMyShoppingCartItems(user.getUserId());
         if (CollectionUtils.isEmpty(myShoppingCartItems)) {
@@ -109,13 +109,13 @@ public class ShoppingCartController {
         } else {
             //总价
             for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : myShoppingCartItems) {
-                priceTotal += newBeeMallShoppingCartItemVO.getGoodsCount() * newBeeMallShoppingCartItemVO.getPrice();
+                priceTotal = priceTotal.add(BigDecimal.valueOf(newBeeMallShoppingCartItemVO.getGoodsCount()).multiply(newBeeMallShoppingCartItemVO.getPrice()));
             }
-            if (priceTotal < 1) {
+            if (priceTotal.compareTo(new BigDecimal(1)) < 0) {
                 return "error/error_5xx";
             }
         }
-        request.setAttribute("priceTotal", priceTotal);
+        request.setAttribute("priceTotal", priceTotal.toString());
         request.setAttribute("myShoppingCartItems", myShoppingCartItems);
         return "mall/order-settle";
     }

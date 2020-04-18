@@ -20,11 +20,10 @@ public class GoodsAndCompayResDTO {
 
     private String goodsCarousel;
 
-    private Integer originalPrice;
-
-    private Integer sellingPrice;
-    private Integer profit;
-    private Integer price;
+    private BigDecimal originalPrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal profit;
+    private BigDecimal price;
     private Integer stockNum;
 
     private String tag;
@@ -267,38 +266,6 @@ public class GoodsAndCompayResDTO {
         return goodsSellStatus;
     }
 
-    public Integer getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public void setOriginalPrice(Integer originalPrice) {
-        this.originalPrice = originalPrice;
-    }
-
-    public Integer getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(Integer sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public Integer getProfit() {
-        return profit;
-    }
-
-    public void setProfit(Integer profit) {
-        this.profit = profit;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -313,5 +280,37 @@ public class GoodsAndCompayResDTO {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public BigDecimal getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(BigDecimal sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
+    public BigDecimal getProfit() {
+        return profit;
+    }
+
+    public void setProfit(BigDecimal profit) {
+        this.profit = profit;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

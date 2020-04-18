@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,7 +63,7 @@ public class NewBeeMallOrderController {
         if (Objects.isNull(newBeeMallOrder.getTotalPrice())
                 || Objects.isNull(newBeeMallOrder.getOrderId())
                 || newBeeMallOrder.getOrderId() < 1
-                || newBeeMallOrder.getTotalPrice() < 1
+                || newBeeMallOrder.getTotalPrice().compareTo(new BigDecimal(1)) < 0
                 || StringUtils.isEmpty(newBeeMallOrder.getUserAddress())) {
             return ResultGenerator.genFailResult("参数异常！");
         }

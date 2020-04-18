@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+</head>
+<style>
+    .plat-goods-manage-main-page {
+        padding: 0 30px;
+    }
+
+    .plat-goods-manage-main-page .query-condition-line {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .query-condition-line > div {
+        width: 280px;
+        margin-right: 15px;
+    }
+
+    .plat-goods-manage-main-page .query-condition-line label {
+        font-size: 14px;
+        margin-right: 5px;
+        font-weight: normal;
+        display: inline-block;
+        width: 70px;
+        text-align: right;
+    }
+
+    .el-select {
+        width: 200px;
+    }
+
+    .el-input {
+        width: 200px;
+    }
+
+    .cell .el-input {
+        width: 80px;
+    }
+
+    .el-button.is-circle {
+        padding: 5px;
+        margin-left: 5px;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .tab-line {
+        margin-top: 30px;
+        min-height: 440px;
+    }
+
+    .dialog-all-div {
+        padding: 0px 10px 10px;
+    }
+
+</style>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="plat-goods-manage-main-page">
+            <div class="query-condition-line">
+                <div>
+                    <label>供应商</label>
+                    <el-select v-model="companyName" placeholder="请选择">
+                        <el-option
+                                v-for="item in compOptions"
+                                :key="item.companyName"
+                                :label="item.companyName"
+                                :value="item.companyName">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div>
+                    <label>系统分类</label>
+                    <el-select v-model="categoryId" placeholder="请选择">
+                        <el-option
+                                v-for="item in sysTypeOptions"
+                                :key="item.categoryId"
+                                :label="item.categoryName"
+                                :value="item.categoryId">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div>
+                    <label>商品名称</label>
+                    <el-input
+                            placeholder="请输入商品名称"
+                            v-model="goodsName">
+                    </el-input>
+                </div>
+                <el-button type="primary" @click="queryTableData">搜索</el-button>
+            </div>
+            <div class="tab-line">
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="待上架" name="waiton"></el-tab-pane>
+                    <el-tab-pane label="待下架" name="waitdown"></el-tab-pane>
+                    <el-tab-pane label="销售中" name="selling"></el-tab-pane>
+                    <el-tab-pane label="已下架" name="havedown"></el-tab-pane>
+                </el-tabs>
+                <el-table
+                        ref="multipleTable"
+                        :data="tableData"
+                        tooltip-effect="dark"
+                        style="width: 100%"
+                        @selection-change="handleTableSelectionChange">
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            prop="goodsName"
+                            label="商品名称"
+                            align="center"
+                            width="120">
+                    </el-table-column>
+                    <el-table-column
+                            prop="companyName"
+                            label="供应商"
+                            align="center">
+                    </el-table-column>
+                    <el-table-column
+                            prop="sellingPriceShow"
+                            label="供货价"
+                            width="100"
+                            align="center"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            label="原价"
+                            align="center"
+                            width="100"
+                            show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            <span style="text-decoration: line-through;">{{scope.row.originalPriceShow}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="priceShow"
+                            label="售价"
+                            align="center"
+                            width="100"
+                            show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            <span v-if="activeName=='waiton'">{{scope.row.priceShowSpecial}}</span>
+                            <span v-else>{{scope.row.priceShow}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="平台利润" align="center">
+                        <template slot-scope="scope">
+                            <template v-if="activeName=='waiton'">
+                                <el-input type="number" v-model="scope.row.profitInput"
+                                          @change="calPrice(scope.row)"></el-input>
+                                <el-button type="success" icon="el-icon-check" circle></el-button>
+                            </template>
+                            <span v-else>{{scope.row.profitShow}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            v-if="activeName!='waiton'"
+                            prop="saleTotal"
+                            label="销量"
+                            width="80"
+                            align="center"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            v-if="activeName=='waitdown'|| activeName=='havedown'"
+                            prop="msgOffline"
+                            label="下架原因"
+                            width="100"
+                            align="center"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" v-if="activeName!='havedown'" width="180">
+                        <template slot-scope="scope">
+                            <el-button
+                                    v-if="activeName=='waiton'"
+                                    size="mini"
+                                    @click="handleUpdate('1', scope.row)">上架
+                            </el-button>
+                            <el-button
+                                    v-if="activeName=='waiton'"
+                                    size="mini"
+                                    type="danger"
+                                    @click="handleUpdate('3', scope.row)">打回
+                            </el-button>
+                            <el-button
+                                    v-if="activeName=='waitdown'|| activeName=='selling'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="handleUpdate('4', scope.row)">前端下架
+                            </el-button>
+                            <el-button
+                                    v-if="activeName=='waitdown'|| activeName=='selling'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="handleUpdate('1', scope.row)">下架
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align: center;padding: 20px 0;">
+                    <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+</div>
+<!-- jQuery -->
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+<!-- 引入组件库 -->
+<script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+<script th:inline="javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                companyName: '', // 供应商
+                activeName: 'waiton',
+                categoryId: '', // 系统分类
+                goodsName: '',
+                compOptions: [],
+                sysTypeOptions: [],
+                tableData: [],
+                multipleSelection: [],
+                total: 0,
+                pagesize: 10,
+                currentPage: 1
+            };
+        },
+        mounted() {
+            this.compOptions = [[${companyList}]] || '';
+            this.compOptions.unshift({companyName: ''});
+            this.sysTypeOptions = [[${firstLevelCategories}]] || '';
+            this.sysTypeOptions.unshift({categoryId: '',categoryName: ""});
+            this.queryTableData();
+        },
+        methods: {
+            // 切换标签页
+            handleClick() {
+                this.queryTableData();
+            },
+            // 计算售价
+            calPrice(valObj) {
+                valObj.price = parseFloat(valObj.sellingPrice) + parseFloat(valObj.profitInput);
+                valObj.priceShowSpecial += valObj.price;
+            },
+            // 表格数据勾选修改
+            handleTableSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            // 换页
+            current_change: function (currentPage) {
+                this.currentPage = currentPage;
+            },
+            // 会员营业执照下载
+            downloadCustom() {
+                console.log('custom download');
+            },
+            // 点击查询按钮查询信息
+            queryInfo() {
+
+            },
+            // 查询供应商和系统分类下拉内容
+            queryTableData() {
+                var _this = this;
+                $.ajax({
+                    url: '/admin/goods/list?_search=true&nd=1587021247684&page=' + this.currentPage + '&limit=' + this.pagesize + '' + '&tab=' + this.activeName +
+                    '&companyName=' + this.companyName + '&categoryId=' + this.categoryId + '&goodsName=' + this.goodsName,
+                    type: 'GET',
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.total = result.data.totalCount || 0;
+                            for (var i in result.data.list) {
+                                result.data.list[i].sellingPriceShow = '¥' + result.data.list[i].sellingPrice;
+                                result.data.list[i].originalPriceShow = '¥' + result.data.list[i].originalPrice;
+                                result.data.list[i].priceShowSpecial = '¥';
+                                result.data.list[i].priceShow = '¥' + result.data.list[i].price;
+                                result.data.list[i].profitShow = '¥' + result.data.list[i].profit;
+                                result.data.list[i].profitInput = "";
+                            }
+                            _this.tableData = result.data.list || [];
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 更改用户状态 0-待审核 1-正常 2-锁定；3-审核不通过；4-禁用
+            handleUpdate(status, valObj) {
+                var postArr = [];
+                var _this = this;
+                postArr.push(valObj.userId);
+                var confimMsg = '';
+                if (status === '3') {
+                    confimMsg = '此用户将无法正常登陆，需要修改注册信息后再次提交审核，请尽快与业务联系人沟通修改意见';
+                } else if (status === '4') {
+                    confimMsg = '确定禁用吗？禁用后此账户将不能登录';
+                }
+                if (confimMsg === '') {
+                    this.updateService(status, postArr);
+                } else {
+                    this.$confirm(confimMsg, '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '我再想想',
+                        type: 'warning'
+                    }).then(function () {
+                        _this.updateService(status, postArr);
+                    }).catch(function () {
+                    });
+                }
+            },
+            // 更改用户状态服务
+            updateService(status, postArr) {
+                var _this = this;
+                $.ajax({
+                    type: "POST",
+                    url: "/admin/users/lock/" + status,
+                    contentType: "application/json",
+                    data: JSON.stringify(postArr),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

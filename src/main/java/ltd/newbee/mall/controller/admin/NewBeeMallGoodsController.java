@@ -52,7 +52,8 @@ public class NewBeeMallGoodsController {
         request.setAttribute("firstLevelCategories", firstLevelCategories);
         request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
-        return "admin/newbee_mall_goods";
+        // return "admin/newbee_mall_goods";
+        return "admin/platGoodsManage";
     }
 
     @GetMapping("/goods/edit")

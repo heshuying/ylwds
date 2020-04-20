@@ -8,6 +8,12 @@
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
 </head>
 <style>
+    body {
+        background-color: #fbfbfb;
+    }
+    .content-wrapper {
+        background: #fbfbfb;
+    }
     .plat-goods-manage-main-page {
         padding: 0 30px;
     }
@@ -66,13 +72,13 @@
         background-color: #477FFF;
     }
     .red-bg {
-        background-color:#FF4600;
+        background-color:#FE4C5F;
     }
     .green-bg {
         background-color: #1FC990;
     }
     .purple-bg {
-        background-color: #CF39C0;
+        background-color: #FE9544;
     }
     .tab-line {
         margin-top: 30px;
@@ -146,6 +152,7 @@
                         :data="tableData"
                         tooltip-effect="dark"
                         style="width: 100%"
+                        @sort-change="sortChange"
                         @selection-change="handleTableSelectionChange">
                     <el-table-column
                             type="selection"
@@ -165,12 +172,14 @@
                             label="供货价"
                             width="100"
                             align="center"
+                            sortable="custom"
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
                             prop="stockNum"
                             label="库存"
                             align="center"
+                            sortable="custom"
                             width="100"
                             show-overflow-tooltip>
                     </el-table-column>
@@ -178,12 +187,14 @@
                             prop="saleTotal"
                             label="销量"
                             align="center"
+                            sortable="custom"
                             width="100"
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
                             prop="onlineTime"
                             label="上架时间"
+                            sortable="custom"
                             align="center"
                             show-overflow-tooltip>
                     </el-table-column>
@@ -233,6 +244,7 @@
                     <el-pagination
                             background
                             layout="prev, pager, next"
+                            :page-size="pagesize"
                             :total="total"
                             @current-change="current_change">
                     </el-pagination>
@@ -261,18 +273,18 @@
                 multipleSelection: [],
                 total: 0,
                 pagesize: 10,
-                currentPage: 1
+                currentPage: 1,
+                sortWord: '',
+                sortType: ''
             };
         },
         mounted() {
             var _this = this;
             var statusObj = [[${goodsStatus}]] || {};
             Object.keys(statusObj).forEach(function(key){
-                console.log(key,statusObj[key]);
                 _this.statusOptions.push({label:key,value:statusObj[key]});
             });
             this.statusOptions.unshift({label: '',value: ''});
-            console.log(this.statusOptions);
             this.sysTypeOptions = [[${firstLevelCategories}]] || '';
             this.sysTypeOptions.unshift({categoryId: '',categoryName: ""});
             this.queryTableData();
@@ -282,9 +294,24 @@
             handleTableSelectionChange(val) {
                 this.multipleSelection = val;
             },
+            // 表格上排序方式发生改变
+            sortChange(column) {
+                if(column.prop.indexOf('sellingPrice') > -1) {
+                    this.sortWord = 'sellingPrice';
+                } else {
+                    this.sortWord = column.prop;
+                }
+                if(column.order.indexOf('desc') > -1) {
+                    this.sortType = 'desc';
+                } else {
+                    this.sortType = 'asc';
+                }
+                this.queryTableData();
+            },
             // 换页
             current_change: function (currentPage) {
                 this.currentPage = currentPage;
+                this.queryTableData();
             },
             // 新增商品
             addGoods() {
@@ -294,12 +321,13 @@
             editGoods(valObj) {
               console.log('edit goods');
             },
-            // 查询供应商和系统分类下拉内容
+            // 查询表格数据
             queryTableData() {
                 var _this = this;
                 $.ajax({
                     url: '/admin/goods/list?_search=true&nd=1587021247684&page=' + this.currentPage + '&limit=' + this.pagesize  +
-                    '&goodsStatus=' + this.goodsStatus + '&categoryId=' + this.categoryId + '&goodsName=' + this.goodsName,
+                    '&goodsStatus=' + this.goodsStatus + '&categoryId=' + this.categoryId + '&goodsName=' + this.goodsName +
+                    '&sidx=' + this.sortWord + '&order=' + this.sortType,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {

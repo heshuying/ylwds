@@ -8,6 +8,12 @@
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
 </head>
 <style>
+    body {
+        background-color: #fbfbfb;
+    }
+    .content-wrapper {
+        background: #fbfbfb;
+    }
     .admin-user-manage-main-page {
         padding: 0 30px;
     }
@@ -186,6 +192,7 @@
                             background
                             layout="prev, pager, next"
                             :total="total"
+                            :page-size="pagesize"
                             @current-change="current_change">
                     </el-pagination>
                 </div>
@@ -403,9 +410,6 @@
             </div>
         </div>
     </div>
-    <!-- /.content-wrapper -->
-    <!-- 引入页脚footer-fragment -->
-    <div th:replace="admin/footer::footer-fragment"></div>
 </div>
 <!-- jQuery -->
 <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
@@ -455,6 +459,7 @@
             // 换页
             current_change: function (currentPage) {
                 this.currentPage = currentPage;
+                this.queryTableData();
             },
             // 会员营业执照下载
             downloadCustom() {

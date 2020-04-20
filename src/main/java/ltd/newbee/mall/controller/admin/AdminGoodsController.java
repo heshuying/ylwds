@@ -49,8 +49,8 @@ public class AdminGoodsController {
         request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
         // return "admin/newbee_mall_goods";
-        // return "admin/platGoodsManage";
-        return "admin/busiGoodsManage";
+        return "admin/platGoodsManage";
+        // return "admin/busiGoodsManage";
     }
 
     @GetMapping("/goods/edit")

@@ -8,6 +8,12 @@
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
 </head>
 <style>
+    body {
+        background-color: #fbfbfb;
+    }
+    .content-wrapper {
+        background: #fbfbfb;
+    }
     .plat-goods-manage-main-page {
         padding: 0 30px;
     }
@@ -229,6 +235,7 @@
                     <el-pagination
                             background
                             layout="prev, pager, next"
+                            :page-size="pagesize"
                             :total="total"
                             @current-change="current_change">
                     </el-pagination>
@@ -310,6 +317,7 @@
             // 换页
             current_change: function (currentPage) {
                 this.currentPage = currentPage;
+                this.queryTableData();
             },
             // 会员营业执照下载
             downloadCustom() {

@@ -49,7 +49,8 @@ public class AdminGoodsController {
         request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
         // return "admin/newbee_mall_goods";
-        return "admin/platGoodsManage";
+        // return "admin/platGoodsManage";
+        return "admin/busiGoodsManage";
     }
 
     @GetMapping("/goods/edit")
@@ -67,7 +68,7 @@ public class AdminGoodsController {
                 request.setAttribute("secondLevelCategories", secondLevelCategories);
                 request.setAttribute("thirdLevelCategories", thirdLevelCategories);
                 request.setAttribute("path", "goods-edit");
-                return "admin/newbee_mall_goods_edit";
+                return "admin/busiGoodsAddEdit";
             }
         }
         return "error/error_5xx";

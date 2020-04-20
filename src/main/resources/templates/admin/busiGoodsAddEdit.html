@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+</head>
+<style>
+    .busi-goods-edit-main-page {
+        min-width: 1080px;
+        padding: 10px 30px 20px;
+        background-color: #fff;
+    }
+    .base-info-line {
+        display: flex;
+        align-items: center;
+    }
+    .base-info-title {
+        padding-left: 15px;
+        border-left: 2px solid #477fff;
+    }
+    .base-info-hr {
+        width: 88%;
+        margin-left: 15px;
+    }
+    .goods-main-content {
+        margin-top: 20px;
+    }
+    .row-line {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .row-line-with-intro {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .el-select {
+        width: 32.8%;
+    }
+    .title-content {
+        text-align: right;
+        color: #333;
+    }
+    .intro-content {
+        font-size: 14px;
+        color: #999;
+    }
+     .red-span {
+        color: #FF581A;
+    }
+     .mini-font {
+         font-size: 12px;
+         text-align: right;
+     }
+    .span-hide {
+        visibility: hidden;
+    }
+    .specs-btn-area {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .specs-margin {
+        margin: 25px 0;
+    }
+    .specs-btn-area img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+    .first-photo-item {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ccc;
+        color: #fff;
+        font-size: 40px;
+    }
+    .operator-btn-area {
+        line-height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+    }
+    .el-input__prefix {
+        display: flex;
+        align-items: center;
+    }
+    .tag-span {
+        display: inline-block;
+        padding: 3px 12px 3px 20px;
+        background-color: #477FFF;
+        border-radius: 12.5px;
+        margin-left: 5px;
+        color: #fff;
+    }
+    .tag-span i {
+        margin-left: 8px;
+        cursor: pointer;
+    }
+</style>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="busi-goods-edit-main-page">
+            <div class="base-info-line">
+                <div class="base-info-title">基本信息</div>
+                <div class="base-info-hr">
+                    <hr/>
+                </div>
+            </div>
+            <div class="goods-main-content">
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        商品分类
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="15">
+                        <el-select v-model="firstCateValue" placeholder="请选择" @change="handleCategoryChange">
+                            <el-option
+                                    v-for="item in firstCategory"
+                                    :key="item.categoryId"
+                                    :label="item.categoryName"
+                                    :value="item.categoryId">
+                            </el-option>
+                        </el-select>
+                        <el-select v-model="secondCateValue" placeholder="请选择" @change="handleCategoryChange">
+                            <el-option
+                                    v-for="item in secondCategory"
+                                    :key="item.categoryId"
+                                    :label="item.categoryName"
+                                    :value="item.categoryId">
+                            </el-option>
+                        </el-select>
+                        <el-select v-model="thridCateValue" placeholder="请选择">
+                            <el-option
+                                    v-for="item in thridCategory"
+                                    :key="item.categoryId"
+                                    :label="item.categoryName"
+                                    :value="item.categoryId">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        商品名称
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="15">
+                        <el-input maxlength="30" show-word-limit v-model="goodsName"></el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        商品简介
+                        <span class="span-hide">*</span>
+                    </el-col>
+                    <el-col :span="15">
+                        <el-input type="textarea" maxlength="50" show-word-limit v-model="goodsIntro"></el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        商品价格
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="3">
+                        <el-input placeholder="原价" v-model="originalPrice">
+                            <span slot="prefix" style="margin-left: 5px;">
+                                ¥
+                            </span>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="3">
+                        <el-input placeholder="供货价" v-model="sellingPrice">
+                             <span slot="prefix" style="margin-left: 5px;">
+                                ¥
+                            </span>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="1" class="mini-font">
+                        <span>运费</span>
+                    </el-col>
+                    <el-col :span="3">
+                        <el-input>
+                             <span slot="prefix" style="margin-left: 5px;">
+                                ¥
+                            </span>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="2" class="mini-font">
+                        <span>库存</span>
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="3">
+                        <el-input v-model="stockNum"></el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line-with-intro">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        标签
+                        <span class="span-hide">*</span>
+                    </el-col>
+                    <el-col :span="15">
+                        <el-input v-model="tagInput" @change="handleTagChange">
+                            <span slot="prefix" class="tag-span" v-for="(item,index) in tagList" :key="item.index">
+                                {{item.tagName}}
+                                <i class="el-icon-close" @click="delTag(index)"></i>
+                            </span>
+                        </el-input>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="15" :offset="6" class="intro-content">
+                        <span>回车添加标签，每个标签不超过4个字，最多3个产品标签</span>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line-with-intro" v-for="(item,index) in specsList" :key="item.index">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        可选规格{{index+1}}
+                        <span class="span-hide">*</span>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-input></el-input>
+                    </el-col>
+                    <el-col :span="3" class="specs-btn-area" @click.native="delSpecs(index)">
+                        <img th:src="@{/admin/image/del.png}" alt="">
+                        <span style="color: #FD5F39;">删除</span>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line specs-margin">
+                    <el-col :span="15" :offset="6" class="specs-btn-area" @click.native="addSpecs">
+                        <img th:src="@{/admin/image/add-blue.png}" alt="">
+                        <span style="color: #477FFF;">添加规格</span>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        商品首图
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="3">
+                        <div class="first-photo-item">
+                            +
+                        </div>
+                    </el-col>
+                    <el-col :span="3">
+                        <div class="first-photo-item">
+                            +
+                        </div>
+                    </el-col>
+                    <el-col :span="3">
+                        <div class="first-photo-item">
+                            +
+                        </div>
+                    </el-col>
+                    <el-col :span="3">
+                        <div class="first-photo-item">
+                            +
+                        </div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
+                    <el-col :span="3" :offset="3" class="title-content">
+                        图文详情
+                        <span class="red-span">*</span>
+                    </el-col>
+                    <el-col :span="15">
+                        <el-input type="textarea" rows="8" v-model="goodsDetailContent"></el-input>
+                    </el-col>
+                </el-row>
+                <div class="operator-btn-area">
+                    <el-button style="margin-right: 30px">暂存仓库</el-button>
+                    <el-button type="primary">申请上架</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+</div>
+<!-- jQuery -->
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+<!-- 引入组件库 -->
+<script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+<script th:inline="javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                specsList:[],  // 规格列表
+                tagList: [],   // 标签列表
+                tagInput: '',
+                goodsName: '',
+                goodsIntro: '',
+                originalPrice: '',
+                sellingPrice: '',
+                stockNum: '',
+                goodsDetailContent: '',
+                firstCategory: [],
+                firstCateValue: '',
+                secondCategory: [],
+                secondCateValue: '',
+                thridCategory: [],
+                thridCateValue: '',
+            };
+        },
+        mounted() {
+            this.firstCategory = [[${firstLevelCategories}]] || '';
+            console.log(this.firstCategory);
+            this.secondCategory = [[${secondLevelCategories}]] || '';
+            console.log(this.secondCategory);
+            this.thridCategory = [[${thirdLevelCategories}]] || '';
+        },
+        methods: {
+            // 删除某个规格
+            delSpecs(index) {
+                this.specsList.splice(index, 1);
+            },
+            // 增加规格
+            addSpecs() {
+                this.specsList.push(this.specsList.length);
+            },
+            // 操作tag
+            handleTagChange(val) {
+                if(this.tagList.length < 3) {
+                    this.tagList.push({tagName:val});
+                } else {
+                    this.$message.error('最多支持3个标签');
+                }
+                this.tagInput = '';
+            },
+            // 删除tag
+            delTag(index) {
+                this.tagList.splice(index, 1);
+            },
+            // 分类下拉值发生改变
+            handleCategoryChange(val) {
+                var _this = this;
+                $.ajax({
+                    url: '/admin/categories/listForSelect?categoryId=' + val,
+                    type: 'GET',
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            if(result.data.secondLevelCategories) {
+                                _this.secondCateValue = '';
+                                _this.secondCategory = result.data.secondLevelCategories;
+                            }
+                            _this.thridCateValue = '';
+                            _this.thridCategory = result.data.thirdLevelCategories;
+                        } else {
+                            _this.$message.error(result.message);
+                        };
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -44,7 +44,10 @@
     .el-input {
         width: 200px;
     }
-
+    thead tr {
+        background: #F5F6F8 !important;
+        color: #999;
+    }
     .cell .el-input {
         width: 80px;
     }
@@ -133,6 +136,7 @@
                         ref="multipleTable"
                         :data="tableData"
                         tooltip-effect="dark"
+                        stripe
                         style="width: 100%"
                         @selection-change="handleTableSelectionChange">
                     <el-table-column

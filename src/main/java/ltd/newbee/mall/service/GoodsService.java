@@ -8,7 +8,7 @@ import ltd.newbee.mall.util.PageResult;
 
 import java.util.List;
 
-public interface NewBeeMallGoodsService {
+public interface GoodsService {
     /**
      * 后台分页
      *

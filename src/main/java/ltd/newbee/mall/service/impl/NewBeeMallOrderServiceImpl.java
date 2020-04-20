@@ -34,6 +34,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -218,7 +219,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
                 }
                 //生成订单号
                 String orderNo = NumberUtil.genOrderNo();
-                int priceTotal = 0;
+                BigDecimal priceTotal = BigDecimal.ZERO;
                 //保存订单
                 NewBeeMallOrder newBeeMallOrder = new NewBeeMallOrder();
                 newBeeMallOrder.setOrderNo(orderNo);
@@ -226,9 +227,9 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
                 newBeeMallOrder.setUserAddress(user.getAddress());
                 //总价
                 for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : myShoppingCartItems) {
-                    priceTotal += newBeeMallShoppingCartItemVO.getGoodsCount() * newBeeMallShoppingCartItemVO.getSellingPrice();
+                    priceTotal = priceTotal.add(BigDecimal.valueOf(newBeeMallShoppingCartItemVO.getGoodsCount()).multiply(newBeeMallShoppingCartItemVO.getSellingPrice()));
                 }
-                if (priceTotal < 1) {
+                if (priceTotal.compareTo(new BigDecimal(1)) < 0) {
                     NewBeeMallException.fail(ServiceResultEnum.ORDER_PRICE_ERROR.getResult());
                 }
                 newBeeMallOrder.setTotalPrice(priceTotal);

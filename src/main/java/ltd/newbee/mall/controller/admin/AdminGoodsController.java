@@ -1,6 +1,5 @@
 package ltd.newbee.mall.controller.admin;
 
-import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.GoodsStatusEnum;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -9,7 +8,7 @@ import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
-import ltd.newbee.mall.service.NewBeeMallGoodsService;
+import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -23,17 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
+ * 商品管理
  */
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallGoodsController {
+public class AdminGoodsController {
 
     @Resource
-    private NewBeeMallGoodsService newBeeMallGoodsService;
+    private GoodsService newBeeMallGoodsService;
     @Resource
     private NewBeeMallCategoryService newBeeMallCategoryService;
 
@@ -46,13 +42,14 @@ public class NewBeeMallGoodsController {
         goodsStatus.put("仓库中", "1,6");
         goodsStatus.put("审核中", "2");
         goodsStatus.put("销售中", "3");
-        goodsStatus.put("下架中", "4，5");
+        goodsStatus.put("下架中", "4,5");
 
         request.setAttribute("companyList", companyList);
         request.setAttribute("firstLevelCategories", firstLevelCategories);
         request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
-        return "admin/newbee_mall_goods";
+        // return "admin/newbee_mall_goods";
+        return "admin/platGoodsManage";
     }
 
     @GetMapping("/goods/edit")
@@ -176,14 +173,12 @@ public class NewBeeMallGoodsController {
     @ResponseBody
     public Result save(@RequestBody NewBeeMallGoods newBeeMallGoods) {
         if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsIntro())
-                || StringUtils.isEmpty(newBeeMallGoods.getTag())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())
-                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
                 || Objects.isNull(newBeeMallGoods.getSellingPrice())
+                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
                 || Objects.isNull(newBeeMallGoods.getStockNum())
                 || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
+//                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -203,17 +198,7 @@ public class NewBeeMallGoodsController {
     @RequestMapping(value = "/goods/update", method = RequestMethod.POST)
     @ResponseBody
     public Result update(@RequestBody NewBeeMallGoods newBeeMallGoods) {
-        if (Objects.isNull(newBeeMallGoods.getGoodsId())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsIntro())
-                || StringUtils.isEmpty(newBeeMallGoods.getTag())
-                || Objects.isNull(newBeeMallGoods.getOriginalPrice())
-                || Objects.isNull(newBeeMallGoods.getSellingPrice())
-                || Objects.isNull(newBeeMallGoods.getGoodsCategoryId())
-                || Objects.isNull(newBeeMallGoods.getStockNum())
-                || Objects.isNull(newBeeMallGoods.getGoodsSellStatus())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsCoverImg())
-                || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
+        if (Objects.isNull(newBeeMallGoods.getGoodsId())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
         String result = newBeeMallGoodsService.updateNewBeeMallGoods(newBeeMallGoods);
@@ -242,7 +227,7 @@ public class NewBeeMallGoodsController {
      */
     @RequestMapping(value = "/goods/status/{sellStatus}", method = RequestMethod.PUT)
     @ResponseBody
-    public Result delete(@RequestBody GoodsStatusUpdateReqDTO requestBean, @PathVariable("sellStatus") Integer sellStatus) {
+    public Result statusUpdate(@RequestBody GoodsStatusUpdateReqDTO requestBean, @PathVariable("sellStatus") Integer sellStatus) {
         if (requestBean.getIds().length < 1) {
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -255,6 +240,24 @@ public class NewBeeMallGoodsController {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("修改失败");
+        }
+    }
+
+    /**
+     * 更新商品价格
+     */
+    @PostMapping(value = "/goods/updatePrice")
+    @ResponseBody
+    public Result statusUpdate(@RequestBody NewBeeMallGoods reqBean) {
+        if (reqBean == null || reqBean.getGoodsId() == null || reqBean.getProfit() == null || reqBean.getPrice() == null) {
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+
+        String result = newBeeMallGoodsService.updateNewBeeMallGoods(reqBean);
+        if (result.equalsIgnoreCase(ServiceResultEnum.SUCCESS.getResult())) {
+            return ResultGenerator.genSuccessResult();
+        } else {
+            return ResultGenerator.genFailResult("更新失败");
         }
     }
 

@@ -9,7 +9,7 @@ import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
 import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.NewBeeMallGoods;
-import ltd.newbee.mall.service.NewBeeMallGoodsService;
+import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class NewBeeMallGoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeMallGoods> implements NewBeeMallGoodsService {
+public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeMallGoods> implements GoodsService {
 
     @Autowired
     private NewBeeMallGoodsMapper goodsMapper;

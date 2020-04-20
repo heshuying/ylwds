@@ -20,11 +20,10 @@ public class GoodsAndCompayResDTO {
 
     private String goodsCarousel;
 
-    private Integer originalPrice;
-
-    private Integer sellingPrice;
-    private Integer profit;
-    private Integer price;
+    private BigDecimal originalPrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal profit;
+    private BigDecimal price;
     private Integer stockNum;
 
     private String tag;
@@ -88,10 +87,10 @@ public class GoodsAndCompayResDTO {
         if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "待下架";
         }
-        if(GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "前端下架";
         }
-        if(GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.OFF_INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "已下架";
         }
 
@@ -107,7 +106,7 @@ public class GoodsAndCompayResDTO {
             return "";
         }
 
-        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.OFF_INSTORE.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "仓库中";
         }
         if(GoodsStatusEnum.AUDITTING.getGoodsStatus().equals(this.getGoodsSellStatus())){
@@ -116,7 +115,7 @@ public class GoodsAndCompayResDTO {
         if(GoodsStatusEnum.SELLING.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "销售中";
         }
-        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.equals(this.getGoodsSellStatus())){
+        if(GoodsStatusEnum.SELLING_OFF_REQUEST.getGoodsStatus().equals(this.getGoodsSellStatus()) || GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus().equals(this.getGoodsSellStatus())){
             return "下架中";
         }
 
@@ -267,38 +266,6 @@ public class GoodsAndCompayResDTO {
         return goodsSellStatus;
     }
 
-    public Integer getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public void setOriginalPrice(Integer originalPrice) {
-        this.originalPrice = originalPrice;
-    }
-
-    public Integer getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(Integer sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public Integer getProfit() {
-        return profit;
-    }
-
-    public void setProfit(Integer profit) {
-        this.profit = profit;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
     public Long getUserId() {
         return userId;
     }
@@ -313,5 +280,37 @@ public class GoodsAndCompayResDTO {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public BigDecimal getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(BigDecimal sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
+    public BigDecimal getProfit() {
+        return profit;
+    }
+
+    public void setProfit(BigDecimal profit) {
+        this.profit = profit;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

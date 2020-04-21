@@ -316,11 +316,11 @@
             },
             // 新增商品
             addGoods() {
-                console.log('add goods');
+                window.location.href = "/admin/goods/edit";
             },
             // 编辑商品
             editGoods(valObj) {
-              console.log('edit goods');
+                window.location.href = "/admin/goods/edit/" + valObj.goodsId;
             },
             // 查询表格数据
             queryTableData() {

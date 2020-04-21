@@ -166,7 +166,7 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <el-input maxlength="30" show-word-limit v-model="goodsName"></el-input>
+                        <el-input placeholder="30个汉字以内(60个字符)" maxlength="60" show-word-limit v-model="goodsName"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
@@ -175,7 +175,7 @@
                         <span class="span-hide">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <el-input type="textarea" maxlength="50" show-word-limit v-model="goodsIntro"></el-input>
+                        <el-input type="textarea" placeholder="50个汉字以内(100个字符)" maxlength="100" show-word-limit v-model="goodsIntro"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
@@ -201,7 +201,7 @@
                         <span>运费</span>
                     </el-col>
                     <el-col :span="3">
-                        <el-input>
+                        <el-input v-model="transitMoney">
                              <span slot="prefix" style="margin-left: 5px;">
                                 ¥
                             </span>
@@ -212,7 +212,7 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="3">
-                        <el-input v-model="stockNum"></el-input>
+                        <el-input placeholder="可销售数量" v-model="stockNum"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line-with-intro">
@@ -223,7 +223,7 @@
                     <el-col :span="15">
                         <el-input v-model="tagInput" @change="handleTagChange">
                             <span slot="prefix" class="tag-span" v-for="(item,index) in tagList" :key="item.index">
-                                {{item.tagName}}
+                                {{item}}
                                 <i class="el-icon-close" @click="delTag(index)"></i>
                             </span>
                         </el-input>
@@ -240,7 +240,7 @@
                         <span class="span-hide">*</span>
                     </el-col>
                     <el-col :span="6">
-                        <el-input></el-input>
+                        <el-input v-model="item.specsValue"></el-input>
                     </el-col>
                     <el-col :span="3" class="specs-btn-area" @click.native="delSpecs(index)">
                         <img th:src="@{/admin/image/del.png}" alt="">
@@ -253,7 +253,7 @@
                         <span style="color: #477FFF;">添加规格</span>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20" class="row-line">
+                <el-row :gutter="20" class="row-line-with-intro">
                     <el-col :span="3" :offset="3" class="title-content">
                         商品首图
                         <span class="red-span">*</span>
@@ -280,6 +280,11 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
+                    <el-col :span="15" :offset="6" class="intro-content">
+                        <span>需上传4张图片，要求每张尺寸430*470，大小不超过1M,拍摄清晰</span>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="row-line">
                     <el-col :span="3" :offset="3" class="title-content">
                         图文详情
                         <span class="red-span">*</span>
@@ -289,8 +294,8 @@
                     </el-col>
                 </el-row>
                 <div class="operator-btn-area">
-                    <el-button style="margin-right: 30px">暂存仓库</el-button>
-                    <el-button type="primary">申请上架</el-button>
+                    <el-button style="margin-right: 30px" @click="saveService('1')">暂存仓库</el-button>
+                    <el-button type="primary" @click="saveService('2')">申请上架</el-button>
                 </div>
             </div>
         </div>
@@ -307,6 +312,7 @@
         el: '#app',
         data() {
             return {
+                goodsId: '',
                 specsList:[],  // 规格列表
                 tagList: [],   // 标签列表
                 tagInput: '',
@@ -314,6 +320,7 @@
                 goodsIntro: '',
                 originalPrice: '',
                 sellingPrice: '',
+                transitMoney: '',
                 stockNum: '',
                 goodsDetailContent: '',
                 firstCategory: [],
@@ -326,10 +333,33 @@
         },
         mounted() {
             this.firstCategory = [[${firstLevelCategories}]] || '';
-            console.log(this.firstCategory);
             this.secondCategory = [[${secondLevelCategories}]] || '';
-            console.log(this.secondCategory);
             this.thridCategory = [[${thirdLevelCategories}]] || '';
+            // 编辑反显的类别
+            this.firstCateValue = [[${firstLevelCategoryId}]] || '';
+            this.secondCateValue = [[${secondLevelCategoryId}]] || '';
+            this.thridCateValue = [[${thirdLevelCategoryId}]] || '';
+            var returnGoods = [[${goods}]];
+            if(returnGoods) {
+                this.goodsId = returnGoods.goodsId;
+                this.goodsName = returnGoods.goodsName;
+                this.goodsIntro = returnGoods.goodsIntro;
+                this.originalPrice = returnGoods.originalPrice;
+                this.sellingPrice = returnGoods.sellingPrice;
+                this.transitMoney = returnGoods.transitMoney;
+                this.stockNum = returnGoods.stockNum;
+                this.goodsDetailContent = returnGoods.goodsDetailContent;
+                if(returnGoods.tag) {
+                    this.tagList = returnGoods.tag.split(',');
+                }
+                var specsTmp = [];
+                if(returnGoods.gooodsAttribute) {
+                    specsTmp = returnGoods.gooodsAttribute.split(',');
+                }
+                for(var i in specsTmp) {
+                    this.specsList.push({specsValue: specsTmp[i]});
+                }
+            }
         },
         methods: {
             // 删除某个规格
@@ -338,12 +368,12 @@
             },
             // 增加规格
             addSpecs() {
-                this.specsList.push(this.specsList.length);
+                this.specsList.push({specsValue: ''});
             },
             // 操作tag
             handleTagChange(val) {
                 if(this.tagList.length < 3) {
-                    this.tagList.push({tagName:val});
+                    this.tagList.push(val);
                 } else {
                     this.$message.error('最多支持3个标签');
                 }
@@ -375,6 +405,74 @@
                         _this.$message.error('操作失败');
                     }
                 });
+            },
+            // 申请上架或暂存仓库
+            saveService(type) {
+                var _this = this;
+                if(!this.validateInput()) {
+                    this.$message.error('请填写完整信息后重试');
+                    return;
+                }
+                var url = '/admin/goods/save';
+                var postTag = '';
+                for(var i in this.tagList) {
+                    if(postTag === '') {
+                        postTag = this.tagList[i];
+                    } else {
+                        postTag = postTag + ',' + this.tagList[i];
+                    }
+                }
+                var postGooodsAttribute = '';
+                for(var j in this.specsList) {
+                    if(postGooodsAttribute === '') {
+                        postGooodsAttribute = this.specsList[j].specsValue;
+                    } else {
+                        postGooodsAttribute = postGooodsAttribute + ',' + this.specsList[j].specsValue;
+                    }
+                }
+                var data = {
+//                    goodsId: this.goodsId,
+                    goodsCategoryId: this.thridCateValue,
+                    goodsName: this.goodsName,
+                    goodsIntro: this.goodsIntro,
+                    originalPrice: this.originalPrice,
+                    sellingPrice: this.sellingPrice,
+                    transitMoney: this.transitMoney,
+                    stockNum: this.stockNum,
+                    tag: postTag,
+                    gooodsAttribute: postGooodsAttribute,
+                    goodsDetailContent: this.goodsDetailContent,
+                    goodsSellStatus: type
+                }
+                if(this.goodsId) {
+                    data.goodsId = this.goodsId;
+                    url = '/admin/goods/update';
+                }
+                $.ajax({
+                    type: 'POST',//方法类型
+                    url: url,
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            window.location.href = "/admin/goods";
+                        } else {
+                            _this.$message.error(result.message);
+                        };
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 验证必输字段
+            validateInput() {
+                if(this.thridCateValue === '' ||  this.goodsName === '' || this.originalPrice === '' || this.sellingPrice === '' ||
+                        this.stockNum === '' || this.goodsDetailContent === '') {
+                    return false;
+                }
+                return true;
             }
         }
     })

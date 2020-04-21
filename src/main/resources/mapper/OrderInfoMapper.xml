@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ltd.newbee.mall.dao.OrderInfoMapper" >
+  <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.order.OrderInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="delivery_address" property="deliveryAddress" jdbcType="VARCHAR" />
+    <result column="express_company" property="expressCompany" jdbcType="VARCHAR" />
+    <result column="express_id" property="expressId" jdbcType="VARCHAR" />
+    <result column="user_remark" property="userRemark" jdbcType="VARCHAR" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
+    <result column="cut_down" property="cutDown" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="gross_profit" property="grossProfit" jdbcType="DECIMAL" />
+    <result column="buying_price" property="buyingPrice" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, status, update_time, create_time, delivery_address, express_company, express_id, 
+    user_remark, customer_id, supplier_id, cut_down, total_price, gross_profit, buying_price
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_order_orderinfo
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_order_orderinfo
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="ltd.newbee.mall.entity.order.OrderInfo" >
+    insert into tb_order_orderinfo (id, status, update_time, 
+      create_time, delivery_address, express_company, 
+      express_id, user_remark, customer_id, 
+      supplier_id, cut_down, total_price, 
+      gross_profit, buying_price)
+    values (#{id,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{deliveryAddress,jdbcType=VARCHAR}, #{expressCompany,jdbcType=VARCHAR}, 
+      #{expressId,jdbcType=VARCHAR}, #{userRemark,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
+      #{supplierId,jdbcType=INTEGER}, #{cutDown,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, 
+      #{grossProfit,jdbcType=DECIMAL}, #{buyingPrice,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.order.OrderInfo" >
+    insert into tb_order_orderinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="deliveryAddress != null" >
+        delivery_address,
+      </if>
+      <if test="expressCompany != null" >
+        express_company,
+      </if>
+      <if test="expressId != null" >
+        express_id,
+      </if>
+      <if test="userRemark != null" >
+        user_remark,
+      </if>
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="cutDown != null" >
+        cut_down,
+      </if>
+      <if test="totalPrice != null" >
+        total_price,
+      </if>
+      <if test="grossProfit != null" >
+        gross_profit,
+      </if>
+      <if test="buyingPrice != null" >
+        buying_price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryAddress != null" >
+        #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="expressCompany != null" >
+        #{expressCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="expressId != null" >
+        #{expressId,jdbcType=VARCHAR},
+      </if>
+      <if test="userRemark != null" >
+        #{userRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cutDown != null" >
+        #{cutDown,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="grossProfit != null" >
+        #{grossProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="buyingPrice != null" >
+        #{buyingPrice,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.order.OrderInfo" >
+    update tb_order_orderinfo
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryAddress != null" >
+        delivery_address = #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="expressCompany != null" >
+        express_company = #{expressCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="expressId != null" >
+        express_id = #{expressId,jdbcType=VARCHAR},
+      </if>
+      <if test="userRemark != null" >
+        user_remark = #{userRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=INTEGER},
+      </if>
+      <if test="cutDown != null" >
+        cut_down = #{cutDown,jdbcType=DECIMAL},
+      </if>
+      <if test="totalPrice != null" >
+        total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="grossProfit != null" >
+        gross_profit = #{grossProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="buyingPrice != null" >
+        buying_price = #{buyingPrice,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.order.OrderInfo" >
+    update tb_order_orderinfo
+    set status = #{status,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      delivery_address = #{deliveryAddress,jdbcType=VARCHAR},
+      express_company = #{expressCompany,jdbcType=VARCHAR},
+      express_id = #{expressId,jdbcType=VARCHAR},
+      user_remark = #{userRemark,jdbcType=VARCHAR},
+      customer_id = #{customerId,jdbcType=INTEGER},
+      supplier_id = #{supplierId,jdbcType=INTEGER},
+      cut_down = #{cutDown,jdbcType=DECIMAL},
+      total_price = #{totalPrice,jdbcType=DECIMAL},
+      gross_profit = #{grossProfit,jdbcType=DECIMAL},
+      buying_price = #{buyingPrice,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <select id="count" resultType="java.lang.Integer">
+
+    select count(1) from tb_order_orderinfo
+  </select>
+
+  <select id="selectByPageForSupplier" parameterType="ltd.newbee.mall.util.PageQueryUtil" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from tb_order_orderinfo
+    <where>
+      <if test="id!=null and id!=''">
+        and id = #{id}
+      </if>
+      <if test="status!=null and status!=''">
+        and status = #{status}
+      </if>
+      <if test="userId!=null and userId!=''">
+        and supplier_id = #{userId}
+      </if>
+    </where>
+    order by create_time desc
+    <if test="start!=null and limit!=null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+
+  <select id="selectByPageForPlatform" parameterType="ltd.newbee.mall.util.PageQueryUtil" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from tb_order_orderinfo
+    <where>
+      <if test="id!=null and id!=''">
+        and id = #{id}
+      </if>
+      <if test="status!=null and status!=''">
+        and status = #{status}
+      </if>
+    </where>
+    order by create_time desc
+    <if test="start!=null and limit!=null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+
+  <select id="selectByPageForCustomer" parameterType="ltd.newbee.mall.util.PageQueryUtil" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from tb_order_orderinfo
+    <where>
+      <if test="id!=null and id!=''">
+        and id = #{id}
+      </if>
+      <if test="status!=null and status!=''">
+        and status = #{status}
+      </if>
+      <if test="systemType!=null and systemType!=''">
+        and system_type = #{systemType}
+      </if>
+      <if test="userId!=null and userId!=''">
+        and customer_id = #{userId}
+      </if>
+    </where>
+    order by create_time desc
+    <if test="start!=null and limit!=null">
+      limit #{start},#{limit}
+    </if>
+  </select>
+
+  <update id="cutDownPrice" parameterType="ltd.newbee.mall.entity.order.CutDownPriceParam">
+    update tb_order_orderinfo set gross_profit = (total_price-cut_down-buying_price) where id = #{orderId}
+  </update>
+</mapper>

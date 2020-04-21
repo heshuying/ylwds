@@ -5,7 +5,7 @@ import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallShoppingCartItemVO;
 import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
 import ltd.newbee.mall.dao.NewBeeMallShoppingCartItemMapper;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.entity.NewBeeMallShoppingCartItem;
 import ltd.newbee.mall.service.NewBeeMallShoppingCartService;
 import ltd.newbee.mall.util.BeanUtil;
@@ -37,7 +37,7 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
             temp.setGoodsCount(newBeeMallShoppingCartItem.getGoodsCount());
             return updateNewBeeMallCartItem(temp);
         }
-        NewBeeMallGoods newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKey(newBeeMallShoppingCartItem.getGoodsId());
+        TbGoodsInfo newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKey(newBeeMallShoppingCartItem.getGoodsId());
         //商品为空
         if (newBeeMallGoods == null) {
             return ServiceResultEnum.GOODS_NOT_EXIST.getResult();
@@ -93,16 +93,16 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
         if (!CollectionUtils.isEmpty(newBeeMallShoppingCartItems)) {
             //查询商品信息并做数据转换
             List<Long> newBeeMallGoodsIds = newBeeMallShoppingCartItems.stream().map(NewBeeMallShoppingCartItem::getGoodsId).collect(Collectors.toList());
-            List<NewBeeMallGoods> newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKeys(newBeeMallGoodsIds);
-            Map<Long, NewBeeMallGoods> newBeeMallGoodsMap = new HashMap<>();
+            List<TbGoodsInfo> newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKeys(newBeeMallGoodsIds);
+            Map<Long, TbGoodsInfo> newBeeMallGoodsMap = new HashMap<>();
             if (!CollectionUtils.isEmpty(newBeeMallGoods)) {
-                newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(NewBeeMallGoods::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
+                newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(TbGoodsInfo::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
             }
             for (NewBeeMallShoppingCartItem newBeeMallShoppingCartItem : newBeeMallShoppingCartItems) {
                 NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO = new NewBeeMallShoppingCartItemVO();
                 BeanUtil.copyProperties(newBeeMallShoppingCartItem, newBeeMallShoppingCartItemVO);
                 if (newBeeMallGoodsMap.containsKey(newBeeMallShoppingCartItem.getGoodsId())) {
-                    NewBeeMallGoods newBeeMallGoodsTemp = newBeeMallGoodsMap.get(newBeeMallShoppingCartItem.getGoodsId());
+                    TbGoodsInfo newBeeMallGoodsTemp = newBeeMallGoodsMap.get(newBeeMallShoppingCartItem.getGoodsId());
                     newBeeMallShoppingCartItemVO.setGoodsCoverImg(newBeeMallGoodsTemp.getGoodsCoverImg());
                     String goodsName = newBeeMallGoodsTemp.getGoodsName();
                     // 字符串过长导致文字超出的问题

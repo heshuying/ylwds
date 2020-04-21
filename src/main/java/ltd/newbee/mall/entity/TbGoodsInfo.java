@@ -1,11 +1,17 @@
 package ltd.newbee.mall.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class NewBeeMallGoods {
+public class TbGoodsInfo {
+    /**
+     * 用户主键id
+     */
+    @TableId(value = "goods_id", type = IdType.AUTO)
     private Long goodsId;
 
     private String goodsName;

@@ -2,40 +2,39 @@ package ltd.newbee.mall.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.entity.StockNumDTO;
-import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.util.PageQueryUtil;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface NewBeeMallGoodsMapper extends BaseMapper<NewBeeMallGoods> {
+public interface NewBeeMallGoodsMapper extends BaseMapper<TbGoodsInfo> {
     int deleteByPrimaryKey(Long goodsId);
 
-    int insert(NewBeeMallGoods record);
+//    int insert(NewBeeMallGoods record);
 
-    int insertSelective(NewBeeMallGoods record);
+    int insertSelective(TbGoodsInfo record);
 
-    NewBeeMallGoods selectByPrimaryKey(Long goodsId);
+    TbGoodsInfo selectByPrimaryKey(Long goodsId);
 
-    int updateByPrimaryKeySelective(NewBeeMallGoods record);
+    int updateByPrimaryKeySelective(TbGoodsInfo record);
 
-    int updateByPrimaryKeyWithBLOBs(NewBeeMallGoods record);
+    int updateByPrimaryKeyWithBLOBs(TbGoodsInfo record);
 
-    int updateByPrimaryKey(NewBeeMallGoods record);
+    int updateByPrimaryKey(TbGoodsInfo record);
 
     List<GoodsAndCompayResDTO> findNewBeeMallGoodsList(PageQueryUtil pageUtil);
 
     int getTotalNewBeeMallGoods(PageQueryUtil pageUtil);
 
-    List<NewBeeMallGoods> selectByPrimaryKeys(List<Long> goodsIds);
+    List<TbGoodsInfo> selectByPrimaryKeys(List<Long> goodsIds);
 
-    List<NewBeeMallGoods> findNewBeeMallGoodsListBySearch(PageQueryUtil pageUtil);
+    List<TbGoodsInfo> findNewBeeMallGoodsListBySearch(PageQueryUtil pageUtil);
 
     int getTotalNewBeeMallGoodsBySearch(PageQueryUtil pageUtil);
 
-    int batchInsert(@Param("newBeeMallGoodsList") List<NewBeeMallGoods> newBeeMallGoodsList);
+    int batchInsert(@Param("newBeeMallGoodsList") List<TbGoodsInfo> newBeeMallGoodsList);
 
     int updateStockNum(@Param("stockNumDTOS") List<StockNumDTO> stockNumDTOS);
 

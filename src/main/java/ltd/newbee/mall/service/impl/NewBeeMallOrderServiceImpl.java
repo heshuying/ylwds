@@ -13,7 +13,7 @@ import ltd.newbee.mall.dao.NewBeeMallOrderMapper;
 import ltd.newbee.mall.dao.NewBeeMallShoppingCartItemMapper;
 import ltd.newbee.mall.dto.CreatePayQrcodeTo;
 import ltd.newbee.mall.dto.PayQrcodeVo;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.entity.NewBeeMallOrder;
 import ltd.newbee.mall.entity.NewBeeMallOrderItem;
 import ltd.newbee.mall.entity.StockNumDTO;
@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -196,8 +195,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     public String saveOrder(NewBeeMallUserVO user, List<NewBeeMallShoppingCartItemVO> myShoppingCartItems) {
         List<Long> itemIdList = myShoppingCartItems.stream().map(NewBeeMallShoppingCartItemVO::getCartItemId).collect(Collectors.toList());
         List<Long> goodsIds = myShoppingCartItems.stream().map(NewBeeMallShoppingCartItemVO::getGoodsId).collect(Collectors.toList());
-        List<NewBeeMallGoods> newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKeys(goodsIds);
-        Map<Long, NewBeeMallGoods> newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(NewBeeMallGoods::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
+        List<TbGoodsInfo> newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKeys(goodsIds);
+        Map<Long, TbGoodsInfo> newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(TbGoodsInfo::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
         //判断商品库存
         for (NewBeeMallShoppingCartItemVO shoppingCartItemVO : myShoppingCartItems) {
             //查出的商品中不存在购物车中的这条关联商品数据，直接返回错误提醒

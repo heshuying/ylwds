@@ -45,7 +45,7 @@ public class GoodsAndCompayResDTO {
     /**
      * 可选规格：多个以逗号分隔
      */
-    private String gooodsAttribute;
+    private String goodsAttribute;
     /**
      * 下架原因
      */
@@ -230,12 +230,12 @@ public class GoodsAndCompayResDTO {
         this.saleTotal = saleTotal;
     }
 
-    public String getGooodsAttribute() {
-        return gooodsAttribute;
+    public String getGoodsAttribute() {
+        return goodsAttribute;
     }
 
-    public void setGooodsAttribute(String gooodsAttribute) {
-        this.gooodsAttribute = gooodsAttribute;
+    public void setGoodsAttribute(String goodsAttribute) {
+        this.goodsAttribute = goodsAttribute;
     }
 
     public String getMsgOffline() {

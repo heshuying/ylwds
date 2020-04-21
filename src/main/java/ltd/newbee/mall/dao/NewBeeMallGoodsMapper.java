@@ -40,4 +40,5 @@ public interface NewBeeMallGoodsMapper extends BaseMapper<TbGoodsInfo> {
 
     int batchUpdateSellStatus(@Param("orderIds")Long[] orderIds, @Param("msgOffline") String msgOffline, @Param("msgReject") String msgReject, @Param("sellStatus") int sellStatus);
 
+    int checkCanOffline(Long goodsId);
 }

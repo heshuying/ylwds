@@ -57,6 +57,8 @@ public interface GoodsService {
      */
     Boolean batchUpdateSellStatus(GoodsStatusUpdateReqDTO requstBean, int sellStatus);
 
+    boolean checkCanOffline(Long googdsId);
+
     /**
      * 商品搜索
      *

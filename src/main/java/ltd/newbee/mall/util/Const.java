@@ -100,4 +100,34 @@ public class Const {
             return null;
         }
     }
+
+    public static enum SettleStatus {
+        Uncheck(1),
+        UnEdit(2),
+        UnBill(3),
+        UnPay(4),
+        Finish(5);
+        private Integer key;
+        SettleStatus(Integer key){
+            this.key = key;
+        }
+
+        public Integer getKey() {
+            return key;
+        }
+
+        public void setKey(Integer key) {
+            this.key = key;
+        }
+
+
+        public static SettleStatus getByKey(Integer key){
+            for(SettleStatus type: SettleStatus.values()){
+                if(type.getKey()==key){
+                    return type;
+                }
+            }
+            return null;
+        }
+    }
 }

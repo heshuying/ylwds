@@ -150,12 +150,12 @@
                 order by g.online_time desc
             </if>
         </if>
-        <if test="sidx!=null and sidx=='price'">
+        <if test="sidx!=null and sidx=='sellingPrice'">
             <if test="order == 'asc'">
-                order by g.price asc
+                order by g.selling_price asc
             </if>
             <if test="order == 'desc'">
-                order by g.price desc
+                order by g.selling_price desc
             </if>
         </if>
         <if test="sidx==null or sidx==''">

@@ -1,43 +1,35 @@
 package ltd.newbee.mall.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.kjtpay.gateway.common.domain.base.ResponseParameter;
-import com.kjtpay.gateway.common.domain.instanttrade.TradeRes;
-import com.kjtpay.gateway.common.util.JsonMapUtil;
+import com.alibaba.fastjson.JSONObject;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 import ltd.newbee.mall.common.*;
 import ltd.newbee.mall.controller.vo.*;
-import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
-import ltd.newbee.mall.dao.NewBeeMallOrderItemMapper;
-import ltd.newbee.mall.dao.NewBeeMallOrderMapper;
-import ltd.newbee.mall.dao.NewBeeMallShoppingCartItemMapper;
-import ltd.newbee.mall.dto.CreatePayQrcodeTo;
-import ltd.newbee.mall.dto.PayQrcodeVo;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
-import ltd.newbee.mall.entity.NewBeeMallOrder;
-import ltd.newbee.mall.entity.NewBeeMallOrderItem;
-import ltd.newbee.mall.entity.StockNumDTO;
+import ltd.newbee.mall.dao.*;
+import ltd.newbee.mall.entity.order.CutDownPriceParam;
+import ltd.newbee.mall.entity.order.DeliverGoodsParam;
+import ltd.newbee.mall.entity.order.OrderInfo;
 import ltd.newbee.mall.service.KjtService;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
-import ltd.newbee.mall.util.AmountUtils;
-import ltd.newbee.mall.util.BeanUtil;
-import ltd.newbee.mall.util.Const;
-import ltd.newbee.mall.util.NumberUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
-import ltd.newbee.mall.util.Result;
-import ltd.newbee.mall.util.ResultGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
+import javax.servlet.ServletOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -53,397 +45,250 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Autowired
     private NewBeeMallGoodsMapper newBeeMallGoodsMapper;
 
+
+
+    @Autowired
+    private OrderInfoMapper orderInfoMapper;
+
+    @Autowired
+    private OrderGoodInfoMapper orderGoodInfoMapper;
+
     @Autowired
     private KjtService kjtService;
 
     @Override
-    public PageResult getNewBeeMallOrdersPage(PageQueryUtil pageUtil) {
-        List<NewBeeMallOrder> newBeeMallOrders = newBeeMallOrderMapper.findNewBeeMallOrderList(pageUtil);
-        int total = newBeeMallOrderMapper.getTotalNewBeeMallOrders(pageUtil);
-        PageResult pageResult = new PageResult(newBeeMallOrders, total, pageUtil.getLimit(), pageUtil.getPage());
+    public PageResult getMyOrdersForSupplier(PageQueryUtil pageUtil) {
+        //获取总条数
+        int total = orderInfoMapper.count();
+        //查询每页的数据
+        List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForSupplier(pageUtil);
+        List<OrderInfoVo> orderListVOS = new ArrayList<>();
+        for(OrderInfo info : orderInfos){
+            String s = JSONObject.toJSONString(info);
+            OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            //查询订单的商品信息
+            List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
+            vo.setGoods(orderGoodInfos);
+            BigDecimal price = BigDecimal.valueOf(0.00);
+            for(OrderGoodInfoVo goodInfoVo : orderGoodInfos){
+                price = price.add(BigDecimal.valueOf(goodInfoVo.getUnitPrice()).multiply(BigDecimal.valueOf(goodInfoVo.getNumber())));
+            }
+            vo.setTotalPrice(price);
+            orderListVOS.add(vo);
+        }
+        PageResult pageResult = new PageResult(orderListVOS, total, pageUtil.getLimit(), pageUtil.getPage());
         return pageResult;
     }
 
-    @Override
-    @Transactional
-    public String updateOrderInfo(NewBeeMallOrder newBeeMallOrder) {
-        NewBeeMallOrder temp = newBeeMallOrderMapper.selectByPrimaryKey(newBeeMallOrder.getOrderId());
-        //不为空且orderStatus>=0且状态为出库之前可以修改部分信息
-        if (temp != null && temp.getOrderStatus() >= 0 && temp.getOrderStatus() < 3) {
-            temp.setTotalPrice(newBeeMallOrder.getTotalPrice());
-            temp.setUserAddress(newBeeMallOrder.getUserAddress());
-            temp.setUpdateTime(new Date());
-            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(temp) > 0) {
-                return ServiceResultEnum.SUCCESS.getResult();
-            }
-            return ServiceResultEnum.DB_ERROR.getResult();
-        }
-        return ServiceResultEnum.DATA_NOT_EXIST.getResult();
+    /**
+     *  资源方-导出订单
+     */
+    public void exportOrdersForSupplier(){
     }
 
     @Override
-    @Transactional
-    public String checkDone(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<NewBeeMallOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
-        String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (NewBeeMallOrder newBeeMallOrder : orders) {
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                    continue;
-                }
-                if (newBeeMallOrder.getOrderStatus() != 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                }
-            }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行配货完成操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.checkDone(Arrays.asList(ids)) > 0) {
-                    return ServiceResultEnum.SUCCESS.getResult();
-                } else {
-                    return ServiceResultEnum.DB_ERROR.getResult();
-                }
-            } else {
-                //订单此时不可执行出库操作
-                if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
-                    return errorOrderNos + "订单的状态不是支付成功无法执行出库操作";
-                } else {
-                    return "你选择了太多状态不是支付成功的订单，无法执行配货完成操作";
-                }
-            }
-        }
-        //未查询到数据 返回错误提示
-        return ServiceResultEnum.DATA_NOT_EXIST.getResult();
-    }
+    public PageResult getMyOrdersForPlatform(PageQueryUtil pageUtil) {
+        //获取总条数
+        int total = orderInfoMapper.count();
+        //查询每页的数据
+        List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForPlatform(pageUtil);
 
-    @Override
-    @Transactional
-    public String checkOut(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<NewBeeMallOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
-        String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (NewBeeMallOrder newBeeMallOrder : orders) {
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                    continue;
-                }
-                if (newBeeMallOrder.getOrderStatus() != 1 && newBeeMallOrder.getOrderStatus() != 2) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                }
+        List<OrderInfoVo> orderListVOS = new ArrayList<>();
+        for(OrderInfo info : orderInfos){
+            String s = JSONObject.toJSONString(info);
+            OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            //查询订单的商品信息
+            List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
+            vo.setGoods(orderGoodInfos);
+/*            BigDecimal totalPrice = BigDecimal.valueOf(0.00);
+            for(OrderGoodInfoVo goodInfoVo : orderGoodInfos){
+                totalPrice = BigDecimal.valueOf(goodInfoVo.getUnitPrice()).multiply(BigDecimal.valueOf(goodInfoVo.getNumber()));
             }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行出库操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.checkOut(Arrays.asList(ids)) > 0) {
-                    return ServiceResultEnum.SUCCESS.getResult();
-                } else {
-                    return ServiceResultEnum.DB_ERROR.getResult();
-                }
-            } else {
-                //订单此时不可执行出库操作
-                if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
-                    return errorOrderNos + "订单的状态不是支付成功或配货完成无法执行出库操作";
-                } else {
-                    return "你选择了太多状态不是支付成功或配货完成的订单，无法执行出库操作";
-                }
-            }
-        }
-        //未查询到数据 返回错误提示
-        return ServiceResultEnum.DATA_NOT_EXIST.getResult();
-    }
-
-    @Override
-    @Transactional
-    public String closeOrder(Long[] ids) {
-        //查询所有的订单 判断状态 修改状态和更新时间
-        List<NewBeeMallOrder> orders = newBeeMallOrderMapper.selectByPrimaryKeys(Arrays.asList(ids));
-        String errorOrderNos = "";
-        if (!CollectionUtils.isEmpty(orders)) {
-            for (NewBeeMallOrder newBeeMallOrder : orders) {
-                // isDeleted=1 一定为已关闭订单
-                if (newBeeMallOrder.getIsDeleted() == 1) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                    continue;
-                }
-                //已关闭或者已完成无法关闭订单
-                if (newBeeMallOrder.getOrderStatus() == 4 || newBeeMallOrder.getOrderStatus() < 0) {
-                    errorOrderNos += newBeeMallOrder.getOrderNo() + " ";
-                }
-            }
-            if (StringUtils.isEmpty(errorOrderNos)) {
-                //订单状态正常 可以执行关闭操作 修改订单状态和更新时间
-                if (newBeeMallOrderMapper.closeOrder(Arrays.asList(ids), NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_JUDGE.getOrderStatus()) > 0) {
-                    return ServiceResultEnum.SUCCESS.getResult();
-                } else {
-                    return ServiceResultEnum.DB_ERROR.getResult();
-                }
-            } else {
-                //订单此时不可执行关闭操作
-                if (errorOrderNos.length() > 0 && errorOrderNos.length() < 100) {
-                    return errorOrderNos + "订单不能执行关闭操作";
-                } else {
-                    return "你选择的订单不能执行关闭操作";
-                }
-            }
-        }
-        //未查询到数据 返回错误提示
-        return ServiceResultEnum.DATA_NOT_EXIST.getResult();
-    }
-
-    @Override
-    @Transactional
-    public String saveOrder(NewBeeMallUserVO user, List<NewBeeMallShoppingCartItemVO> myShoppingCartItems) {
-        List<Long> itemIdList = myShoppingCartItems.stream().map(NewBeeMallShoppingCartItemVO::getCartItemId).collect(Collectors.toList());
-        List<Long> goodsIds = myShoppingCartItems.stream().map(NewBeeMallShoppingCartItemVO::getGoodsId).collect(Collectors.toList());
-        List<NewBeeMallGoods> newBeeMallGoods = newBeeMallGoodsMapper.selectByPrimaryKeys(goodsIds);
-        Map<Long, NewBeeMallGoods> newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(NewBeeMallGoods::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
-        //判断商品库存
-        for (NewBeeMallShoppingCartItemVO shoppingCartItemVO : myShoppingCartItems) {
-            //查出的商品中不存在购物车中的这条关联商品数据，直接返回错误提醒
-            if (!newBeeMallGoodsMap.containsKey(shoppingCartItemVO.getGoodsId())) {
-                NewBeeMallException.fail(ServiceResultEnum.SHOPPING_ITEM_ERROR.getResult());
-            }
-            //存在数量大于库存的情况，直接返回错误提醒
-            if (shoppingCartItemVO.getGoodsCount() > newBeeMallGoodsMap.get(shoppingCartItemVO.getGoodsId()).getStockNum()) {
-                NewBeeMallException.fail(ServiceResultEnum.SHOPPING_ITEM_COUNT_ERROR.getResult());
-            }
-        }
-        //删除购物项
-        if (!CollectionUtils.isEmpty(itemIdList) && !CollectionUtils.isEmpty(goodsIds) && !CollectionUtils.isEmpty(newBeeMallGoods)) {
-            if (newBeeMallShoppingCartItemMapper.deleteBatch(itemIdList) > 0) {
-                List<StockNumDTO> stockNumDTOS = BeanUtil.copyList(myShoppingCartItems, StockNumDTO.class);
-                int updateStockNumResult = newBeeMallGoodsMapper.updateStockNum(stockNumDTOS);
-                if (updateStockNumResult < 1) {
-                    NewBeeMallException.fail(ServiceResultEnum.SHOPPING_ITEM_COUNT_ERROR.getResult());
-                }
-                //生成订单号
-                String orderNo = NumberUtil.genOrderNo();
-                BigDecimal priceTotal = BigDecimal.ZERO;
-                //保存订单
-                NewBeeMallOrder newBeeMallOrder = new NewBeeMallOrder();
-                newBeeMallOrder.setOrderNo(orderNo);
-                newBeeMallOrder.setUserId(user.getUserId());
-                newBeeMallOrder.setUserAddress(user.getAddress());
-                //总价
-                for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : myShoppingCartItems) {
-                    priceTotal = priceTotal.add(BigDecimal.valueOf(newBeeMallShoppingCartItemVO.getGoodsCount()).multiply(newBeeMallShoppingCartItemVO.getSellingPrice()));
-                }
-                if (priceTotal.compareTo(new BigDecimal(1)) < 0) {
-                    NewBeeMallException.fail(ServiceResultEnum.ORDER_PRICE_ERROR.getResult());
-                }
-                newBeeMallOrder.setTotalPrice(priceTotal);
-                //todo 订单body字段，用来作为生成支付单描述信息，暂时未接入第三方支付接口，故该字段暂时设为空字符串
-                String extraInfo = "";
-                newBeeMallOrder.setExtraInfo(extraInfo);
-                //生成订单项并保存订单项纪录
-                if (newBeeMallOrderMapper.insertSelective(newBeeMallOrder) > 0) {
-                    //生成所有的订单项快照，并保存至数据库
-                    List<NewBeeMallOrderItem> newBeeMallOrderItems = new ArrayList<>();
-                    for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : myShoppingCartItems) {
-                        NewBeeMallOrderItem newBeeMallOrderItem = new NewBeeMallOrderItem();
-                        //使用BeanUtil工具类将newBeeMallShoppingCartItemVO中的属性复制到newBeeMallOrderItem对象中
-                        BeanUtil.copyProperties(newBeeMallShoppingCartItemVO, newBeeMallOrderItem);
-                        //NewBeeMallOrderMapper文件insert()方法中使用了useGeneratedKeys因此orderId可以获取到
-                        newBeeMallOrderItem.setOrderId(newBeeMallOrder.getOrderId());
-                        newBeeMallOrderItems.add(newBeeMallOrderItem);
-                    }
-                    //保存至数据库
-                    if (newBeeMallOrderItemMapper.insertBatch(newBeeMallOrderItems) > 0) {
-                        //所有操作成功后，将订单号返回，以供Controller方法跳转到订单详情
-                        return orderNo;
-                    }
-                    NewBeeMallException.fail(ServiceResultEnum.ORDER_PRICE_ERROR.getResult());
-                }
-                NewBeeMallException.fail(ServiceResultEnum.DB_ERROR.getResult());
-            }
-            NewBeeMallException.fail(ServiceResultEnum.DB_ERROR.getResult());
-        }
-        NewBeeMallException.fail(ServiceResultEnum.SHOPPING_ITEM_ERROR.getResult());
-        return ServiceResultEnum.SHOPPING_ITEM_ERROR.getResult();
-    }
-
-    @Override
-    public NewBeeMallOrderDetailVO getOrderDetailByOrderNo(String orderNo, Long userId) {
-        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
-        if (newBeeMallOrder != null) {
-            //todo 验证是否是当前userId下的订单，否则报错
-            List<NewBeeMallOrderItem> orderItems = newBeeMallOrderItemMapper.selectByOrderId(newBeeMallOrder.getOrderId());
-            //获取订单项数据
-            if (!CollectionUtils.isEmpty(orderItems)) {
-                List<NewBeeMallOrderItemVO> newBeeMallOrderItemVOS = BeanUtil.copyList(orderItems, NewBeeMallOrderItemVO.class);
-                NewBeeMallOrderDetailVO newBeeMallOrderDetailVO = new NewBeeMallOrderDetailVO();
-                BeanUtil.copyProperties(newBeeMallOrder, newBeeMallOrderDetailVO);
-                newBeeMallOrderDetailVO.setOrderStatusString(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(newBeeMallOrderDetailVO.getOrderStatus()).getName());
-                newBeeMallOrderDetailVO.setPayTypeString(PayTypeEnum.getPayTypeEnumByType(newBeeMallOrderDetailVO.getPayType()).getName());
-                newBeeMallOrderDetailVO.setNewBeeMallOrderItemVOS(newBeeMallOrderItemVOS);
-                return newBeeMallOrderDetailVO;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public NewBeeMallOrder getNewBeeMallOrderByOrderNo(String orderNo) {
-        return newBeeMallOrderMapper.selectByOrderNo(orderNo);
-    }
-
-    @Override
-    public PageResult getMyOrders(PageQueryUtil pageUtil) {
-        int total = newBeeMallOrderMapper.getTotalNewBeeMallOrders(pageUtil);
-        List<NewBeeMallOrder> newBeeMallOrders = newBeeMallOrderMapper.findNewBeeMallOrderList(pageUtil);
-        List<NewBeeMallOrderListVO> orderListVOS = new ArrayList<>();
-        if (total > 0) {
-            //数据转换 将实体类转成vo
-            orderListVOS = BeanUtil.copyList(newBeeMallOrders, NewBeeMallOrderListVO.class);
-            //设置订单状态中文显示值
-            for (NewBeeMallOrderListVO newBeeMallOrderListVO : orderListVOS) {
-                newBeeMallOrderListVO.setOrderStatusString(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(newBeeMallOrderListVO.getOrderStatus()).getName());
-            }
-            List<Long> orderIds = newBeeMallOrders.stream().map(NewBeeMallOrder::getOrderId).collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(orderIds)) {
-                List<NewBeeMallOrderItem> orderItems = newBeeMallOrderItemMapper.selectByOrderIds(orderIds);
-                Map<Long, List<NewBeeMallOrderItem>> itemByOrderIdMap = orderItems.stream().collect(groupingBy(NewBeeMallOrderItem::getOrderId));
-                for (NewBeeMallOrderListVO newBeeMallOrderListVO : orderListVOS) {
-                    //封装每个订单列表对象的订单项数据
-                    if (itemByOrderIdMap.containsKey(newBeeMallOrderListVO.getOrderId())) {
-                        List<NewBeeMallOrderItem> orderItemListTemp = itemByOrderIdMap.get(newBeeMallOrderListVO.getOrderId());
-                        //将NewBeeMallOrderItem对象列表转换成NewBeeMallOrderItemVO对象列表
-                        List<NewBeeMallOrderItemVO> newBeeMallOrderItemVOS = BeanUtil.copyList(orderItemListTemp, NewBeeMallOrderItemVO.class);
-                        newBeeMallOrderListVO.setNewBeeMallOrderItemVOS(newBeeMallOrderItemVOS);
-                    }
-                }
-            }
+            vo.setTotalPrice(totalPrice);*/
+            orderListVOS.add(vo);
         }
         PageResult pageResult = new PageResult(orderListVOS, total, pageUtil.getLimit(), pageUtil.getPage());
         return pageResult;
     }
 
     @Override
-    public String cancelOrder(String orderNo, Long userId) {
-        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
-        if (newBeeMallOrder != null) {
-            //todo 验证是否是当前userId下的订单，否则报错
-            //todo 订单状态判断
-            if (newBeeMallOrderMapper.closeOrder(Collections.singletonList(newBeeMallOrder.getOrderId()), NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_MALLUSER.getOrderStatus()) > 0) {
-                return ServiceResultEnum.SUCCESS.getResult();
-            } else {
-                return ServiceResultEnum.DB_ERROR.getResult();
-            }
-        }
-        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
+    public void deliverGoods(DeliverGoodsParam params) {
+        OrderInfo info = new OrderInfo();
+        info.setId(params.getOrderId());
+        info.setExpressCompany(params.getExpressCompany());
+        info.setExpressId(params.getExpressNumber());
+        info.setUpdateTime(new Date());
+        orderInfoMapper.updateByPrimaryKeySelective(info);
     }
 
     @Override
-    public String finishOrder(String orderNo, Long userId) {
-        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
-        if (newBeeMallOrder != null) {
-            //todo 验证是否是当前userId下的订单，否则报错
-            //todo 订单状态判断
-            newBeeMallOrder.setOrderStatus((byte) NewBeeMallOrderStatusEnum.ORDER_SUCCESS.getOrderStatus());
-            newBeeMallOrder.setUpdateTime(new Date());
-            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(newBeeMallOrder) > 0) {
-                return ServiceResultEnum.SUCCESS.getResult();
-            } else {
-                return ServiceResultEnum.DB_ERROR.getResult();
-            }
+    public void cutDownPrice(CutDownPriceParam params) {
+        OrderInfo info = new OrderInfo();
+        info.setId(params.getOrderId());
+        info.setCutDown(params.getCutdownNumber());
+        int i = orderInfoMapper.updateByPrimaryKeySelective(info);
+        int i1 = orderInfoMapper.cutDownPrice(params);
+        if(i == 0 || i1 == 0){
+            throw new RuntimeException();
         }
-        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
+
+
     }
 
     @Override
-    public String paySuccess(String orderNo, int payType) {
-        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
-        if (newBeeMallOrder != null) {
-            //todo 订单状态判断 非待支付状态下不进行修改操作
-            newBeeMallOrder.setOrderStatus((byte) NewBeeMallOrderStatusEnum.OREDER_PAID.getOrderStatus());
-            newBeeMallOrder.setPayType((byte) payType);
-            newBeeMallOrder.setPayStatus((byte) PayStatusEnum.PAY_SUCCESS.getPayStatus());
-            newBeeMallOrder.setPayTime(new Date());
-            newBeeMallOrder.setUpdateTime(new Date());
-            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(newBeeMallOrder) > 0) {
-                return ServiceResultEnum.SUCCESS.getResult();
-            } else {
-                return ServiceResultEnum.DB_ERROR.getResult();
-            }
+    public void batchDeliverGoods(InputStream inputStream) throws Exception {
+        List<OrderInfoVo> orderInfoVos = excelToList(inputStream);
+        for(OrderInfoVo vo : orderInfoVos){
+            OrderInfo info = new OrderInfo();
+            info.setId(vo.getId());
+            info.setExpressCompany(vo.getExpressCompany());
+            info.setExpressId(vo.getExpressId());
+            info.setUpdateTime(new Date());
+            orderInfoMapper.updateByPrimaryKeySelective(info);
         }
-        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
     }
 
-    @Override
-    public List<NewBeeMallOrderItemVO> getOrderItems(Long id) {
-        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByPrimaryKey(id);
-        if (newBeeMallOrder != null) {
-            List<NewBeeMallOrderItem> orderItems = newBeeMallOrderItemMapper.selectByOrderId(newBeeMallOrder.getOrderId());
-            //获取订单项数据
-            if (!CollectionUtils.isEmpty(orderItems)) {
-                List<NewBeeMallOrderItemVO> newBeeMallOrderItemVOS = BeanUtil.copyList(orderItems, NewBeeMallOrderItemVO.class);
-                return newBeeMallOrderItemVOS;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Result createPayQrcode(CreatePayQrcodeTo to, String payerIp) {
-        Const.EnumPayType type = Const.EnumPayType.getByKey(to.getPayType());
-        if (type == null) {
-            return ResultGenerator.genFailResult( "支付类型异常");
-        }
-        if (type != Const.EnumPayType.PAY_TYPE_03 && type != Const.EnumPayType.PAY_TYPE_04) {
-            return ResultGenerator.genFailResult( "支付类型不支持");
-        }
-        List<String> orderCodeList = to.getOrderCodeList();
-        List<NewBeeMallOrder> orderList = newBeeMallOrderMapper.selectByOrderNos(orderCodeList);
-        if (orderList == null) {
-            return ResultGenerator.genFailResult("订单不存在");
-        }
-        String orderAmount = "0.00";
-        HashSet<String> orderSet=new HashSet<>();//判断订单是否已经存在 如果不存在金额可以处理
-        List<NewBeeMallOrder> newOrderList =new ArrayList<>();
-        for (NewBeeMallOrder order : orderList) {
-            if(orderSet.contains(order.getOrderNo())){
-                continue;
-            }else{
-                orderSet.add(order.getOrderNo());
-                newOrderList.add(order);
-                orderAmount = AmountUtils.add(orderAmount, order.getOrderNo());
-            }
-        }
-        NewBeeMallOrder order = newOrderList.get(0);
-
-        //生成支付二维码
-
-            String payResult = kjtService.instantTrade(order.getOrderNo(), "华为手机",
-                    order.getTotalPrice().toString(), "1",
-                    order.getTotalPrice().toString(), payerIp, type.getKey());
-            ResponseParameter responseParameter = JSON.parseObject(payResult, new TypeReference<ResponseParameter>() {
-            });
-            String code = responseParameter.getCode();
-            if ("S10000".equals(code)) {
-                String tradeResStr = responseParameter.getBizContent().toString();
-                TradeRes tradeRes = JsonMapUtil.gsonToObj(tradeResStr, TradeRes.class);
-                String status = tradeRes.getStatus();//return_url out_trade_no trade_no
-                if (!"P".equals(status)) {
-                    return ResultGenerator.genFailResult("生成付款码失败，请稍后重试");
+    private List<OrderInfoVo> excelToList(InputStream inputStream) throws Exception{
+        List<OrderInfoVo> list = new ArrayList<>();
+        jxl.Workbook book = Workbook.getWorkbook(inputStream);
+        Sheet sheet = book.getSheet(0);
+        for (int j = 1; j < sheet.getRows(); j++) {
+            Cell[] cells = sheet.getRow(j);
+            OrderInfoVo vo = new OrderInfoVo();
+            for(int k=0;k<cells.length;k++){
+                if(k == 0){
+                    vo.setId(Long.valueOf(cells[k].getContents()));
                 }
-                String tradeNo = tradeRes.getTradeNo();
-                String returnUrl = tradeRes.getReturnUrl();
-                PayQrcodeVo vo = new PayQrcodeVo();
-                vo.setOrderCode(order.getOrderNo());
-                vo.setPayType(to.getPayType());
-                vo.setTradeNo(tradeNo);
-                vo.setPayData(returnUrl);
-                vo.setPayAmount(AmountUtils.toYuan(order.getTotalPrice()));
+                if(k == 5){
+                    vo.setExpressCompany(cells[k].getContents());
+                }
+                if(k==6){
+                    vo.setExpressId(cells[k].getContents());
+                }
+            }
+            list.add(vo);
+        }
+        return list;
+    }
 
-                Result<PayQrcodeVo> result=ResultGenerator.genSuccessResult();
-                result.setData(vo);
-                return result;
-            } else {
-                return ResultGenerator.genFailResult("生成付款码失败，请稍后重试");
+
+
+    /**
+     * 将list集合转成Excel文件
+     * @param list  对象集合
+     * @param outputStream  输出路径
+     * @return   返回文件路径
+     */
+    public String createExcel(List<? extends Object> list, ServletOutputStream outputStream){
+        String result = "";
+        if(list.size()==0||list==null){
+            result = "没有对象信息";
+        }else{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Object o = list.get(0);
+            Class<? extends Object> clazz = o.getClass();
+            String className = clazz.getSimpleName();
+            Field[] fields=clazz.getDeclaredFields();    //这里通过反射获取字段数组
+            String fileName = "orders";
+            String name = fileName.concat(".xls");
+            WritableWorkbook book = null;
+            File file = null;
+            try {
+                book = Workbook.createWorkbook(outputStream);  //创建xls文件
+                WritableSheet sheet  =  book.createSheet(className,0);
+                int i = 0;  //列
+                int j = 0;  //行
+                for(Field f:fields){
+                    j = 0;
+                    Label label = new Label(i, j,getRealName(f.getName()));   //这里把字段名称写入excel第一行中
+                    sheet.addCell(label);
+                    j = 1;
+                    for(Object obj:list){
+                        Object temp = getFieldValueByName(f.getName(),obj);
+                        String strTemp = "";
+                        if(temp!=null){
+                            if(f.getName().equals("createTime") || f.getName().equals("updateTime")){
+                                strTemp = sdf.format((Date) temp);
+                            }else {
+                                strTemp = temp.toString();
+                            }
+                        }
+                        sheet.addCell(new Label(i,j,strTemp));  //把每个对象此字段的属性写入这一列excel中
+                        j++;
+                    }
+                    i++;
+                }
+                book.write();
+                result = file.getPath();
+            } catch (Exception e) {
+                result = "SystemException";
+                e.printStackTrace();
+            }finally{
+                fileName = null;
+                name = null;
+                file = null;
+                if(book!=null){
+                    try {
+                        book.close();
+                    } catch (WriteException e) {
+                        result = "WriteException";
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        result = "IOException";
+                        e.printStackTrace();
+                    }
+                }
             }
 
+        }
 
+        return result;   //最后输出文件路径
+    }
+
+
+
+
+    /**
+     * 获取属性值
+     * @param fieldName 字段名称
+     * @param o 对象
+     * @return  Object
+     */
+    private static Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);    //获取方法名
+            Method method = o.getClass().getMethod(getter, new Class[] {});  //获取方法对象
+            Object value = method.invoke(o, new Object[] {});    //用invoke调用此对象的get字段方法
+            return value;  //返回值
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getRealName(String name){
+        switch (name){
+            case "id" : return "订单编号";
+            case "status" : return "订单状态";
+            case "updateTime" : return "最后更新时间";
+            case "createTime" : return "创建时间";
+            case "deliveryAddress" : return "收获地址";
+            case "expressCompany" : return "快递公司";
+            case "expressId" : return "快递单号";
+            case "customerId" : return "客户id";
+            case "supplierId" : return "商户id";
+            case "goods" : return "商品详情";
+            case "totalPrice" : return "订单售价";
+            case "userRemark": return "用户备注";
+            case "grossProfit": return "毛利润";
+            case "buyingPrice": return "进货价";
+            default:return "";
+        }
 
     }
+
+
 }

@@ -8,7 +8,7 @@ import ltd.newbee.mall.dao.TbUserDao;
 import ltd.newbee.mall.dto.GoodsAndCompayResDTO;
 import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeMallGoods> implements GoodsService {
+public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoodsInfo> implements GoodsService {
 
     @Autowired
     private NewBeeMallGoodsMapper goodsMapper;
@@ -38,35 +38,35 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeM
     }
 
     @Override
-    public String saveNewBeeMallGoods(NewBeeMallGoods goods) {
-        if (goodsMapper.insertSelective(goods) > 0) {
+    public String saveNewBeeMallGoods(TbGoodsInfo goods) {
+        if (baseMapper.insert(goods) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
     }
 
     @Override
-    public void batchSaveNewBeeMallGoods(List<NewBeeMallGoods> newBeeMallGoodsList) {
+    public void batchSaveNewBeeMallGoods(List<TbGoodsInfo> newBeeMallGoodsList) {
         if (!CollectionUtils.isEmpty(newBeeMallGoodsList)) {
             goodsMapper.batchInsert(newBeeMallGoodsList);
         }
     }
 
     @Override
-    public String updateNewBeeMallGoods(NewBeeMallGoods goods) {
-        NewBeeMallGoods temp = goodsMapper.selectByPrimaryKey(goods.getGoodsId());
+    public String updateNewBeeMallGoods(TbGoodsInfo goods) {
+        TbGoodsInfo temp = goodsMapper.selectByPrimaryKey(goods.getGoodsId());
         if (temp == null) {
             return ServiceResultEnum.DATA_NOT_EXIST.getResult();
         }
         goods.setUpdateTime(new Date());
-        if (goodsMapper.updateByPrimaryKeySelective(goods) > 0) {
+        if (baseMapper.updateById(goods) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();
     }
 
     @Override
-    public NewBeeMallGoods getNewBeeMallGoodsById(Long id) {
+    public TbGoodsInfo getNewBeeMallGoodsById(Long id) {
         return goodsMapper.selectByPrimaryKey(id);
     }
     
@@ -77,7 +77,7 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, NewBeeM
 
     @Override
     public PageResult searchNewBeeMallGoods(PageQueryUtil pageUtil) {
-        List<NewBeeMallGoods> goodsList = goodsMapper.findNewBeeMallGoodsListBySearch(pageUtil);
+        List<TbGoodsInfo> goodsList = goodsMapper.findNewBeeMallGoodsListBySearch(pageUtil);
         int total = goodsMapper.getTotalNewBeeMallGoodsBySearch(pageUtil);
         List<NewBeeMallSearchGoodsVO> newBeeMallSearchGoodsVOS = new ArrayList<>();
         if (!CollectionUtils.isEmpty(goodsList)) {

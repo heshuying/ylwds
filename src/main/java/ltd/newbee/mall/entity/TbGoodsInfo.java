@@ -1,11 +1,17 @@
 package ltd.newbee.mall.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class NewBeeMallGoods {
+public class TbGoodsInfo {
+    /**
+     * 用户主键id
+     */
+    @TableId(value = "goods_id", type = IdType.AUTO)
     private Long goodsId;
 
     private String goodsName;
@@ -49,7 +55,7 @@ public class NewBeeMallGoods {
     /**
      * 可选规格：多个以逗号分隔
      */
-    private String gooodsAttribute;
+    private String goodsAttribute;
     /**
      * 下架原因
      */
@@ -215,12 +221,12 @@ public class NewBeeMallGoods {
         this.saleTotal = saleTotal;
     }
 
-    public String getGooodsAttribute() {
-        return gooodsAttribute;
+    public String getGoodsAttribute() {
+        return goodsAttribute;
     }
 
-    public void setGooodsAttribute(String gooodsAttribute) {
-        this.gooodsAttribute = gooodsAttribute;
+    public void setGoodsAttribute(String goodsAttribute) {
+        this.goodsAttribute = goodsAttribute;
     }
 
     public String getMsgOffline() {

@@ -6,7 +6,7 @@ import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
@@ -77,7 +77,7 @@ public class AdminGoodsController {
     @GetMapping("/goods/edit/{goodsId}")
     public String edit(HttpServletRequest request, @PathVariable("goodsId") Long goodsId) {
         request.setAttribute("path", "edit");
-        NewBeeMallGoods newBeeMallGoods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
+        TbGoodsInfo newBeeMallGoods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
         if (newBeeMallGoods == null) {
             return "error/error_400";
         }
@@ -172,7 +172,7 @@ public class AdminGoodsController {
      */
     @RequestMapping(value = "/goods/save", method = RequestMethod.POST)
     @ResponseBody
-    public Result save(@RequestBody NewBeeMallGoods newBeeMallGoods) {
+    public Result save(@RequestBody TbGoodsInfo newBeeMallGoods) {
         if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())
                 || Objects.isNull(newBeeMallGoods.getSellingPrice())
@@ -198,7 +198,7 @@ public class AdminGoodsController {
      */
     @RequestMapping(value = "/goods/update", method = RequestMethod.POST)
     @ResponseBody
-    public Result update(@RequestBody NewBeeMallGoods newBeeMallGoods) {
+    public Result update(@RequestBody TbGoodsInfo newBeeMallGoods) {
         if (Objects.isNull(newBeeMallGoods.getGoodsId())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -216,7 +216,7 @@ public class AdminGoodsController {
     @GetMapping("/goods/info/{id}")
     @ResponseBody
     public Result info(@PathVariable("id") Long id) {
-        NewBeeMallGoods goods = newBeeMallGoodsService.getNewBeeMallGoodsById(id);
+        TbGoodsInfo goods = newBeeMallGoodsService.getNewBeeMallGoodsById(id);
         if (goods == null) {
             return ResultGenerator.genFailResult(ServiceResultEnum.DATA_NOT_EXIST.getResult());
         }
@@ -249,7 +249,7 @@ public class AdminGoodsController {
      */
     @PostMapping(value = "/goods/updatePrice")
     @ResponseBody
-    public Result statusUpdate(@RequestBody NewBeeMallGoods reqBean) {
+    public Result statusUpdate(@RequestBody TbGoodsInfo reqBean) {
         if (reqBean == null || reqBean.getGoodsId() == null || reqBean.getProfit() == null || reqBean.getPrice() == null) {
             return ResultGenerator.genFailResult("参数异常！");
         }

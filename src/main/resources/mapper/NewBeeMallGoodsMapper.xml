@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ltd.newbee.mall.dao.NewBeeMallGoodsMapper">
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbGoodsInfo">
         <id column="goods_id" property="goodsId" />
         <result column="goods_name" property="goodsName" />
         <result column="goods_intro" property="goodsIntro" />
@@ -19,7 +19,7 @@
         <result column="sale_total" property="saleTotal" />
         <result column="goods_sno" property="goodsSno" />
         <result column="tag" property="tag" />
-        <result column="gooods_attribute" property="gooodsAttribute" />
+        <result column="goods_attribute" property="goodsAttribute" />
         <result column="goods_sell_status" property="goodsSellStatus" />
         <result column="create_sno" property="createSno" />
         <result column="msg_offline" property="msgOffline" />
@@ -30,7 +30,7 @@
         <result column="update_time" property="updateTime" />
         <result column="online_time" property="onlineTime" />
     </resultMap>
-    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="ltd.newbee.mall.entity.TbGoodsInfo">
         <result column="goods_detail_content" jdbcType="LONGVARCHAR" property="goodsDetailContent"/>
     </resultMap>
 
@@ -41,7 +41,7 @@
 
     <sql id="Base_Column_List">
     goods_id, goods_name, goods_intro,goods_category_id, goods_cover_img, goods_carousel, original_price,
-    selling_price, transit_money, stock_num, sale_total, goods_sno, tag, gooods_attribute, goods_sell_status, create_sno,
+    selling_price, transit_money, stock_num, sale_total, goods_sno, tag, goods_attribute, goods_sell_status, create_sno,
     msg_offline, msg_reject, create_user, create_time, update_user, price,profit,update_time, online_time
   </sql>
     <sql id="Blob_Column_List">
@@ -94,7 +94,7 @@
     <select id="findNewBeeMallGoodsList" parameterType="Map" resultMap="ResultMapGoodsAndCompay">
         select
         g.goods_id, g.goods_name, g.goods_intro, g.goods_category_id, g.goods_cover_img, g.goods_carousel, g.original_price,
-        g.selling_price, g.transit_money, g.stock_num, g.sale_total, g.goods_sno, g.tag, g.gooods_attribute, g.goods_sell_status, g.create_sno,
+        g.selling_price, g.transit_money, g.stock_num, g.sale_total, g.goods_sno, g.tag, g.goods_attribute, g.goods_sell_status, g.create_sno,
         g.msg_offline, g.msg_reject, g.price, g.profit, g.online_time, g.user_id, p.company_name
         from tb_goods_info g
         left join tb_user u on g.user_id = u.user_id
@@ -263,7 +263,7 @@
     delete from tb_goods_info
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <insert id="insert" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
     insert into tb_goods_info (goods_id, goods_name, goods_intro, 
       goods_cover_img, goods_carousel, original_price, 
       selling_price, stock_num, tag, price,profit
@@ -277,7 +277,7 @@
       #{updateUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{goodsDetailContent,jdbcType=LONGVARCHAR}
       )
   </insert>
-    <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
         insert into tb_goods_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">
@@ -392,7 +392,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
         update tb_goods_info
         <set>
             <if test="goodsName != null">
@@ -449,7 +449,7 @@
         </set>
         where goods_id = #{goodsId,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
     update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},
@@ -467,7 +467,7 @@
       goods_detail_content = #{goodsDetailContent,jdbcType=LONGVARCHAR}
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </update>
-    <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.NewBeeMallGoods">
+    <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
     update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},

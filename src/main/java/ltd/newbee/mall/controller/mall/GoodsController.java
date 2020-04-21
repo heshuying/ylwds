@@ -3,7 +3,7 @@ package ltd.newbee.mall.controller.mall;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.controller.vo.NewBeeMallGoodsDetailVO;
 import ltd.newbee.mall.controller.vo.SearchPageCategoryVO;
-import ltd.newbee.mall.entity.NewBeeMallGoods;
+import ltd.newbee.mall.entity.TbGoodsInfo;
 import ltd.newbee.mall.service.NewBeeMallCategoryService;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.BeanUtil;
@@ -63,7 +63,7 @@ public class GoodsController {
         if (goodsId < 1) {
             return "error/error_5xx";
         }
-        NewBeeMallGoods goods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
+        TbGoodsInfo goods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
         if (goods == null) {
             return "error/error_404";
         }

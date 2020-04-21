@@ -29,6 +29,7 @@ import java.util.Map;
 @Controller
 public class OrderController {
 
+/*
     @Resource
     private NewBeeMallShoppingCartService newBeeMallShoppingCartService;
     @Resource
@@ -145,5 +146,6 @@ public class OrderController {
             return ResultGenerator.genFailResult(payResult);
         }
     }
+*/
 
 }

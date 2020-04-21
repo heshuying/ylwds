@@ -25,6 +25,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,10 +57,22 @@ public class NewBeeMallOrderController {
         try{
            /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
             params.put("userId", user.getUserId());*/
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
-            params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && ((String)beginTime).length() != 0){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && ((String)endTime).length() != 0){
+                params.put("endTime",sdf.parse((String)endTime));
+            }
+
+            //TODO 订单下单时间查询
+            params.put("limit", params.get("limit"));
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
             request.setAttribute("pageResult", result);
@@ -139,10 +152,20 @@ public class NewBeeMallOrderController {
     @GetMapping("/orders/platform")
     public String platformOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
-            params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && ((String)beginTime).length() != 0){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && ((String)endTime).length() != 0){
+                params.put("endTime",sdf.parse((String)endTime));
+            }
+
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForPlatform(pageUtil);
             request.setAttribute("pageResult", result);

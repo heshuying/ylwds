@@ -217,6 +217,12 @@
       <if test="userId!=null and userId!=''">
         and supplier_id = #{userId}
       </if>
+      <if test="beginTime!=null">
+        and create_time > #{beginTime}
+      </if>
+      <if test="endTime!=null">
+        and create_time &lt; #{endTime}
+      </if>
     </where>
     order by create_time desc
     <if test="start!=null and limit!=null">
@@ -234,6 +240,12 @@
       </if>
       <if test="status!=null and status!=''">
         and status = #{status}
+      </if>
+      <if test="beginTime!=null">
+        and create_time > #{beginTime}
+      </if>
+      <if test="endTime!=null">
+        and create_time &lt; #{endTime}
       </if>
     </where>
     order by create_time desc

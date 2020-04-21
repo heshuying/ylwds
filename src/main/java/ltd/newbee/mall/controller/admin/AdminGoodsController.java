@@ -249,7 +249,7 @@ public class AdminGoodsController {
      */
     @PostMapping(value = "/goods/updatePrice")
     @ResponseBody
-    public Result statusUpdate(@RequestBody TbGoodsInfo reqBean) {
+    public Result updatePrice(@RequestBody TbGoodsInfo reqBean) {
         if (reqBean == null || reqBean.getGoodsId() == null || reqBean.getProfit() == null || reqBean.getPrice() == null) {
             return ResultGenerator.genFailResult("参数异常！");
         }

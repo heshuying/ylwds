@@ -1,6 +1,7 @@
 package ltd.newbee.mall.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ltd.newbee.mall.common.NewBeeMallException;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallSearchGoodsVO;
 import ltd.newbee.mall.dao.NewBeeMallGoodsMapper;
@@ -72,7 +73,24 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
     
     @Override
     public Boolean batchUpdateSellStatus(GoodsStatusUpdateReqDTO requstBean, int sellStatus) {
+        // 下架要判断是否有未完成的订单（1-待支付 2-待发货 3-待收货 4-待评价 5-售后中）
+        if(sellStatus == 6){
+            for(Long id : requstBean.getIds()){
+                if(!this.checkCanOffline(id)){
+                    throw new NewBeeMallException("有未完成订单不可以下架，请前端下架");
+                }
+            }
+        }
         return goodsMapper.batchUpdateSellStatus(requstBean.getIds(), requstBean.getMsgOffline(), requstBean.getMsgReject(), sellStatus) > 0;
+    }
+
+    /**
+     * 校验是否可下架
+     */
+    @Override
+    public boolean checkCanOffline(Long googdsId){
+        int count = goodsMapper.checkCanOffline(googdsId);
+        return count>0 ? false:true;
     }
 
     @Override

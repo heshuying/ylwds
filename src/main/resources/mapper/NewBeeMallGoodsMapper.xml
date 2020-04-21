@@ -484,4 +484,17 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </update>
+    <select id="checkCanOffline" resultType="int">
+        SELECT
+          COUNT(o.id)
+        FROM
+          tb_order_orderinfo o
+        WHERE o.id IN
+          (SELECT
+            order_id
+          FROM
+            tb_order_goodinfo og
+          WHERE og.`good_id` = #{value})
+          AND o.`status` IN (1,2,3,4,5)
+    </select>
 </mapper>

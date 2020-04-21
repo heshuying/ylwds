@@ -72,7 +72,9 @@ public class NewBeeMallOrderController {
             }
 
             //TODO 订单下单时间查询
-            params.put("limit", params.get("limit"));
+            if(params.get("limit") == null){
+                params.put("limit","10");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
             request.setAttribute("pageResult", result);
@@ -165,7 +167,9 @@ public class NewBeeMallOrderController {
             if(endTime != null && ((String)endTime).length() != 0){
                 params.put("endTime",sdf.parse((String)endTime));
             }
-
+            if(params.get("limit") == null){
+                params.put("limit","10");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForPlatform(pageUtil);
             request.setAttribute("pageResult", result);

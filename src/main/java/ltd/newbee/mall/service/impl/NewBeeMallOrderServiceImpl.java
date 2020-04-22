@@ -233,7 +233,6 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
 
                 }
                 book.write();
-                result = file.getPath();
             } catch (Exception e) {
                 result = "SystemException";
                 e.printStackTrace();
@@ -293,11 +292,12 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             case "customerId" : return "客户id";
             case "supplierId" : return "商户id";
             case "goods" : return "商品详情";
-            case "totalPrice" : return "订单售价";
+            case "totalPrice" : return "订单原价";
             case "userRemark": return "用户备注";
             case "grossProfit": return "毛利润";
             case "buyingPrice": return "进货价";
             case "cutDown" : return "平台减免价格";
+            case "realPrice" : return "最终售价";
             default:return "";
         }
 

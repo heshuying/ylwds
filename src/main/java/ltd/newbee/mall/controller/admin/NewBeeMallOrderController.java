@@ -92,8 +92,7 @@ public class NewBeeMallOrderController {
     public Result SupplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
            /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-            params.put("userId", user.getUserId());*/
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("userId", user.getUserId());*/           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
@@ -161,7 +160,7 @@ public class NewBeeMallOrderController {
             pageUtil.put("start",null);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
             List<?> list = result.getList();
-            response.setContentType("APPLICATION/OCTET-STREAM");
+            //response.setContentType("APPLICATION/OCTET-STREAM");
             response.setHeader("Content-Disposition", "attachment;filename=orders.xls");
             newBeeMallOrderService.createExcel(list,outputStream);
             return new CommonResult("200","导出成功");

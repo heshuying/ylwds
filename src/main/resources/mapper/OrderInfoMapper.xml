@@ -217,10 +217,10 @@
       <if test="userId!=null and userId!=''">
         and supplier_id = #{userId}
       </if>
-      <if test="beginTime!=null">
+      <if test="beginTime!=null and beginTime!=''">
         and create_time > #{beginTime}
       </if>
-      <if test="endTime!=null">
+      <if test="endTime!=null and beginTime!=''">
         and create_time &lt; #{endTime}
       </if>
     </where>

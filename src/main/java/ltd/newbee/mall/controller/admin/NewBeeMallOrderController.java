@@ -98,15 +98,15 @@ public class NewBeeMallOrderController {
                 params.put("page", 1);
             }
             Object beginTime = params.get("beginTime");
-            if(beginTime != null && ((String)beginTime).length() != 0){
+            if(beginTime != null && !((String)beginTime).equals("")){
                 params.put("beginTime",sdf.parse((String)beginTime));
             }
 
             Object endTime = params.get("endTime");
-            if(endTime != null && ((String)endTime).length() != 0){
+            if(endTime != null && !((String)endTime).equals("")){
                 params.put("endTime",sdf.parse((String)endTime));
             }
-            if(params.get("limit") == null){
+            if(params.get("limit") == null || (params.get("limit")).equals("")){
                 params.put("limit","10");
             }
             PageQueryUtil pageUtil = new PageQueryUtil(params);

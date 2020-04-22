@@ -126,6 +126,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         info.setExpressCompany(params.getExpressCompany());
         info.setExpressId(params.getExpressNumber());
         info.setUpdateTime(new Date());
+        info.setStatus(3);
         orderInfoMapper.updateByPrimaryKeySelective(info);
     }
 
@@ -153,6 +154,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             info.setExpressCompany(vo.getExpressCompany());
             info.setExpressId(vo.getExpressId());
             info.setUpdateTime(new Date());
+            info.setStatus(3);
             orderInfoMapper.updateByPrimaryKeySelective(info);
         }
     }

@@ -210,24 +210,27 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
                 int i = 0;  //列
                 int j = 0;  //行
                 for(Field f:fields){
-                    j = 0;
-                    Label label = new Label(i, j,getRealName(f.getName()));   //这里把字段名称写入excel第一行中
-                    sheet.addCell(label);
-                    j = 1;
-                    for(Object obj:list){
-                        Object temp = getFieldValueByName(f.getName(),obj);
-                        String strTemp = "";
-                        if(temp!=null){
-                            if(f.getName().equals("createTime") || f.getName().equals("updateTime")){
-                                strTemp = sdf.format((Date) temp);
-                            }else {
-                                strTemp = temp.toString();
+                    if(!f.getName().equals("createTimeString") && !f.getName().equals("updateTimeString")){
+                        j = 0;
+                        Label label = new Label(i, j,getRealName(f.getName()));   //这里把字段名称写入excel第一行中
+                        sheet.addCell(label);
+                        j = 1;
+                        for(Object obj:list){
+                            Object temp = getFieldValueByName(f.getName(),obj);
+                            String strTemp = "";
+                            if(temp!=null){
+                                if(f.getName().equals("createTime") || f.getName().equals("updateTime")){
+                                    strTemp = sdf.format((Date) temp);
+                                }else {
+                                    strTemp = temp.toString();
+                                }
                             }
+                            sheet.addCell(new Label(i,j,strTemp));  //把每个对象此字段的属性写入这一列excel中
+                            j++;
                         }
-                        sheet.addCell(new Label(i,j,strTemp));  //把每个对象此字段的属性写入这一列excel中
-                        j++;
+                        i++;
                     }
-                    i++;
+
                 }
                 book.write();
                 result = file.getPath();
@@ -294,6 +297,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             case "userRemark": return "用户备注";
             case "grossProfit": return "毛利润";
             case "buyingPrice": return "进货价";
+            case "cutDown" : return "平台减免价格";
             default:return "";
         }
 

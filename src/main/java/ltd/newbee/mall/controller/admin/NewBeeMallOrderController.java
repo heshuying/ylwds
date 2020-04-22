@@ -137,6 +137,26 @@ public class NewBeeMallOrderController {
         params.put("userId", user.getUserId());*/
             params.put("page",1);
             params.put("limit",3);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && !((String)beginTime).equals("")){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }else {
+                params.remove("beginTime");
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && !((String)endTime).equals("")){
+                params.put("endTime",sdf.parse((String)endTime));
+            }else {
+                params.remove("endTime");
+            }
+
+            Object descOrAsc = params.get("descOrAsc");
+            if(descOrAsc == null || ((String)descOrAsc).equals("")){
+                params.put("descOrAsc","desc");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             pageUtil.put("start",null);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);

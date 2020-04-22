@@ -20,4 +20,7 @@ public interface TbSettleDao extends BaseMapper<TbSettle> {
     List<UnSettleListDto> querySettleList(@Param("supplierId") Long supplierId,
                                           @Param("startDate") Date startDate,
                                           @Param("endDate") Date endDate);
+
+    Integer updateBatchOrderStatus(@Param("status") Integer status,
+                                   @Param("orderIds") List<Long> orderIds);
 }

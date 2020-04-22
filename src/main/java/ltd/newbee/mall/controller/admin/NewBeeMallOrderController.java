@@ -55,7 +55,7 @@ public class NewBeeMallOrderController {
     public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
             request.setAttribute("path", "newbee_mall_supplier_order");
-            return "mall/my-orders";
+            return "admin/busiOrderManage";
         } catch (Exception e){
             e.printStackTrace();
             return "error/error_5xx";

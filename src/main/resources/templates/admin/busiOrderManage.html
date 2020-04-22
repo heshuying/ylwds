@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+</head>
+<style>
+    body {
+        background-color: #fbfbfb;
+    }
+
+    .content-wrapper {
+        background: #fbfbfb;
+    }
+
+    .manage-main-page {
+        padding: 0 30px;
+    }
+
+    .manage-main-page .query-condition-line {
+        display: flex;
+        margin-bottom: 30px;
+    }
+
+    .query-condition-line > div {
+        margin-right: 20px;
+    }
+
+    .el-date-editor .el-range-separator {
+        width: 8%;
+    }
+
+    .el-date-editor--daterange.el-input__inner {
+        width: 300px;
+    }
+
+    .query-condition-line label {
+        font-size: 14px;
+        margin-right: 5px;
+        font-weight: normal;
+        display: inline-block;
+        width: 70px;
+        text-align: right;
+    }
+
+    .el-select {
+        width: 250px;
+    }
+    .query-condition-line .el-input {
+        width: 250px;
+    }
+    .search-btn {
+        margin-left: 15px;
+        width: 100px;
+    }
+    .cell .el-input {
+        width: 80px;
+    }
+
+    .el-message-box .el-input {
+        width: 100%;
+    }
+
+    .bg-common {
+        padding: 2px 5px;
+        color: #fff;
+    }
+
+    .blue-bg {
+        background-color: #477FFF;
+    }
+
+    .red-bg {
+        background-color: #FE9544;
+    }
+
+    .green-bg {
+        background-color: #1FC990;
+    }
+
+    .gray-bg {
+        background-color: #999;
+    }
+
+    .tab-line {
+        margin-top: 30px;
+        min-height: 440px;
+    }
+
+    .goods-operiton-line {
+        color: #477FFF;
+        text-align: right;
+        margin: 15px 0;
+        cursor: pointer;
+    }
+    .address-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .address-line div {
+        width: 90%;
+    }
+    .address-line img {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+</style>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="manage-main-page">
+            <div class="query-condition-line">
+                <div>
+                    <label>订单状态</label>
+                    <el-select v-model="orderStatus" placeholder="请选择">
+                        <el-option
+                                v-for="item in orderStatusArr"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div>
+                    <label>下单时间</label>
+                    <el-date-picker
+                            v-model="orderDate"
+                            type="datetimerange"
+                            value-format="yyyy-MM-dd hh:mm:ss"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期">
+                    </el-date-picker>
+                </div>
+            </div>
+            <div class="query-condition-line">
+                <div>
+                    <label>订单编号</label>
+                    <el-input
+                            placeholder="请输入订单编号"
+                            v-model="orderId">
+                    </el-input>
+                </div>
+                <el-button type="primary" @click="queryTableData" class="search-btn">搜索</el-button>
+            </div>
+            <div class="tab-line">
+                <div class="goods-operiton-line">
+                    <span>+</span>
+                    新增商品
+                </div>
+                <el-table
+                        ref="multipleTable"
+                        :data="tableData"
+                        tooltip-effect="dark"
+                        stripe
+                        style="width: 100%"
+                        @sort-change="sortChange"
+                        @selection-change="handleTableSelectionChange">
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            prop="id"
+                            label="订单编号"
+                            align="center"
+                            width="120">
+                    </el-table-column>
+                    <el-table-column
+                            label="商品名称"
+                            align="center"
+                            >
+                        <template slot-scope="scope">
+                            <div class="address-line" v-for="item in scope.row.goods" :key="item.index">
+                                <div style="width: 60%;color:#477fff;">{{item.goodName}}</div>
+                                <div style="width: 40%;font-size: 10px;color: #999">
+                                    ¥{{item.unitPrice}}×{{item.number}}
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="totalPriceShow"
+                            label="订单总价"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            prop="createTimeString"
+                            label="下单时间"
+                            sortable="custom"
+                            align="center"
+                            width="100"
+                            >
+                    </el-table-column>
+                    <el-table-column
+                            label="收件地址"
+                            align="center"
+                            >
+                        <template slot-scope="scope">
+                            <div class="address-line">
+                                <div>{{scope.row.deliveryAddress}}</div>
+                                <img th:src="@{/admin/image/add-copy.png}" alt="" @click="copyAddress(scope.row.deliveryAddress)">
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="userRemark"
+                            label="用户备注"
+                            align="center"
+                            width="100"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            label="订单状态"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.status=='待发货'" class="bg-common blue-bg">{{scope.row.status}}</span>
+                            <span v-else-if="scope.row.status=='待结算'" class="bg-common red-bg">{{scope.row.status}}</span>
+                            <span v-else-if="scope.row.status=='待支付'||scope.row.status=='待收货'||scope.row.status=='待评价'" class="bg-common green-bg">{{scope.row.status}}</span>
+                            <span v-else class="bg-common gray-bg">{{scope.row.status}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="80">
+                        <template slot-scope="scope">
+                            <el-button
+                                    v-if="scope.row.status=='待发货'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="singleSendGoods(scope.row)">发货
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align: center;padding: 20px 0;">
+                    <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :page-size="pagesize"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+</div>
+<!-- jQuery -->
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+<!-- 引入组件库 -->
+<script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+<script th:inline="javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                orderStatus: '',
+                orderStatusArr: [
+                    {label:'请选择',value: ''},
+                    {label:'待支付',value: '1'},
+                    {label:'待发货',value: '2'},
+                    {label:'待收货',value: '3'},
+                    {label:'待评价',value: '4'},
+                    {label:'售后中',value: '5'},
+                    {label:'待结算',value: '6'},
+                    {label:'结算中',value: '7'},
+                    {label:'已结算',value: '8'},
+                    {label:'已取消',value: '9'},
+                ],
+                orderDate: '',
+                orderId: '',
+                tableData: [],
+                multipleSelection: [],
+                sortType: '',
+                total: 0,
+                pagesize: 10,
+                currentPage: 1
+            };
+        },
+        mounted() {
+            this.queryTableData();
+        },
+        methods: {
+            // 表格数据勾选修改
+            handleTableSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            // 复制地址
+            copyAddress(address) {
+                var input = document.createElement('input');
+                document.body.appendChild(input);
+                input.setAttribute('value', address);
+                input.select();
+                if (document.execCommand('copy')) {
+                    document.execCommand('copy');
+                    this.$message.success('地址已复制');
+                }
+                document.body.removeChild(input);
+            },
+            // 表格上排序方式发生改变
+            sortChange(column) {
+                if (column.order.indexOf('desc') > -1) {
+                    this.sortType = 'desc';
+                } else {
+                    this.sortType = 'asc';
+                }
+                this.queryTableData();
+            },
+            // 单个发货
+            singleSendGoods() {
+
+            },
+            // 换页
+            current_change: function (currentPage) {
+                this.currentPage = currentPage;
+                this.queryTableData();
+            },
+            // 查询表格数据
+            queryTableData() {
+                var beginTime = this.orderDate[0] || '';
+                var endTime = this.orderDate[1] || '';
+                var _this = this;
+                $.ajax({
+                    url: '/admin/orders/supplier?page=' + this.currentPage + '&limit=' + this.pagesize +
+                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
+                    '&endTime=' + endTime + '&descOrAsc=' + this.sortType,
+                    type: 'GET',
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.total = result.data.totalCount || 0;
+                            for (var i in result.data.list) {
+                                result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
+                            }
+                            _this.tableData = result.data.list || [];
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 更改商品状态
+            handleUpdate(status, valObj) {
+                var postArr = [];
+                var _this = this;
+                postArr.push(valObj.goodsId);
+                var postObj = {
+                    ids: postArr,
+                    msgOffline: '',
+                    msgReject: ''
+                }
+                if (status === '4') { // 申请下架
+                    this.$prompt('下架原因', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '我再想想',
+                    }).then(function (value) {
+                        postObj.msgOffline = value.value;
+                        _this.updateService(status, postObj);
+                    }).catch(function () {
+                    });
+                } else { // 取消下架或申请上架
+                    _this.updateService(status, postObj);
+                }
+            },
+            // 更改用户状态服务
+            updateService(status, postObj) {
+                var _this = this;
+                $.ajax({
+                    type: "PUT",
+                    url: "/admin/goods/status/" + status,
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.queryTableData();
+                            if (status === '2') {
+                                _this.$confirm('您的上架申请已经提交到平台管理员，请耐心等待或与业务对接人沟通', '提示', {
+                                    confirmButtonText: '我知道了',
+                                    type: 'success',
+                                    showCancelButton: false
+                                }).then(function () {
+                                })
+                            }
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

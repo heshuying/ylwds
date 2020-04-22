@@ -41,9 +41,44 @@ import java.util.Objects;
 public class NewBeeMallOrderController {
 
     @Resource
-    private NewBeeMallShoppingCartService newBeeMallShoppingCartService;
-    @Resource
     private NewBeeMallOrderService newBeeMallOrderService;
+
+
+    /**
+     * 资源方-订单列表页面
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/orders/supplier/page")
+    public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        try{
+            request.setAttribute("path", "newbee_mall_supplier_order");
+            return "mall/my-orders";
+        } catch (Exception e){
+            e.printStackTrace();
+            return "error/error_5xx";
+        }
+    }
+
+    /**
+     * 平台方-订单列表页面
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/orders/platform/page")
+    public String platformOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        try{
+            request.setAttribute("path", "newbee_mall_platform_order");
+            return "mall/my-orders";
+        } catch (Exception e){
+            e.printStackTrace();
+            return "error/error_5xx";
+        }
+    }
 
     /**
      * 资源方-订单列表查询功能
@@ -53,7 +88,8 @@ public class NewBeeMallOrderController {
      * @return
      */
     @GetMapping("/orders/supplier")
-    public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    @ResponseBody
+    public Result SupplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
            /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
             params.put("userId", user.getUserId());*/
@@ -70,18 +106,15 @@ public class NewBeeMallOrderController {
             if(endTime != null && ((String)endTime).length() != 0){
                 params.put("endTime",sdf.parse((String)endTime));
             }
-
-            //TODO 订单下单时间查询
             if(params.get("limit") == null){
                 params.put("limit","10");
             }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
-            request.setAttribute("pageResult", result);
-            return "mall/my-orders";
+            return ResultGenerator.genSuccessResult(result);
         } catch (Exception e){
             e.printStackTrace();
-            return "error/error_5xx";
+            return ResultGenerator.genFailResult("");
         }
     }
 
@@ -109,7 +142,6 @@ public class NewBeeMallOrderController {
             return new CommonResult("301","导出失败");
         }
     }
-
 
     /**
      * 资源方-发货功能
@@ -152,7 +184,8 @@ public class NewBeeMallOrderController {
      * @return
      */
     @GetMapping("/orders/platform")
-    public String platformOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    @ResponseBody
+    public Result platformOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
@@ -162,7 +195,6 @@ public class NewBeeMallOrderController {
             if(beginTime != null && ((String)beginTime).length() != 0){
                 params.put("beginTime",sdf.parse((String)beginTime));
             }
-
             Object endTime = params.get("endTime");
             if(endTime != null && ((String)endTime).length() != 0){
                 params.put("endTime",sdf.parse((String)endTime));
@@ -172,14 +204,12 @@ public class NewBeeMallOrderController {
             }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForPlatform(pageUtil);
-            request.setAttribute("pageResult", result);
-            return "mall/my-orders";
+            return ResultGenerator.genSuccessResult(result);
         } catch (Exception e){
             e.printStackTrace();
-            return "error/error_5xx";
+            return ResultGenerator.genFailResult("");
         }
     }
-
 
     @PostMapping("/orders/cutDown")
     @ResponseBody

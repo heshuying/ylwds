@@ -25,6 +25,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,9 +41,44 @@ import java.util.Objects;
 public class NewBeeMallOrderController {
 
     @Resource
-    private NewBeeMallShoppingCartService newBeeMallShoppingCartService;
-    @Resource
     private NewBeeMallOrderService newBeeMallOrderService;
+
+
+    /**
+     * 资源方-订单列表页面
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/orders/supplier/page")
+    public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        try{
+            request.setAttribute("path", "newbee_mall_supplier_order");
+            return "admin/busiOrderManage";
+        } catch (Exception e){
+            e.printStackTrace();
+            return "error/error_5xx";
+        }
+    }
+
+    /**
+     * 平台方-订单列表页面
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/orders/platform/page")
+    public String platformOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        try{
+            request.setAttribute("path", "newbee_mall_platform_order");
+            return "mall/my-orders";
+        } catch (Exception e){
+            e.printStackTrace();
+            return "error/error_5xx";
+        }
+    }
 
     /**
      * 资源方-订单列表查询功能
@@ -52,21 +88,41 @@ public class NewBeeMallOrderController {
      * @return
      */
     @GetMapping("/orders/supplier")
-    public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    @ResponseBody
+    public Result SupplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
            /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
             params.put("userId", user.getUserId());*/
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
-            params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && !((String)beginTime).equals("")){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }else {
+                params.remove("beginTime");
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && !((String)endTime).equals("")){
+                params.put("endTime",sdf.parse((String)endTime));
+            }else {
+                params.remove("endTime");
+            }
+            if(params.get("limit") == null || (params.get("limit")).equals("")){
+                params.put("limit","10");
+            }
+            Object descOrAsc = params.get("descOrAsc");
+            if(descOrAsc == null || ((String)descOrAsc).equals("")){
+                params.put("descOrAsc","desc");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
-            request.setAttribute("pageResult", result);
-            return "mall/my-orders";
+            return ResultGenerator.genSuccessResult(result);
         } catch (Exception e){
             e.printStackTrace();
-            return "error/error_5xx";
+            return ResultGenerator.genFailResult("");
         }
     }
 
@@ -94,7 +150,6 @@ public class NewBeeMallOrderController {
             return new CommonResult("301","导出失败");
         }
     }
-
 
     /**
      * 资源方-发货功能
@@ -137,22 +192,42 @@ public class NewBeeMallOrderController {
      * @return
      */
     @GetMapping("/orders/platform")
-    public String platformOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    @ResponseBody
+    public Result platformOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
-            params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && !((String)beginTime).equals("")){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }else {
+                params.remove("beginTime");
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && !((String)endTime).equals("")){
+                params.put("endTime",sdf.parse((String)endTime));
+            }else {
+                params.remove("endTime");
+            }
+            if(params.get("limit") == null || (params.get("limit")).equals("")){
+                params.put("limit","10");
+            }
+
+            Object descOrAsc = params.get("descOrAsc");
+            if(descOrAsc == null || ((String)descOrAsc).equals("")){
+                params.put("descOrAsc","desc");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForPlatform(pageUtil);
-            request.setAttribute("pageResult", result);
-            return "mall/my-orders";
+            return ResultGenerator.genSuccessResult(result);
         } catch (Exception e){
             e.printStackTrace();
-            return "error/error_5xx";
+            return ResultGenerator.genFailResult("");
         }
     }
-
 
     @PostMapping("/orders/cutDown")
     @ResponseBody

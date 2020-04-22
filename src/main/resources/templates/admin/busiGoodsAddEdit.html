@@ -353,8 +353,8 @@
                     this.tagList = returnGoods.tag.split(',');
                 }
                 var specsTmp = [];
-                if(returnGoods.gooodsAttribute) {
-                    specsTmp = returnGoods.gooodsAttribute.split(',');
+                if(returnGoods.goodsAttribute) {
+                    specsTmp = returnGoods.goodsAttribute.split(',');
                 }
                 for(var i in specsTmp) {
                     this.specsList.push({specsValue: specsTmp[i]});
@@ -440,7 +440,7 @@
                     transitMoney: this.transitMoney,
                     stockNum: this.stockNum,
                     tag: postTag,
-                    gooodsAttribute: postGooodsAttribute,
+                    goodsAttribute: postGooodsAttribute,
                     goodsDetailContent: this.goodsDetailContent,
                     goodsSellStatus: type
                 }

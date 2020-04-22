@@ -20,6 +20,7 @@ import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletOutputStream;
 import java.io.File;
@@ -63,9 +64,12 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForSupplier(pageUtil);
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for(OrderInfo info : orderInfos){
             String s = JSONObject.toJSONString(info);
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
+            vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
             vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
@@ -93,11 +97,13 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         int total = orderInfoMapper.count();
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForPlatform(pageUtil);
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
         for(OrderInfo info : orderInfos){
             String s = JSONObject.toJSONString(info);
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
+            vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
             vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
@@ -138,6 +144,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     }
 
     @Override
+    @Transactional
     public void batchDeliverGoods(InputStream inputStream) throws Exception {
         List<OrderInfoVo> orderInfoVos = excelToList(inputStream);
         for(OrderInfoVo vo : orderInfoVos){

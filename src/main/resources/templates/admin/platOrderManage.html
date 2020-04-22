@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+</head>
+<style>
+    body {
+        background-color: #fbfbfb;
+    }
+
+    .content-wrapper {
+        background: #fbfbfb;
+    }
+
+    .manage-main-page {
+        padding: 0 30px;
+    }
+
+    .manage-main-page .query-condition-line {
+        display: flex;
+        margin-bottom: 30px;
+    }
+
+    .el-date-editor .el-range-separator {
+        width: 8%;
+    }
+
+    .el-date-editor--daterange.el-input__inner {
+        width: 300px;
+    }
+
+    .query-condition-line label {
+        font-size: 14px;
+        margin-right: 5px;
+        font-weight: normal;
+        display: inline-block;
+        width: 70px;
+        text-align: right;
+    }
+    .query-condition-line > div {
+        margin-right: 30px;
+    }
+    .el-select {
+        width: 250px;
+    }
+    .query-condition-line .el-input, .el-dialog__body .el-input{
+        width: 250px;
+    }
+    .search-btn {
+        margin-left: 15px;
+        width: 100px;
+    }
+    .cell .el-input {
+        width: 80px;
+    }
+
+    .bg-common {
+        padding: 2px 5px;
+        color: #fff;
+    }
+
+    .blue-bg {
+        background-color: #477FFF;
+    }
+    .blue-color {
+        color: #477FFF;
+    }
+    .red-bg {
+        background-color: #FE9544;
+    }
+
+    .green-bg {
+        background-color: #1FC990;
+    }
+
+    .gray-bg {
+        background-color: #999;
+    }
+
+    .tab-line {
+        margin-top: 30px;
+        min-height: 440px;
+    }
+
+    .goods-name-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .plat-deduct-line {
+        display: flex;
+        align-items: center;
+    }
+    .plat-deduct-line img {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        margin-left: 5px;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+</style>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="manage-main-page">
+            <div class="query-condition-line">
+                <div>
+                    <label>订单状态</label>
+                    <el-select v-model="orderStatus" placeholder="请选择">
+                        <el-option
+                                v-for="item in orderStatusArr"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div>
+                    <label>订单编号</label>
+                    <el-input
+                            placeholder="请输入订单编号"
+                            v-model="orderId">
+                    </el-input>
+                </div>
+                <el-button type="primary" @click="queryTableData" class="search-btn">搜索</el-button>
+            </div>
+            <div class="tab-line">
+                <el-table
+                        ref="multipleTable"
+                        :data="tableData"
+                        tooltip-effect="dark"
+                        stripe
+                        style="width: 100%"
+                        @sort-change="sortChange"
+                        @selection-change="handleTableSelectionChange">
+                    <el-table-column
+                            prop="id"
+                            label="订单编号"
+                            align="center"
+                            width="120">
+                    </el-table-column>
+                    <el-table-column
+                            label="商品名称"
+                            align="center"
+                            >
+                        <template slot-scope="scope">
+                            <div class="goods-name-line" v-for="item in scope.row.goods" :key="item.index">
+                                <div style="width: 60%;color:#477fff;">{{item.goodName}}</div>
+                                <div style="width: 40%;font-size: 10px;color: #999">
+                                    ¥{{item.unitPrice}}×{{item.number}}
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="totalPriceShow"
+                            label="订单总价"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            label="平台减免(-¥)"
+                            align="center">
+                        <template slot-scope="scope">
+                            <div class="plat-deduct-line">
+                                <el-input type="number" v-model="scope.row.cutDown" @change="calFinalPrice(scope.row)"></el-input>
+                                <img th:src="@{/admin/image/success.png}" alt="">
+                                <img th:src="@{/admin/image/photo.png}" alt="">
+                            </div>
+                            <div style="text-align: left;">
+                                =¥{{scope.row.realPrice || ''}}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="grossProfitShow"
+                            label="毛利润"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            prop="createTimeString"
+                            label="下单时间"
+                            sortable="custom"
+                            align="center"
+                            width="100"
+                            >
+                    </el-table-column>
+                    <el-table-column
+                            prop="userRemark"
+                            label="用户备注"
+                            align="center"
+                            width="100"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
+                            label="订单状态"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.status=='待发货'" class="bg-common blue-bg">{{scope.row.status}}</span>
+                            <span v-else-if="scope.row.status=='待结算'" class="bg-common red-bg">{{scope.row.status}}</span>
+                            <span v-else-if="scope.row.status=='待支付'||scope.row.status=='待收货'||scope.row.status=='待评价'" class="bg-common green-bg">{{scope.row.status}}</span>
+                            <span v-else class="bg-common gray-bg">{{scope.row.status}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="客户方"
+                            align="center"
+                            width="100">
+                        <template slot-scope="scope">
+                            <div class="blue-color">
+                               {{scope.row.customerId}}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="资源方"
+                            align="center"
+                            width="100">
+                        <template slot-scope="scope">
+                            <div class="blue-color">
+                                {{scope.row.supplierId}}
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div style="text-align: center;padding: 20px 0;">
+                    <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :page-size="pagesize"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+</div>
+<!-- jQuery -->
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+<!-- 引入组件库 -->
+<script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+<script th:inline="javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                orderStatus: '',
+                orderStatusArr: [
+                    {label:'请选择',value: ''},
+                    {label:'待支付',value: '1'},
+                    {label:'待发货',value: '2'},
+                    {label:'待收货',value: '3'},
+                    {label:'待评价',value: '4'},
+                    {label:'售后中',value: '5'},
+                    {label:'待结算',value: '6'},
+                    {label:'结算中',value: '7'},
+                    {label:'已结算',value: '8'},
+                    {label:'已取消',value: '9'},
+                ],
+                orderId: '',
+                tableData: [],
+                multipleSelection: [],
+                sortType: '',
+                total: 0,
+                pagesize: 10,
+                currentPage: 1
+            };
+        },
+        mounted() {
+            this.queryTableData();
+        },
+        methods: {
+            // 表格数据勾选修改
+            handleTableSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            // 表格上排序方式发生改变
+            sortChange(column) {
+                if (column.order.indexOf('desc') > -1) {
+                    this.sortType = 'desc';
+                } else {
+                    this.sortType = 'asc';
+                }
+                this.queryTableData();
+            },
+            // 计算最终价格
+            calFinalPrice(valObj) {
+                valObj.realPrice = parseFloat(valObj.totalPrice) - parseFloat(valObj.cutDown);
+            },
+            // 换页
+            current_change: function (currentPage) {
+                this.currentPage = currentPage;
+                this.queryTableData();
+            },
+            // 查询表格数据
+            queryTableData() {
+                var _this = this;
+                $.ajax({
+                    url: '/admin/orders/platform?page=' + this.currentPage + '&limit=' + this.pagesize +
+                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&descOrAsc=' + this.sortType,
+                    type: 'GET',
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.total = result.data.totalCount || 0;
+                            for (var i in result.data.list) {
+                                result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
+                                var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
+                                result.data.list[i].grossProfitShow = '¥' + formatGross;
+                            }
+                            _this.tableData = result.data.list || [];
+                        } else {
+                            _this.$message.error(result.message);
+                        };
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            }
+        }
+    })
+</script>
+</body>
+</html>

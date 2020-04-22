@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Data
 public class UnSettleListDto {
     /**
-     * 供应商价格
+     * 结算价格
      */
     private BigDecimal buyingPrice;
     /**
@@ -18,9 +18,17 @@ public class UnSettleListDto {
      */
     private BigDecimal cutDown;
     /**
+     * 订单金额
+     */
+    private BigDecimal totalPrice;
+    /**
      * 订单价格
      */
     private BigDecimal price;
+    /**
+     * 供应商价格
+     */
+    private BigDecimal sellingPrice;
     private String goodsName;
     private String userName;
     private String supName;

@@ -15,6 +15,7 @@ public class SettleCreateDto {
      */
     private List<UnSettleListDto> unSettleList;
     private Long supplierId;
+    private String supplierName;
     private Date startDate;
     private Date endDate;
 }

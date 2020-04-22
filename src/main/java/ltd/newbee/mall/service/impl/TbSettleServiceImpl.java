@@ -17,6 +17,7 @@ import ltd.newbee.mall.util.DateTimeUtil;
 import ltd.newbee.mall.util.Query;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
+import ltd.newbee.mall.util.SystemUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -85,11 +87,16 @@ public class TbSettleServiceImpl extends ServiceImpl<TbSettleDao, TbSettle> impl
     public Result createSettle(SettleCreateDto dto) {
         //创建结算单
         TbSettle tbSettle =new TbSettle();
-        tbSettle.setSettleNo("");
-        tbSettle.setSettleName("");
+        String no= SystemUtil.buildSettleNo(dto.getSupplierId());
+        tbSettle.setSettleNo(no);
+        String name=SystemUtil.buildSettleName(dto.getSupplierName(),dto.getStartDate(), dto.getEndDate());
+        tbSettle.setSettleName(name);
         tbSettle.setStatus(Const.SettleStatus.Uncheck.getKey());
         tbSettle.setSupplierId(dto.getSupplierId());
-        tbSettle.setAmount(BigDecimal.ONE);
+        Double sumAmount= dto.getUnSettleList().stream().mapToDouble(
+                m->Double.parseDouble(m.getBuyingPrice().toString())
+        ).sum();
+        tbSettle.setAmount(BigDecimal.valueOf(sumAmount));
         tbSettle.setBeginPeriod(DateTimeUtil.format( dto.getStartDate()));
         tbSettle.setEndPeriod(DateTimeUtil.format( dto.getEndDate()));
         tbSettle.setCreateTime(new Date());
@@ -104,11 +111,12 @@ public class TbSettleServiceImpl extends ServiceImpl<TbSettleDao, TbSettle> impl
             detail.setSettleId(tbSettle.getId());
             detail.setOrderId(unSettle.getOrderId());
             detail.setSettleNum(unSettle.getSaleNum());
-            detail.setSettlePrice(unSettle.getBuyingPrice());
+            detail.setSettlePrice(unSettle.getSellingPrice());
             details.add(detail);
         }
         //更新订单到结算中
-
-        return null;
+        List<Long> orderIds=details.stream().map(m->m.getOrderId()).collect(Collectors.toList());
+        baseMapper.updateBatchOrderStatus(7,orderIds);
+        return ResultGenerator.genSuccessResult();
     }
 }

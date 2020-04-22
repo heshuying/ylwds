@@ -19,9 +19,12 @@
     <resultMap id="SettleMap" type="ltd.newbee.mall.dto.UnSettleListDto">
         <id column="order_id" property="orderId" />
         <result column="buying_price" property="buyingPrice" />
+        <result column="total_price" property="totalPrice" />
         <result column="cut_down" property="cutDown" />
         <result column="goods_name" property="goodsName" />
         <result column="price" property="price" />
+        <result column="selling_price" property="sellingPrice" />
+
         <result column="user_name" property="userName" />
         <result column="sup_name" property="supName" />
         <result column="user_id" property="userId" />
@@ -29,8 +32,8 @@
     </resultMap>
 
     <select id="querySettleList" resultMap="SettleMap" >
-        select oi.id, oi.buying_price,oi.cut_down,
-        gi.goods_name, gi.price, og.number as 'sale_num', oi.create_time, tu.login_name as 'user_name',
+        select oi.id, oi.buying_price,oi.cut_down,oi.totalPrice,
+        gi.goods_name, gi.price,gi.selling_price, og.number as 'sale_num', oi.create_time, tu.login_name as 'user_name',
         tus.login_name as 'sup_name',tus.user_id
         from tb_order_orderinfo oi
         join tb_order_goodinfo og on oi.id=og.order_id
@@ -42,5 +45,13 @@
         and<![CDATA[ oi.create_time = <= #{endDate} ]]>
     </select>
 
+    <update id="updateBatchOrderStatus">
+        update tb_order_orderinfo set status=#{status}
+        where
+        id in
+        <foreach collection="orderIds" item="orderId" separator="," open="(" close=")" index="">
+             #{orderId}
+        </foreach>
+    </update>
 
 </mapper>

@@ -2,6 +2,8 @@ package ltd.newbee.mall.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author 13
@@ -14,6 +16,7 @@ public class SystemUtil {
     private SystemUtil() {
     }
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
     /**
      * 登录或注册成功后,生成保持用户登录状态会话token值
@@ -37,6 +40,26 @@ public class SystemUtil {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String buildSettleNo(Long supplerId){
+        String no=sdf.format(new Date())+(1 + (int) (Math.random() * 10000))+supplerId;
+        return no;
+    }
+
+    public static String buildSettleName(String name, Date start, Date end){
+        StringBuilder settleName=new StringBuilder(name);
+        int year=DateTimeUtil.getYearOfDate(start);
+
+        int mounth = DateTimeUtil.getMonthOfDate(start);
+        int endMounth=DateTimeUtil.getMonthOfDate(end);
+        if(mounth==endMounth){
+            settleName.append(year).append("年").append(mounth).append("月").append("对账单");
+        }else{
+            settleName.append(year).append("年").append(mounth).
+                    append("、").append(endMounth).append("月").append("对账单");
+        }
+        return settleName.toString();
     }
 
 }

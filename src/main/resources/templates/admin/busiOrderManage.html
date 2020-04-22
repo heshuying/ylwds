@@ -25,10 +25,6 @@
         margin-bottom: 30px;
     }
 
-    .query-condition-line > div {
-        margin-right: 20px;
-    }
-
     .el-date-editor .el-range-separator {
         width: 8%;
     }
@@ -49,7 +45,7 @@
     .el-select {
         width: 250px;
     }
-    .query-condition-line .el-input {
+    .query-condition-line .el-input, .el-dialog__body .el-input{
         width: 250px;
     }
     .search-btn {
@@ -90,11 +86,21 @@
         min-height: 440px;
     }
 
-    .goods-operiton-line {
+    .import-operiton-line {
         color: #477FFF;
-        text-align: right;
         margin: 15px 0;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .import-word-icon-line {
+        display: flex;
+        margin-right: 15px;
+        align-items: center;
         cursor: pointer;
+    }
+    .import-word-icon-line img {
+        width: 20px;
+        height: 20px;
     }
     .address-line {
         display: flex;
@@ -109,6 +115,20 @@
         height: 20px;
         cursor: pointer;
         margin-left: 5px;
+    }
+    .dialog-line {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .dialog-line > div:first-child {
+        margin-right: 15px;
+    }
+    .dialog-btn-line {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
     }
 
 </style>
@@ -162,9 +182,15 @@
                 <el-button type="primary" @click="queryTableData" class="search-btn">搜索</el-button>
             </div>
             <div class="tab-line">
-                <div class="goods-operiton-line">
-                    <span>+</span>
-                    新增商品
+                <div class="import-operiton-line">
+                    <div class="import-word-icon-line">
+                        <img th:src="@{/admin/image/export.png}" alt="">
+                        <div>导出Excel</div>
+                    </div>
+                    <div class="import-word-icon-line">
+                        <img th:src="@{/admin/image/import.png}" alt="">
+                        <div>导入Excel</div>
+                    </div>
                 </div>
                 <el-table
                         ref="multipleTable"
@@ -262,6 +288,30 @@
                             @current-change="current_change">
                     </el-pagination>
                 </div>
+                <el-dialog :visible.sync="moralShow" width="45%" title="发货">
+                    <div class="dialog-line">
+                        <div>物流公司</div>
+                        <div>
+                            <el-select v-model="expressCompany" placeholder="请选择">
+                                <el-option
+                                        v-for="item in expressComArr"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="dialog-line">
+                        <div>物流单号</div>
+                        <div>
+                            <el-input v-model="expressNumber" placeholder="请选择物流单号"></el-input>
+                        </div>
+                    </div>
+                    <div class="dialog-btn-line">
+                        <el-button type="primary" style="width: 140px;" @click="singleSendGoodsService">确定</el-button>
+                    </div>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -295,6 +345,19 @@
                 tableData: [],
                 multipleSelection: [],
                 sortType: '',
+                expressComArr: [
+                    {label:'顺丰',value: '顺丰'},
+                    {label:'中通',value: '中通'},
+                    {label:'申通',value: '申通'},
+                    {label:'圆通',value: '圆通'},
+                    {label:'韵达',value: '韵达'},
+                    {label:'优速',value: '优速'},
+                    {label:'全峰',value: '全峰'},
+                ],
+                expressCompany: '',
+                expressNumber: '',
+                sendOrderId: '',
+                moralShow: false,
                 total: 0,
                 pagesize: 10,
                 currentPage: 1
@@ -329,9 +392,39 @@
                 }
                 this.queryTableData();
             },
-            // 单个发货
-            singleSendGoods() {
-
+            // 点击发货
+            singleSendGoods(valObj) {
+                this.moralShow = true;
+                this.sendOrderId = valObj.id;
+            },
+            // 单个发货服务
+            singleSendGoodsService() {
+                var _this = this;
+                if(this.expressCompany === ''|| this.expressNumber === '') {
+                    this.$message.error('物流公司及物流单号不能为空');
+                    return;
+                }
+                var postObj = {
+//                    userId:[[${session.loginUserId}]],
+                    orderId: this.sendOrderId,
+                    expressCompany: this.expressCompany,
+                    expressNumber: this.expressNumber
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/admin/orders/deliverGoods",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.code == 200) {
+                            _this.$message.success('发货成功');
+                            _this.moralShow = false;
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
             },
             // 换页
             current_change: function (currentPage) {
@@ -362,55 +455,6 @@
                     },
                     error: function () {
                         _this.$message.error('操作失败');
-                    }
-                });
-            },
-            // 更改商品状态
-            handleUpdate(status, valObj) {
-                var postArr = [];
-                var _this = this;
-                postArr.push(valObj.goodsId);
-                var postObj = {
-                    ids: postArr,
-                    msgOffline: '',
-                    msgReject: ''
-                }
-                if (status === '4') { // 申请下架
-                    this.$prompt('下架原因', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '我再想想',
-                    }).then(function (value) {
-                        postObj.msgOffline = value.value;
-                        _this.updateService(status, postObj);
-                    }).catch(function () {
-                    });
-                } else { // 取消下架或申请上架
-                    _this.updateService(status, postObj);
-                }
-            },
-            // 更改用户状态服务
-            updateService(status, postObj) {
-                var _this = this;
-                $.ajax({
-                    type: "PUT",
-                    url: "/admin/goods/status/" + status,
-                    contentType: "application/json",
-                    data: JSON.stringify(postObj),
-                    success: function (result) {
-                        if (result.resultCode == 200) {
-                            _this.$message.success('操作成功');
-                            _this.queryTableData();
-                            if (status === '2') {
-                                _this.$confirm('您的上架申请已经提交到平台管理员，请耐心等待或与业务对接人沟通', '提示', {
-                                    confirmButtonText: '我知道了',
-                                    type: 'success',
-                                    showCancelButton: false
-                                }).then(function () {
-                                })
-                            }
-                        } else {
-                            _this.$message.error(result.message);
-                        }
                     }
                 });
             }

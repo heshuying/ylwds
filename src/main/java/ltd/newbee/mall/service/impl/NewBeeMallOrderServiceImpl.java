@@ -97,11 +97,13 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         int total = orderInfoMapper.count();
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForPlatform(pageUtil);
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
         for(OrderInfo info : orderInfos){
             String s = JSONObject.toJSONString(info);
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
+            vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
             vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());

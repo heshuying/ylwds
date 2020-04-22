@@ -211,6 +211,11 @@ public class NewBeeMallOrderController {
             if(params.get("limit") == null || (params.get("limit")).equals("")){
                 params.put("limit","10");
             }
+
+            Object descOrAsc = params.get("descOrAsc");
+            if(descOrAsc == null || ((String)descOrAsc).equals("")){
+                params.put("descOrAsc","desc");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForPlatform(pageUtil);
             return ResultGenerator.genSuccessResult(result);

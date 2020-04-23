@@ -30,9 +30,13 @@ public class OrderInfoVo implements Serializable {
 
     private String userRemark;
 
-    private Integer customerId;
+    private Long customerId;
 
-    private Integer supplierId;
+    private String customerName;
+
+    private String supplierName;
+
+    private Long supplierId;
 
     private List<OrderGoodInfoVo> goods;
 

@@ -5,6 +5,7 @@ import com.haier.openplatform.BusinessException;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
+import jxl.WorkbookSettings;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
@@ -12,6 +13,7 @@ import jxl.write.WriteException;
 import ltd.newbee.mall.common.*;
 import ltd.newbee.mall.controller.vo.*;
 import ltd.newbee.mall.dao.*;
+import ltd.newbee.mall.entity.MallUser;
 import ltd.newbee.mall.entity.order.CutDownPriceParam;
 import ltd.newbee.mall.entity.order.DeliverGoodsParam;
 import ltd.newbee.mall.entity.order.OrderInfo;
@@ -58,6 +60,9 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     private OrderGoodInfoMapper orderGoodInfoMapper;
 
     @Autowired
+    private TbUserDao userMapper;
+
+    @Autowired
     private KjtService kjtService;
 
     @Override
@@ -77,11 +82,11 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
-            BigDecimal price = BigDecimal.valueOf(0.00);
-            for(OrderGoodInfoVo goodInfoVo : orderGoodInfos){
-                price = price.add(BigDecimal.valueOf(goodInfoVo.getUnitPrice()).multiply(BigDecimal.valueOf(goodInfoVo.getNumber())));
-            }
-            vo.setTotalPrice(price);
+            //查询用户对应的公司名
+            String customerName = userMapper.queryCompanyNameById(vo.getCustomerId());
+            vo.setCustomerName(customerName);
+            String supplierName = userMapper.queryCompanyNameById(vo.getSupplierId());
+            vo.setSupplierName(supplierName);
             orderListVOS.add(vo);
         }
         PageResult pageResult = new PageResult(orderListVOS, total, pageUtil.getLimit(), pageUtil.getPage());
@@ -111,11 +116,11 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
-/*            BigDecimal totalPrice = BigDecimal.valueOf(0.00);
-            for(OrderGoodInfoVo goodInfoVo : orderGoodInfos){
-                totalPrice = BigDecimal.valueOf(goodInfoVo.getUnitPrice()).multiply(BigDecimal.valueOf(goodInfoVo.getNumber()));
-            }
-            vo.setTotalPrice(totalPrice);*/
+            //查询用户对应的公司名
+            String customerName = userMapper.queryCompanyNameById(vo.getCustomerId());
+            vo.setCustomerName(customerName);
+            String supplierName = userMapper.queryCompanyNameById(vo.getSupplierId());
+            vo.setSupplierName(supplierName);
             orderListVOS.add(vo);
         }
         PageResult pageResult = new PageResult(orderListVOS, total, pageUtil.getLimit(), pageUtil.getPage());
@@ -214,12 +219,15 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             WritableWorkbook book = null;
             File file = null;
             try {
+                WorkbookSettings workbookSettings = new WorkbookSettings();
+                workbookSettings.setEncoding("UTF-8"); //关键代码，解决中文乱码
                 book = Workbook.createWorkbook(outputStream);  //创建xls文件
                 WritableSheet sheet  =  book.createSheet(className,0);
                 int i = 0;  //列
                 int j = 0;  //行
                 for(Field f:fields){
-                    if(!f.getName().equals("createTimeString") && !f.getName().equals("updateTimeString")){
+                    if(!f.getName().equals("createTimeString") && !f.getName().equals("updateTimeString") &&
+                            !f.getName().equals("customerId") && !f.getName().equals("supplierI")){
                         j = 0;
                         Label label = new Label(i, j,getRealName(f.getName()));   //这里把字段名称写入excel第一行中
                         sheet.addCell(label);
@@ -229,7 +237,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
                             String strTemp = "";
                             if(temp!=null){
                                 if(f.getName().equals("createTime") || f.getName().equals("updateTime")){
-                                    strTemp = sdf.format((Date) temp);
+                                    strTemp = new String(sdf.format((Date) temp).getBytes("utf-8"),"utf-8");
                                 }else {
                                     strTemp = temp.toString();
                                 }
@@ -300,6 +308,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             case "expressId" : return "快递单号";
             case "customerId" : return "客户id";
             case "supplierId" : return "商户id";
+            case "customerName" : return "客户名称";
+            case "supplierName" : return "商户名称";
             case "goods" : return "商品详情";
             case "totalPrice" : return "订单原价";
             case "userRemark": return "用户备注";

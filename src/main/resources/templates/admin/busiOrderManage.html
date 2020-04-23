@@ -183,11 +183,11 @@
             </div>
             <div class="tab-line">
                 <div class="import-operiton-line">
-                    <div class="import-word-icon-line">
+                    <div class="import-word-icon-line" @click="exportSheet">
                         <img th:src="@{/admin/image/export.png}" alt="">
                         <div>导出Excel</div>
                     </div>
-                    <div class="import-word-icon-line">
+                    <div class="import-word-icon-line"  @click="importSheet">
                         <img th:src="@{/admin/image/import.png}" alt="">
                         <div>导入Excel</div>
                     </div>
@@ -198,12 +198,7 @@
                         tooltip-effect="dark"
                         stripe
                         style="width: 100%"
-                        @sort-change="sortChange"
-                        @selection-change="handleTableSelectionChange">
-                    <el-table-column
-                            type="selection"
-                            width="55">
-                    </el-table-column>
+                        @sort-change="sortChange">
                     <el-table-column
                             prop="id"
                             label="订单编号"
@@ -343,7 +338,6 @@
                 orderDate: '',
                 orderId: '',
                 tableData: [],
-                multipleSelection: [],
                 sortType: '',
                 expressComArr: [
                     {label:'顺丰',value: '顺丰'},
@@ -367,10 +361,6 @@
             this.queryTableData();
         },
         methods: {
-            // 表格数据勾选修改
-            handleTableSelectionChange(val) {
-                this.multipleSelection = val;
-            },
             // 复制地址
             copyAddress(address) {
                 var input = document.createElement('input');
@@ -391,6 +381,39 @@
                     this.sortType = 'asc';
                 }
                 this.queryTableData();
+            },
+            // 导出excel
+            exportSheet() {
+                var beginTime = this.orderDate[0] || '';
+                var endTime = this.orderDate[1] || '';
+//                window.location.href = "/admin/orders/export";
+                var _this = this;
+                $.ajax({
+                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
+                    '&endTime=' + endTime,
+                    type: 'GET',
+                    contentType: "application/json",
+                    responseType: "blob",
+                    success: function (result) {
+                        const blob = new Blob([result]);
+                        const fileName = "订单信息.xls";
+                        const elink = document.createElement("a");
+                        elink.download = fileName;
+                        elink.style.display = "none";
+                        elink.href = URL.createObjectURL(blob);
+                        document.body.appendChild(elink);
+                        elink.click();
+                        URL.revokeObjectURL(elink.href); // 释放URL 对象
+                        document.body.removeChild(elink);
+                    },
+                    error: function () {
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 导入excel
+            importSheet() {
+
             },
             // 点击发货
             singleSendGoods(valObj) {

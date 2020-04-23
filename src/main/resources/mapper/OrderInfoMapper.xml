@@ -249,7 +249,7 @@
   <select id="selectByPageForPlatform" parameterType="ltd.newbee.mall.util.PageQueryUtil" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List"/>
-    from tb_order_orderinfo
+    from tb_order_orderinfo orders
     <where>
       <if test="id!=null and id!=''">
         and id = #{id}

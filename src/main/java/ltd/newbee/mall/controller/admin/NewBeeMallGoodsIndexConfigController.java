@@ -2,9 +2,7 @@ package ltd.newbee.mall.controller.admin;
 
 import ltd.newbee.mall.common.IndexConfigTypeEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
-import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.IndexConfig;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
 import ltd.newbee.mall.service.NewBeeMallIndexConfigService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;

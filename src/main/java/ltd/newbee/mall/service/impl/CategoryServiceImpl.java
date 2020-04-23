@@ -9,11 +9,10 @@ import ltd.newbee.mall.controller.vo.SecondLevelCategoryVO;
 import ltd.newbee.mall.controller.vo.ThirdLevelCategoryVO;
 import ltd.newbee.mall.dao.GoodsCategoryMapper;
 import ltd.newbee.mall.entity.GoodsCategory;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
-public class NewBeeMallCategoryServiceImpl implements NewBeeMallCategoryService {
+public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private GoodsCategoryMapper goodsCategoryMapper;

@@ -4,7 +4,7 @@ import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.controller.vo.NewBeeMallGoodsDetailVO;
 import ltd.newbee.mall.controller.vo.SearchPageCategoryVO;
 import ltd.newbee.mall.entity.TbGoodsInfo;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.PageQueryUtil;
@@ -24,7 +24,7 @@ public class GoodsController {
     @Resource
     private GoodsService newBeeMallGoodsService;
     @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private CategoryService newBeeMallCategoryService;
 
     @GetMapping({"/search", "/search.html"})
     public String searchPage(@RequestParam Map<String, Object> params, HttpServletRequest request) {

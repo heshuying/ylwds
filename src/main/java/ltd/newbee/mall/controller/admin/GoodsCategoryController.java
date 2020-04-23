@@ -3,7 +3,7 @@ package ltd.newbee.mall.controller.admin;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.entity.GoodsCategory;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -24,10 +24,10 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallGoodsCategoryController {
+public class GoodsCategoryController {
 
     @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private CategoryService newBeeMallCategoryService;
 
     @GetMapping("/categories")
     public String categoriesPage(HttpServletRequest request, @RequestParam("categoryLevel") Byte categoryLevel, @RequestParam("parentId") Long parentId, @RequestParam("backParentId") Long backParentId) {

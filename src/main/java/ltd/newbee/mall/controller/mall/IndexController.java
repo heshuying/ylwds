@@ -6,7 +6,7 @@ import ltd.newbee.mall.controller.vo.NewBeeMallIndexCarouselVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallIndexCategoryVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallIndexConfigGoodsVO;
 import ltd.newbee.mall.service.NewBeeMallCarouselService;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.service.NewBeeMallIndexConfigService;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -26,7 +26,7 @@ public class IndexController {
     private NewBeeMallIndexConfigService newBeeMallIndexConfigService;
 
     @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private CategoryService newBeeMallCategoryService;
 
     @GetMapping({"/index", "/", "/index.html"})
     public String indexPage(HttpServletRequest request) {

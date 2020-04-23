@@ -131,7 +131,7 @@ public class NewBeeMallOrderController {
     /**
      *  资源方-导出订单
      */
-    @RequestMapping("/orders/export")
+    @GetMapping(value = "/orders/export",headers = "Accept=application/octet-stream")
     @ResponseBody
     public CommonResult exportOrdersForSupplier(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response){
         try(ServletOutputStream outputStream = response.getOutputStream()){

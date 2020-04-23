@@ -41,7 +41,9 @@
         width: 70px;
         text-align: right;
     }
-
+    .query-condition-line > div {
+        margin-right: 30px;
+    }
     .el-select {
         width: 250px;
     }
@@ -56,10 +58,6 @@
         width: 80px;
     }
 
-    .el-message-box .el-input {
-        width: 100%;
-    }
-
     .bg-common {
         padding: 2px 5px;
         color: #fff;
@@ -68,7 +66,9 @@
     .blue-bg {
         background-color: #477FFF;
     }
-
+    .blue-color {
+        color: #477FFF;
+    }
     .red-bg {
         background-color: #FE9544;
     }
@@ -86,49 +86,28 @@
         min-height: 440px;
     }
 
-    .import-operiton-line {
-        color: #477FFF;
-        margin: 15px 0;
-        display: flex;
-        justify-content: flex-end;
-    }
-    .import-word-icon-line {
-        display: flex;
-        margin-right: 15px;
-        align-items: center;
-        cursor: pointer;
-    }
-    .import-word-icon-line img {
-        width: 20px;
-        height: 20px;
-    }
-    .address-line {
+    .goods-name-line {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    .address-line div {
-        width: 90%;
-    }
-    .address-line img {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
-    .dialog-line {
+    .plat-deduct-line {
         display: flex;
         align-items: center;
-        justify-content: center;
-        margin-bottom: 15px;
     }
-    .dialog-line > div:first-child {
-        margin-right: 15px;
+    .plat-deduct-line img {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        margin-left: 5px;
     }
-    .dialog-btn-line {
-        display: flex;
-        justify-content: center;
-        margin-top: 25px;
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
     }
 
 </style>
@@ -160,19 +139,6 @@
                     </el-select>
                 </div>
                 <div>
-                    <label>下单时间</label>
-                    <el-date-picker
-                            v-model="orderDate"
-                            type="datetimerange"
-                            value-format="yyyy-MM-dd hh:mm:ss"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期">
-                    </el-date-picker>
-                </div>
-            </div>
-            <div class="query-condition-line">
-                <div>
                     <label>订单编号</label>
                     <el-input
                             placeholder="请输入订单编号"
@@ -182,23 +148,14 @@
                 <el-button type="primary" @click="queryTableData" class="search-btn">搜索</el-button>
             </div>
             <div class="tab-line">
-                <div class="import-operiton-line">
-                    <div class="import-word-icon-line" @click="exportSheet">
-                        <img th:src="@{/admin/image/export.png}" alt="">
-                        <div>导出Excel</div>
-                    </div>
-                    <div class="import-word-icon-line"  @click="importSheet">
-                        <img th:src="@{/admin/image/import.png}" alt="">
-                        <div>导入Excel</div>
-                    </div>
-                </div>
                 <el-table
                         ref="multipleTable"
                         :data="tableData"
                         tooltip-effect="dark"
                         stripe
                         style="width: 100%"
-                        @sort-change="sortChange">
+                        @sort-change="sortChange"
+                        @selection-change="handleTableSelectionChange">
                     <el-table-column
                             prop="id"
                             label="订单编号"
@@ -210,7 +167,7 @@
                             align="center"
                             >
                         <template slot-scope="scope">
-                            <div class="address-line" v-for="item in scope.row.goods" :key="item.index">
+                            <div class="goods-name-line" v-for="item in scope.row.goods" :key="item.index">
                                 <div style="width: 60%;color:#477fff;">{{item.goodName}}</div>
                                 <div style="width: 40%;font-size: 10px;color: #999">
                                     ¥{{item.unitPrice}}×{{item.number}}
@@ -226,23 +183,33 @@
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
+                            label="平台减免(-¥)"
+                            align="center">
+                        <template slot-scope="scope">
+                            <div class="plat-deduct-line">
+                                <el-input type="number" v-model="scope.row.cutDown" @change="calFinalPrice(scope.row)"></el-input>
+                                <img th:src="@{/admin/image/success.png}" alt="">
+                                <img th:src="@{/admin/image/photo.png}" alt="">
+                            </div>
+                            <div style="text-align: left;">
+                                =¥{{scope.row.realPrice || ''}}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="grossProfitShow"
+                            label="毛利润"
+                            align="center"
+                            width="80"
+                            show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column
                             prop="createTimeString"
                             label="下单时间"
                             sortable="custom"
                             align="center"
                             width="100"
                             >
-                    </el-table-column>
-                    <el-table-column
-                            label="收件地址"
-                            align="center"
-                            >
-                        <template slot-scope="scope">
-                            <div class="address-line">
-                                <div>{{scope.row.deliveryAddress}}</div>
-                                <img th:src="@{/admin/image/add-copy.png}" alt="" @click="copyAddress(scope.row.deliveryAddress)">
-                            </div>
-                        </template>
                     </el-table-column>
                     <el-table-column
                             prop="userRemark"
@@ -263,14 +230,24 @@
                             <span v-else class="bg-common gray-bg">{{scope.row.status}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" width="80">
+                    <el-table-column
+                            label="客户方"
+                            align="center"
+                            width="100">
                         <template slot-scope="scope">
-                            <el-button
-                                    v-if="scope.row.status=='待发货'"
-                                    size="mini"
-                                    type="primary"
-                                    @click="singleSendGoods(scope.row)">发货
-                            </el-button>
+                            <div class="blue-color">
+                               {{scope.row.customerId}}
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label="资源方"
+                            align="center"
+                            width="100">
+                        <template slot-scope="scope">
+                            <div class="blue-color">
+                                {{scope.row.supplierId}}
+                            </div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -283,30 +260,6 @@
                             @current-change="current_change">
                     </el-pagination>
                 </div>
-                <el-dialog :visible.sync="moralShow" width="45%" title="发货">
-                    <div class="dialog-line">
-                        <div>物流公司</div>
-                        <div>
-                            <el-select v-model="expressCompany" placeholder="请选择">
-                                <el-option
-                                        v-for="item in expressComArr"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </div>
-                    </div>
-                    <div class="dialog-line">
-                        <div>物流单号</div>
-                        <div>
-                            <el-input v-model="expressNumber" placeholder="请选择物流单号"></el-input>
-                        </div>
-                    </div>
-                    <div class="dialog-btn-line">
-                        <el-button type="primary" style="width: 140px;" @click="singleSendGoodsService">确定</el-button>
-                    </div>
-                </el-dialog>
             </div>
         </div>
     </div>
@@ -335,23 +288,10 @@
                     {label:'已结算',value: '8'},
                     {label:'已取消',value: '9'},
                 ],
-                orderDate: '',
                 orderId: '',
                 tableData: [],
+                multipleSelection: [],
                 sortType: '',
-                expressComArr: [
-                    {label:'顺丰',value: '顺丰'},
-                    {label:'中通',value: '中通'},
-                    {label:'申通',value: '申通'},
-                    {label:'圆通',value: '圆通'},
-                    {label:'韵达',value: '韵达'},
-                    {label:'优速',value: '优速'},
-                    {label:'全峰',value: '全峰'},
-                ],
-                expressCompany: '',
-                expressNumber: '',
-                sendOrderId: '',
-                moralShow: false,
                 total: 0,
                 pagesize: 10,
                 currentPage: 1
@@ -361,17 +301,9 @@
             this.queryTableData();
         },
         methods: {
-            // 复制地址
-            copyAddress(address) {
-                var input = document.createElement('input');
-                document.body.appendChild(input);
-                input.setAttribute('value', address);
-                input.select();
-                if (document.execCommand('copy')) {
-                    document.execCommand('copy');
-                    this.$message.success('地址已复制');
-                }
-                document.body.removeChild(input);
+            // 表格数据勾选修改
+            handleTableSelectionChange(val) {
+                this.multipleSelection = val;
             },
             // 表格上排序方式发生改变
             sortChange(column) {
@@ -382,72 +314,9 @@
                 }
                 this.queryTableData();
             },
-            // 导出excel
-            exportSheet() {
-                var beginTime = this.orderDate[0] || '';
-                var endTime = this.orderDate[1] || '';
-//                window.location.href = "/admin/orders/export";
-                var _this = this;
-                $.ajax({
-                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
-                    '&endTime=' + endTime,
-                    type: 'GET',
-                    contentType: "application/json",
-                    responseType: "blob",
-                    success: function (result) {
-                        const blob = new Blob([result]);
-                        const fileName = "订单信息.xls";
-                        const elink = document.createElement("a");
-                        elink.download = fileName;
-                        elink.style.display = "none";
-                        elink.href = URL.createObjectURL(blob);
-                        document.body.appendChild(elink);
-                        elink.click();
-                        URL.revokeObjectURL(elink.href); // 释放URL 对象
-                        document.body.removeChild(elink);
-                    },
-                    error: function () {
-                        _this.$message.error('操作失败');
-                    }
-                });
-            },
-            // 导入excel
-            importSheet() {
-
-            },
-            // 点击发货
-            singleSendGoods(valObj) {
-                this.moralShow = true;
-                this.sendOrderId = valObj.id;
-            },
-            // 单个发货服务
-            singleSendGoodsService() {
-                var _this = this;
-                if(this.expressCompany === ''|| this.expressNumber === '') {
-                    this.$message.error('物流公司及物流单号不能为空');
-                    return;
-                }
-                var postObj = {
-//                    userId:[[${session.loginUserId}]],
-                    orderId: this.sendOrderId,
-                    expressCompany: this.expressCompany,
-                    expressNumber: this.expressNumber
-                }
-                $.ajax({
-                    type: "post",
-                    url: "/admin/orders/deliverGoods",
-                    contentType: "application/json",
-                    data: JSON.stringify(postObj),
-                    success: function (result) {
-                        if (result.code == 200) {
-                            _this.$message.success('发货成功');
-                            _this.moralShow = false;
-                            _this.queryTableData();
-                        } else {
-                            _this.$message.error(result.message);
-                        }
-                    }
-                });
+            // 计算最终价格
+            calFinalPrice(valObj) {
+                valObj.realPrice = parseFloat(valObj.totalPrice) - parseFloat(valObj.cutDown);
             },
             // 换页
             current_change: function (currentPage) {
@@ -456,25 +325,23 @@
             },
             // 查询表格数据
             queryTableData() {
-                var beginTime = this.orderDate[0] || '';
-                var endTime = this.orderDate[1] || '';
                 var _this = this;
                 $.ajax({
-                    url: '/admin/orders/supplier?page=' + this.currentPage + '&limit=' + this.pagesize +
-                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
-                    '&endTime=' + endTime + '&descOrAsc=' + this.sortType,
+                    url: '/admin/orders/platform?page=' + this.currentPage + '&limit=' + this.pagesize +
+                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&descOrAsc=' + this.sortType,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {
                             _this.total = result.data.totalCount || 0;
                             for (var i in result.data.list) {
                                 result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
+                                var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
+                                result.data.list[i].grossProfitShow = '¥' + formatGross;
                             }
                             _this.tableData = result.data.list || [];
                         } else {
                             _this.$message.error(result.message);
-                        }
-                        ;
+                        };
                     },
                     error: function () {
                         _this.$message.error('操作失败');

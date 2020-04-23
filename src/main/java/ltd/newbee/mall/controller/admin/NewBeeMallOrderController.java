@@ -1,5 +1,6 @@
 package ltd.newbee.mall.controller.admin;
 
+import com.haier.openplatform.BusinessException;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.NewBeeMallOrderStatusEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -25,6 +26,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +95,7 @@ public class NewBeeMallOrderController {
     public Result SupplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
            /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-            params.put("userId", user.getUserId());*/
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            params.put("userId", user.getUserId());*/           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty(params.get("page"))) {
                 params.put("page", 1);
             }
@@ -129,7 +131,7 @@ public class NewBeeMallOrderController {
     /**
      *  资源方-导出订单
      */
-    @RequestMapping("/orders/export")
+    @GetMapping(value = "/orders/export",headers = "Accept=application/octet-stream")
     @ResponseBody
     public CommonResult exportOrdersForSupplier(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response){
         try(ServletOutputStream outputStream = response.getOutputStream()){
@@ -137,11 +139,31 @@ public class NewBeeMallOrderController {
         params.put("userId", user.getUserId());*/
             params.put("page",1);
             params.put("limit",3);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Object beginTime = params.get("beginTime");
+            if(beginTime != null && !((String)beginTime).equals("")){
+                params.put("beginTime",sdf.parse((String)beginTime));
+            }else {
+                params.remove("beginTime");
+            }
+
+            Object endTime = params.get("endTime");
+            if(endTime != null && !((String)endTime).equals("")){
+                params.put("endTime",sdf.parse((String)endTime));
+            }else {
+                params.remove("endTime");
+            }
+
+            Object descOrAsc = params.get("descOrAsc");
+            if(descOrAsc == null || ((String)descOrAsc).equals("")){
+                params.put("descOrAsc","desc");
+            }
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             pageUtil.put("start",null);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
             List<?> list = result.getList();
-            response.setContentType("APPLICATION/OCTET-STREAM");
+            //response.setContentType("APPLICATION/OCTET-STREAM");
             response.setHeader("Content-Disposition", "attachment;filename=orders.xls");
             newBeeMallOrderService.createExcel(list,outputStream);
             return new CommonResult("200","导出成功");
@@ -174,11 +196,14 @@ public class NewBeeMallOrderController {
      */
     @RequestMapping(value = "/orders/batchDeliverGoods",method = RequestMethod.POST)
     @ResponseBody
-    public CommonResult batchDeliverGoods(@RequestParam MultipartFile file, HttpServletRequest request){
+    public CommonResult batchDeliverGoods(@RequestParam MultipartFile file,  HttpServletRequest request){
         try{
             newBeeMallOrderService.batchDeliverGoods(file.getInputStream());
             return new CommonResult("200","批量发货成功");
-        }catch (Exception e){
+        }catch (BusinessException e){
+            e.printStackTrace();
+            return new CommonResult("302",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
             return new CommonResult("301","批量发货失败");
         }

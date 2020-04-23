@@ -44,5 +44,7 @@ public class OrderInfoVo implements Serializable {
 
     private BigDecimal cutDown;
 
+    private BigDecimal realPrice;
+
 
 }

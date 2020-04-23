@@ -186,7 +186,8 @@
                         <template slot-scope="scope">
                             <template v-if="activeName=='waiton'">
                                 <el-input type="number" v-model="scope.row.profit" @change="calSale(scope.row)"></el-input>
-                                <el-button type="success" icon="el-icon-check" circle @click="saveProfit(scope.row)"></el-button>
+                                <!--<el-button type="success" icon="el-icon-check" circle @click="saveProfit(scope.row)"></el-button>-->
+                                <img th:src="@{/admin/image/success.png}" alt="" @click="saveProfit(scope.row)" style="cursor: pointer;">
                             </template>
                             <span v-else>{{scope.row.profitShow}}</span>
                         </template>

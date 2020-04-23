@@ -32,6 +32,8 @@ public class OrderInfo {
 
     private BigDecimal buyingPrice;
 
+    private BigDecimal realPrice;
+
     public Long getId() {
         return id;
     }
@@ -142,5 +144,13 @@ public class OrderInfo {
 
     public void setBuyingPrice(BigDecimal buyingPrice) {
         this.buyingPrice = buyingPrice;
+    }
+
+    public BigDecimal getRealPrice() {
+        return realPrice;
+    }
+
+    public void setRealPrice(BigDecimal realPrice) {
+        this.realPrice = realPrice;
     }
 }

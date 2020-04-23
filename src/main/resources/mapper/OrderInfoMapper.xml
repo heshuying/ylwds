@@ -298,7 +298,7 @@
   </select>
 
   <update id="cutDownPrice" parameterType="ltd.newbee.mall.entity.order.CutDownPriceParam">
-    update tb_order_orderinfo set gross_profit = (total_price-cut_down-buying_price) and real_price = (total_price-cut_down) where id = #{orderId}
+    update tb_order_orderinfo set gross_profit = (total_price-cut_down-buying_price) ,real_price = (total_price-cut_down) where id = #{orderId}
   </update>
 
 </mapper>

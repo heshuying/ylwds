@@ -3,6 +3,7 @@ package ltd.newbee.mall.controller.api;
 import ltd.newbee.mall.dto.ProfileDto;
 import ltd.newbee.mall.dto.RegisterFirstDto;
 import ltd.newbee.mall.entity.TbUserProfile;
+import ltd.newbee.mall.service.TbModuleService;
 import ltd.newbee.mall.service.TbUserService;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -24,6 +25,8 @@ public class AuthController {
 
     @Autowired
     private TbUserService userService;
+    @Autowired
+    private TbModuleService moduleService;
 
     @PostMapping("/register/first")
     @ResponseBody
@@ -42,6 +45,18 @@ public class AuthController {
     @ResponseBody
     public Result updateProfile(@RequestBody ProfileDto dto){
         return userService.updateUserProfile(dto);
+    }
+
+    @GetMapping("/banners")
+    @ResponseBody
+    public Result banners(){
+        return moduleService.getBanner();
+    }
+
+    @GetMapping("/modules")
+    @ResponseBody
+    public Result modules(){
+        return moduleService.getModules();
     }
 
 }

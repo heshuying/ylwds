@@ -8,6 +8,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.boot.Banner;
 
 /**
  * <p>
@@ -34,6 +35,11 @@ public class TbModule extends Model<TbModule> {
      * 专区名称
      */
     private String modName;
+    /**
+     * 专区键
+     */
+    private String modKey;
+
 
     /**
      * 专区描述

@@ -1,5 +1,6 @@
 package ltd.newbee.mall.controller.admin;
 
+import com.haier.openplatform.BusinessException;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.NewBeeMallOrderStatusEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -25,6 +26,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -193,11 +196,14 @@ public class NewBeeMallOrderController {
      */
     @RequestMapping(value = "/orders/batchDeliverGoods",method = RequestMethod.POST)
     @ResponseBody
-    public CommonResult batchDeliverGoods(@RequestParam MultipartFile file, HttpServletRequest request){
+    public CommonResult batchDeliverGoods(@RequestParam MultipartFile file,  HttpServletRequest request){
         try{
             newBeeMallOrderService.batchDeliverGoods(file.getInputStream());
             return new CommonResult("200","批量发货成功");
-        }catch (Exception e){
+        }catch (BusinessException e){
+            e.printStackTrace();
+            return new CommonResult("302",e.getMessage());
+        } catch (Exception e){
             e.printStackTrace();
             return new CommonResult("301","批量发货失败");
         }

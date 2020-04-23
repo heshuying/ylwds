@@ -1,6 +1,7 @@
 package ltd.newbee.mall.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.haier.openplatform.BusinessException;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -18,6 +19,8 @@ import ltd.newbee.mall.service.KjtService;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.PageResult;
+import org.apache.commons.lang3.StringUtils;
+import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,6 +152,12 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     public void batchDeliverGoods(InputStream inputStream) throws Exception {
         List<OrderInfoVo> orderInfoVos = excelToList(inputStream);
         for(OrderInfoVo vo : orderInfoVos){
+            if(StringUtils.isBlank(vo.getExpressCompany())){
+                throw new BusinessException("快递公司必填");
+            }
+            if(StringUtils.isBlank(vo.getExpressId())){
+                throw new BusinessException("快递单号必填");
+            }
             OrderInfo info = new OrderInfo();
             info.setId(vo.getId());
             info.setExpressCompany(vo.getExpressCompany());

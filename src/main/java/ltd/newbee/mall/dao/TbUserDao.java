@@ -22,4 +22,6 @@ public interface TbUserDao extends BaseMapper<TbUser> {
     Integer updateUserStatus(@Param("userStatus")Integer userStatus, @Param("userIds") List<Long> userIds);
 
     List<UserListDto> queryCompanyNameList(@Param("dto") UserListDto dto);
+
+    String queryCompanyNameById(Long userId);
 }

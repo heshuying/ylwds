@@ -131,7 +131,7 @@ public class NewBeeMallOrderController {
     /**
      *  资源方-导出订单
      */
-    @GetMapping(value = "/orders/export",headers = "Accept=application/octet-stream")
+    @RequestMapping(value = "/orders/export")
     @ResponseBody
     public CommonResult exportOrdersForSupplier(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession, HttpServletResponse response){
         try(ServletOutputStream outputStream = response.getOutputStream()){
@@ -165,6 +165,7 @@ public class NewBeeMallOrderController {
             List<?> list = result.getList();
             //response.setContentType("APPLICATION/OCTET-STREAM");
             response.setHeader("Content-Disposition", "attachment;filename=orders.xls");
+            response.setCharacterEncoding("utf-8");
             newBeeMallOrderService.createExcel(list,outputStream);
             return new CommonResult("200","导出成功");
         }catch (Exception e){

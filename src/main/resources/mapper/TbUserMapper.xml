@@ -78,4 +78,8 @@
         </if>
 
     </select>
+
+    <select id="queryCompanyNameById" parameterType="java.lang.Long" resultType="java.lang.String">
+        select company_name from tb_user_profile where user_id = #{userId}
+    </select>
 </mapper>

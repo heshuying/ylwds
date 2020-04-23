@@ -4,6 +4,10 @@ package ltd.newbee.mall.util;
  * Created by 19012964 on 2020/4/10.
  */
 public class Const {
+
+    public static  String Mod_Banner_Key="Banner";
+    public static  String Mod_Module_Key="Module";
+
     public static enum EnumPayType {
         PAY_TYPE_01("01","快捷通"),
         PAY_TYPE_02("02","积分支付"),

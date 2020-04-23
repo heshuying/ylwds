@@ -2,6 +2,7 @@ package ltd.newbee.mall.service;
 
 import ltd.newbee.mall.entity.TbModule;
 import com.baomidou.mybatisplus.extension.service.IService;
+import ltd.newbee.mall.util.Result;
 
 /**
  * <p>
@@ -12,5 +13,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-04-23
  */
 public interface TbModuleService extends IService<TbModule> {
+    /**
+     * 获取banner
+     * @return
+     */
+    Result getBanner();
 
+    /**
+     * 获取分区
+     * @return
+     */
+    Result getModules();
 }

@@ -80,4 +80,20 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
         result.setData(list);
         return result;
     }
+
+    /**
+     * 有效的专区列表
+     * @return
+     */
+    @Override
+    public List<TbModule> getModuleList(){
+        List<TbModule> tbModules=baseMapper.selectList(new QueryWrapper<TbModule>()
+                .eq("mod_key", Const.Mod_Module_Key)
+                .eq("is_deleted", 0)
+                .orderByDesc("mod_rank")
+        );
+        return tbModules;
+    }
+
+
 }

@@ -4,6 +4,8 @@ import ltd.newbee.mall.entity.TbModule;
 import com.baomidou.mybatisplus.extension.service.IService;
 import ltd.newbee.mall.util.Result;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -24,4 +26,6 @@ public interface TbModuleService extends IService<TbModule> {
      * @return
      */
     Result getModules();
+
+    List<TbModule> getModuleList();
 }

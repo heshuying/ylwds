@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -41,9 +43,19 @@ public class TbModuleDetail extends Model<TbModuleDetail> {
     private Long goodsId;
 
     /**
+     * 商品首图地址
+     */
+    private String imgUrl;
+
+    /**
      * 调整地址
      */
     private String jumpUrl;
+
+    /**
+     * 是否是最左边推荐位：0 否 1 是
+     */
+    private String isHead;
 
     /**
      * 排序值(字段越大越靠前)
@@ -68,7 +80,7 @@ public class TbModuleDetail extends Model<TbModuleDetail> {
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 创建者id
@@ -78,7 +90,7 @@ public class TbModuleDetail extends Model<TbModuleDetail> {
     /**
      * 修改时间
      */
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     /**
      * 修改者id

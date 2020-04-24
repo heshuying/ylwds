@@ -13,6 +13,9 @@ public class GoodsCategory {
 
     private String categoryName;
 
+    /**售后有效期*/
+    private String validityTime;
+
     private Integer categoryRank;
 
     private Byte isDeleted;
@@ -107,23 +110,11 @@ public class GoodsCategory {
         this.updateUser = updateUser;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", categoryId=").append(categoryId);
-        sb.append(", categoryLevel=").append(categoryLevel);
-        sb.append(", parentId=").append(parentId);
-        sb.append(", categoryName=").append(categoryName);
-        sb.append(", categoryRank=").append(categoryRank);
-        sb.append(", isDeleted=").append(isDeleted);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", createUser=").append(createUser);
-        sb.append(", updateTime=").append(updateTime);
-        sb.append(", updateUser=").append(updateUser);
-        sb.append("]");
-        return sb.toString();
+    public String getValidityTime() {
+        return validityTime;
+    }
+
+    public void setValidityTime(String validityTime) {
+        this.validityTime = validityTime;
     }
 }

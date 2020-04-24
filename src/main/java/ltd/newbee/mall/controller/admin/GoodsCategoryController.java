@@ -3,7 +3,7 @@ package ltd.newbee.mall.controller.admin;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.entity.GoodsCategory;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -24,10 +24,10 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallGoodsCategoryController {
+public class GoodsCategoryController {
 
     @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private CategoryService newBeeMallCategoryService;
 
     @GetMapping("/categories")
     public String categoriesPage(HttpServletRequest request, @RequestParam("categoryLevel") Byte categoryLevel, @RequestParam("parentId") Long parentId, @RequestParam("backParentId") Long backParentId) {
@@ -47,9 +47,11 @@ public class NewBeeMallGoodsCategoryController {
     @RequestMapping(value = "/categories/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
-            return ResultGenerator.genFailResult("参数异常！");
-        }
+//        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
+//            return ResultGenerator.genFailResult("参数异常！");
+//        }
+        params.put("page", "1");
+        params.put("limit", "1000");
         PageQueryUtil pageUtil = new PageQueryUtil(params);
         return ResultGenerator.genSuccessResult(newBeeMallCategoryService.getCategorisPage(pageUtil));
     }

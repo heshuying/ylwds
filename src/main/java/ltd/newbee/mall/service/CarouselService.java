@@ -7,7 +7,7 @@ import ltd.newbee.mall.util.PageResult;
 
 import java.util.List;
 
-public interface NewBeeMallCarouselService {
+public interface CarouselService {
     /**
      * 后台分页
      *

@@ -7,7 +7,7 @@ import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.GoodsCategory;
 import ltd.newbee.mall.entity.TbGoodsInfo;
-import ltd.newbee.mall.service.NewBeeMallCategoryService;
+import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
@@ -31,7 +31,7 @@ public class AdminGoodsController {
     @Resource
     private GoodsService newBeeMallGoodsService;
     @Resource
-    private NewBeeMallCategoryService newBeeMallCategoryService;
+    private CategoryService newBeeMallCategoryService;
 
     @GetMapping("/goods")
     public String goodsPage(HttpServletRequest request) {

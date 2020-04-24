@@ -187,8 +187,8 @@
                             align="center">
                         <template slot-scope="scope">
                             <div class="plat-deduct-line">
-                                <el-input type="number" v-model="scope.row.cutDown" @change="calFinalPrice(scope.row)"></el-input>
-                                <img th:src="@{/admin/image/success.png}" alt="">
+                                <el-input type="number" v-model="scope.row.cutDown"></el-input>
+                                <img th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
                                 <img th:src="@{/admin/image/photo.png}" alt="">
                             </div>
                             <div style="text-align: left;">
@@ -236,7 +236,7 @@
                             width="100">
                         <template slot-scope="scope">
                             <div class="blue-color">
-                               {{scope.row.customerId}}
+                               {{scope.row.customerName}}
                             </div>
                         </template>
                     </el-table-column>
@@ -246,7 +246,7 @@
                             width="100">
                         <template slot-scope="scope">
                             <div class="blue-color">
-                                {{scope.row.supplierId}}
+                                {{scope.row.supplierName}}
                             </div>
                         </template>
                     </el-table-column>
@@ -314,10 +314,6 @@
                 }
                 this.queryTableData();
             },
-            // 计算最终价格
-            calFinalPrice(valObj) {
-                valObj.realPrice = parseFloat(valObj.totalPrice) - parseFloat(valObj.cutDown);
-            },
             // 换页
             current_change: function (currentPage) {
                 this.currentPage = currentPage;
@@ -334,7 +330,8 @@
                         if (result.resultCode == 200) {
                             _this.total = result.data.totalCount || 0;
                             for (var i in result.data.list) {
-                                result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
+                                var totalTemp = result.data.list[i].totalPrice === null ?  '' : result.data.list[i].totalPrice;
+                                result.data.list[i].totalPriceShow = '¥' + totalTemp;
                                 var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
                                 result.data.list[i].grossProfitShow = '¥' + formatGross;
                             }
@@ -345,6 +342,33 @@
                     },
                     error: function () {
                         _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 平台减免服务
+            cutDownService(valObj) {
+                if(valObj.cutDown === '') {
+                    this.$message.error('前先输入减免金额');
+                    return;
+                }
+                var _this = this;
+                var postObj = {
+//                    userId:[[${session.loginUserId}]],
+                    orderId: valObj.id,
+                    cutdownNumber: parseFloat(valObj.cutDown)
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/admin/orders/cutDown",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.code == 200) {
+                            _this.$message.success('操作成功');
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
                     }
                 });
             }

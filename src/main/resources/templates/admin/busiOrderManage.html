@@ -187,9 +187,19 @@
                         <img th:src="@{/admin/image/export.png}" alt="">
                         <div>导出Excel</div>
                     </div>
-                    <div class="import-word-icon-line"  @click="importSheet">
+                    <div class="import-word-icon-line">
                         <img th:src="@{/admin/image/import.png}" alt="">
-                        <div>导入Excel</div>
+                        <el-upload
+                                class="upload-demo"
+                                action="/admin/orders/batchDeliverGoods"
+                                multiple
+                                :limit="5"
+                                accept=".xls"
+                                :show-file-list="false"
+                                :on-success="handleUploadSuccess"
+                        >
+                            <span>导出Excel</span>
+                        </el-upload>
                     </div>
                 </div>
                 <el-table
@@ -386,34 +396,39 @@
             exportSheet() {
                 var beginTime = this.orderDate[0] || '';
                 var endTime = this.orderDate[1] || '';
-//                window.location.href = "/admin/orders/export";
-                var _this = this;
-                $.ajax({
-                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
-                    '&endTime=' + endTime,
-                    type: 'GET',
-                    contentType: "application/json",
-                    responseType: "blob",
-                    success: function (result) {
-                        const blob = new Blob([result]);
-                        const fileName = "订单信息.xls";
-                        const elink = document.createElement("a");
-                        elink.download = fileName;
-                        elink.style.display = "none";
-                        elink.href = URL.createObjectURL(blob);
-                        document.body.appendChild(elink);
-                        elink.click();
-                        URL.revokeObjectURL(elink.href); // 释放URL 对象
-                        document.body.removeChild(elink);
-                    },
-                    error: function () {
-                        _this.$message.error('操作失败');
-                    }
-                });
+                window.location.href = '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime + '&endTime=' + endTime;
+//                var _this = this;
+//                $.ajax({
+//                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
+//                    '&endTime=' + endTime,
+//                    type: 'GET',
+//                    contentType: "application/json",
+//                    responseType: "arraybuffer",
+//                    success: function (result) {
+//                        const blob = new Blob([result]);
+//                        const fileName = "订单信息.xls";
+//                        const elink = document.createElement("a");
+//                        elink.download = fileName;
+//                        elink.style.display = "none";
+//                        elink.href = URL.createObjectURL(blob);
+//                        document.body.appendChild(elink);
+//                        elink.click();
+//                        URL.revokeObjectURL(elink.href); // 释放URL 对象
+//                        document.body.removeChild(elink);
+//                    },
+//                    error: function () {
+//                        _this.$message.error('操作失败');
+//                    }
+//                });
             },
             // 导入excel
-            importSheet() {
-
+            handleUploadSuccess(res) {
+                if (res.code == "200") {
+                    this.$message.success("上传成功！");
+                    this.queryTableData();
+                } else {
+                    this.$message.error('上传失败，'+ res.msg);
+                }
             },
             // 点击发货
             singleSendGoods(valObj) {

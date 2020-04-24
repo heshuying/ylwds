@@ -109,6 +109,14 @@
     input[type="number"] {
         -moz-appearance: textfield;
     }
+    .el-input--prefix .el-input__inner {
+        padding-left: 22px;
+        padding-right: 2px;
+    }
+    .el-input__prefix {
+        line-height: 40px;
+        color: #333;
+    }
 
 </style>
 <body class="hold-transition sidebar-mini">
@@ -184,11 +192,15 @@
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
-                            label="平台减免(-¥)"
+                            label="平台减免"
                             align="center">
                         <template slot-scope="scope">
                             <div class="plat-deduct-line">
-                                <el-input type="number" v-model="scope.row.cutDown"></el-input>
+                                <el-input type="number" v-model="scope.row.cutDown">
+                                    <span slot="prefix" style="margin-left: 2px;">
+                                        -¥
+                                    </span>
+                                </el-input>
                                 <img th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
                                 <img th:src="@{/admin/image/photo.png}" alt="">
                             </div>

@@ -2,9 +2,7 @@ package ltd.newbee.mall.controller.admin;
 
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.entity.Carousel;
-import ltd.newbee.mall.entity.IndexConfig;
-import ltd.newbee.mall.service.NewBeeMallCarouselService;
-import ltd.newbee.mall.service.NewBeeMallIndexConfigService;
+import ltd.newbee.mall.service.CarouselService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
@@ -25,10 +23,10 @@ import java.util.Objects;
  */
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallCarouselController {
+public class CarouselController {
 
     @Resource
-    NewBeeMallCarouselService newBeeMallCarouselService;
+    CarouselService newBeeMallCarouselService;
 
     @GetMapping("/carousels")
     public String carouselPage(HttpServletRequest request) {
@@ -42,9 +40,11 @@ public class NewBeeMallCarouselController {
     @RequestMapping(value = "/carousels/list", method = RequestMethod.GET)
     @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
-        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
-            return ResultGenerator.genFailResult("参数异常！");
-        }
+//        if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
+//            return ResultGenerator.genFailResult("参数异常！");
+//        }
+        params.put("page", "1");
+        params.put("limit", "1000");
         PageQueryUtil pageUtil = new PageQueryUtil(params);
         return ResultGenerator.genSuccessResult(newBeeMallCarouselService.getCarouselPage(pageUtil));
     }

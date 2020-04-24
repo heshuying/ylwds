@@ -5,7 +5,7 @@ import ltd.newbee.mall.common.IndexConfigTypeEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallIndexCarouselVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallIndexCategoryVO;
 import ltd.newbee.mall.controller.vo.NewBeeMallIndexConfigGoodsVO;
-import ltd.newbee.mall.service.NewBeeMallCarouselService;
+import ltd.newbee.mall.service.CarouselService;
 import ltd.newbee.mall.service.CategoryService;
 import ltd.newbee.mall.service.NewBeeMallIndexConfigService;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ import java.util.List;
 public class IndexController {
 
     @Resource
-    private NewBeeMallCarouselService newBeeMallCarouselService;
+    private CarouselService newBeeMallCarouselService;
 
     @Resource
     private NewBeeMallIndexConfigService newBeeMallIndexConfigService;

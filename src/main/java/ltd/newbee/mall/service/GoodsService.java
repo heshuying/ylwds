@@ -1,5 +1,6 @@
 package ltd.newbee.mall.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import ltd.newbee.mall.dto.GoodsStatusUpdateReqDTO;
 import ltd.newbee.mall.dto.UserListDto;
 import ltd.newbee.mall.entity.TbGoodsInfo;
@@ -8,7 +9,7 @@ import ltd.newbee.mall.util.PageResult;
 
 import java.util.List;
 
-public interface GoodsService {
+public interface GoodsService extends IService<TbGoodsInfo> {
     /**
      * 后台分页
      *

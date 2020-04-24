@@ -1,5 +1,6 @@
 package ltd.newbee.mall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ltd.newbee.mall.common.GoodsStatusEnum;
 import ltd.newbee.mall.common.NewBeeMallCategoryLevelEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -12,7 +13,6 @@ import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,23 +20,24 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 商品管理
  */
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminGoodsController {
 
     @Resource
-    private GoodsService newBeeMallGoodsService;
+    private GoodsService goodsService;
     @Resource
     private CategoryService newBeeMallCategoryService;
 
     @GetMapping("/goods")
     public String goodsPage(HttpServletRequest request) {
         //查询所有的一级分类
-        List<UserListDto> companyList = newBeeMallGoodsService.queryCompanyNameList();
+        List<UserListDto> companyList = goodsService.queryCompanyNameList();
         List<GoodsCategory> firstLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(0L), NewBeeMallCategoryLevelEnum.LEVEL_ONE.getLevel());
         Map<String,String> goodsStatus = new HashMap<>();
         goodsStatus.put("仓库中", "1,6");
@@ -77,7 +78,7 @@ public class AdminGoodsController {
     @GetMapping("/goods/edit/{goodsId}")
     public String edit(HttpServletRequest request, @PathVariable("goodsId") Long goodsId) {
         request.setAttribute("path", "edit");
-        TbGoodsInfo newBeeMallGoods = newBeeMallGoodsService.getNewBeeMallGoodsById(goodsId);
+        TbGoodsInfo newBeeMallGoods = goodsService.getNewBeeMallGoodsById(goodsId);
         if (newBeeMallGoods == null) {
             return "error/error_400";
         }
@@ -137,7 +138,6 @@ public class AdminGoodsController {
      * 列表
      */
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
-    @ResponseBody
     public Result list(@RequestParam Map<String, Object> params) {
         if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
             return ResultGenerator.genFailResult("参数异常！");
@@ -163,7 +163,28 @@ public class AdminGoodsController {
         }
 
         PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(newBeeMallGoodsService.getNewBeeMallGoodsPage(pageUtil));
+        return ResultGenerator.genSuccessResult(goodsService.getNewBeeMallGoodsPage(pageUtil));
+    }
+
+    /**
+     * 运营专区添加页面上面下拉数据
+     * @param goodsName
+     * @return
+     */
+    @RequestMapping(value = "/goods/listsimple", method = RequestMethod.GET)
+    public Result listsimple(@RequestParam("goodsName") String goodsName) {
+        List<TbGoodsInfo> goodsInfoList = goodsService.list(new QueryWrapper<TbGoodsInfo>()
+                .like("goods_name", goodsName)
+                .in("goods_sell_status", 3)
+                .last("limit 100"));
+        List<Map<String, String>> list = goodsInfoList.stream().map(m -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("goodsName", m.getGoodsName());
+            map.put("goodsId", String.valueOf(m.getGoodsId()));
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResultGenerator.genSuccessResult(list);
     }
 
     /**
@@ -183,7 +204,7 @@ public class AdminGoodsController {
                 || StringUtils.isEmpty(newBeeMallGoods.getGoodsDetailContent())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallGoodsService.saveNewBeeMallGoods(newBeeMallGoods);
+        String result = goodsService.saveNewBeeMallGoods(newBeeMallGoods);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -202,7 +223,7 @@ public class AdminGoodsController {
         if (Objects.isNull(newBeeMallGoods.getGoodsId())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
-        String result = newBeeMallGoodsService.updateNewBeeMallGoods(newBeeMallGoods);
+        String result = goodsService.updateNewBeeMallGoods(newBeeMallGoods);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();
         } else {
@@ -216,7 +237,7 @@ public class AdminGoodsController {
     @GetMapping("/goods/info/{id}")
     @ResponseBody
     public Result info(@PathVariable("id") Long id) {
-        TbGoodsInfo goods = newBeeMallGoodsService.getNewBeeMallGoodsById(id);
+        TbGoodsInfo goods = goodsService.getNewBeeMallGoodsById(id);
         if (goods == null) {
             return ResultGenerator.genFailResult(ServiceResultEnum.DATA_NOT_EXIST.getResult());
         }
@@ -237,7 +258,7 @@ public class AdminGoodsController {
                 && !sellStatus.equals(GoodsStatusEnum.SELLING_OFF_FRONT.getGoodsStatus()) && !sellStatus.equals(GoodsStatusEnum.OFF_INSTORE.getGoodsStatus())) {
             return ResultGenerator.genFailResult("状态异常！");
         }
-        if (newBeeMallGoodsService.batchUpdateSellStatus(requestBean, sellStatus)) {
+        if (goodsService.batchUpdateSellStatus(requestBean, sellStatus)) {
             return ResultGenerator.genSuccessResult();
         } else {
             return ResultGenerator.genFailResult("修改失败");
@@ -254,7 +275,7 @@ public class AdminGoodsController {
             return ResultGenerator.genFailResult("参数异常！");
         }
 
-        String result = newBeeMallGoodsService.updateNewBeeMallGoods(reqBean);
+        String result = goodsService.updateNewBeeMallGoods(reqBean);
         if (result.equalsIgnoreCase(ServiceResultEnum.SUCCESS.getResult())) {
             return ResultGenerator.genSuccessResult();
         } else {

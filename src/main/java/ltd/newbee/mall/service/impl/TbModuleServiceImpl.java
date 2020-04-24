@@ -95,5 +95,9 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
         return tbModules;
     }
 
+    public void getModuleDetails(){
+
+    }
+
 
 }

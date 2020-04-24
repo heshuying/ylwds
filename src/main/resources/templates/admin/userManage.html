@@ -18,9 +18,24 @@
         padding: 0 30px;
     }
 
+    .query-condition-line label {
+        font-size: 14px;
+        margin-right: 5px;
+        font-weight: normal;
+        display: inline-block;
+        width: 70px;
+        text-align: right;
+        margin-right: 10px;
+        margin-top: 5px;
+    }
+    .query-condition-line > div {
+        margin-right: 30px;
+        display: flex;
+        align-items: center;
+    }
+
     .admin-user-manage-main-page .query-condition-line {
         display: flex;
-        justify-content: space-between;
     }
 
     .tab-line {
@@ -81,7 +96,8 @@
         <div id="app" class="admin-user-manage-main-page">
             <div class="query-condition-line">
                 <div>
-                    <el-select v-model="userType" placeholder="请选择" @change="queryTableData">
+                    <label>用户类型</label>
+                    <el-select v-model="userType" placeholder="请选择">
                         <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -91,13 +107,13 @@
                     </el-select>
                 </div>
                 <div>
+                    <label>用户名</label>
                     <el-input
-                            placeholder="请输入内容"
-                            prefix-icon="el-icon-search"
-                            v-model="loginName"
-                            @change="queryTableData">
+                            placeholder="请输入用户名"
+                            v-model="loginName">
                     </el-input>
                 </div>
+                <el-button type="primary" @click="queryTableData" class="search-btn">搜索</el-button>
             </div>
             <div class="tab-line">
                 <el-tabs v-model="activeName" @tab-click="handleClick">

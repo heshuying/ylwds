@@ -9,7 +9,7 @@
 </head>
 <style>
     body {
-        background-color: #fbfbfb;
+        background-color: #FBFBFC;
     }
     .content-wrapper {
         background: #fbfbfb;
@@ -152,6 +152,7 @@
                         :data="tableData"
                         tooltip-effect="dark"
                         stripe
+                        :header-cell-style="{background:'#F5F6F8'}"
                         style="width: 100%"
                         @sort-change="sortChange"
                         @selection-change="handleTableSelectionChange">

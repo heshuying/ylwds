@@ -13,6 +13,7 @@ import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * 商品管理
  */
-@RestController
+@Controller
 @RequestMapping("/admin")
 public class AdminGoodsController {
 
@@ -137,6 +138,7 @@ public class AdminGoodsController {
      * tab=categoryId=15&goodsStatus=1,2&companyName=莫某公司&limit=20&page=1&sidx=saleTotal&order=asc
      * 列表
      */
+    @ResponseBody
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
     public Result list(@RequestParam Map<String, Object> params) {
         if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
@@ -171,6 +173,7 @@ public class AdminGoodsController {
      * @param goodsName
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "/goods/listsimple", method = RequestMethod.GET)
     public Result listsimple(@RequestParam("goodsName") String goodsName) {
         List<TbGoodsInfo> goodsInfoList = goodsService.list(new QueryWrapper<TbGoodsInfo>()

@@ -1,5 +1,6 @@
 package ltd.newbee.mall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.dto.ModuleDetailAddRes;
 import ltd.newbee.mall.dto.ModuleDetailReq;
@@ -10,16 +11,14 @@ import ltd.newbee.mall.entity.TbModuleDetail;
 import ltd.newbee.mall.service.GoodsService;
 import ltd.newbee.mall.service.TbModuleDetailService;
 import ltd.newbee.mall.service.TbModuleService;
-import ltd.newbee.mall.util.CommonUtil;
-import ltd.newbee.mall.util.Const;
-import ltd.newbee.mall.util.Result;
-import ltd.newbee.mall.util.ResultGenerator;
-import org.apache.commons.lang3.StringUtils;
+import ltd.newbee.mall.util.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -43,7 +42,7 @@ public class ModuleController {
      */
     @PostMapping("/save")
     public Result save(@RequestBody ModuleReq reqBean){
-        if(reqBean == null || StringUtils.isBlank(reqBean.getModName())){
+        if(reqBean == null || StringUtils.isEmpty(reqBean.getModName())){
             return ResultGenerator.genFailResult("参数异常！");
         }
 
@@ -83,10 +82,12 @@ public class ModuleController {
      */
     @PostMapping("/saveModelDetail")
     public Result saveModelDetail(@RequestBody ModuleDetailReq reqBean){
-        if(reqBean == null || StringUtils.isBlank(reqBean.getIsHead())){
+        if(reqBean == null
+                || StringUtils.isEmpty(reqBean.getIsHead())
+                || StringUtils.isEmpty(reqBean.getModId())){
             return ResultGenerator.genFailResult("参数异常！");
         }
-        if("1".equals(reqBean.getIsHead()) && StringUtils.isBlank(reqBean.getJumpUrl())){
+        if("1".equals(reqBean.getIsHead()) && StringUtils.isEmpty(reqBean.getJumpUrl())){
             return ResultGenerator.genFailResult("参数异常！");
         }
         if("0".equals(reqBean.getIsHead()) && Objects.isNull(reqBean.getGoodsId())){
@@ -124,9 +125,20 @@ public class ModuleController {
         return ResultGenerator.genSuccessResult(res);
     }
 
+    /**
+     * 专区详情列表
+     * @return
+     */
     @GetMapping("getModuleDetails")
-    public Result getModuleDetails(){
-        return ResultGenerator.genSuccessResult(moduleService.getModuleList());
+    public Result getModuleDetails(@RequestParam Map<String, Object> params){
+        if (org.springframework.util.StringUtils.isEmpty(params.get("page"))
+                || StringUtils.isEmpty(params.get("limit"))
+                || StringUtils.isEmpty(params.get("modId"))){
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+
+        PageQueryUtil pageUtil = new PageQueryUtil(params);
+        return ResultGenerator.genSuccessResult(moduleDetailService.getModuleDetails(pageUtil));
     }
 
 }

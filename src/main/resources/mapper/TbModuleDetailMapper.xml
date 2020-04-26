@@ -7,7 +7,9 @@
         <id column="id" property="id" />
         <result column="mod_id" property="modId" />
         <result column="goods_id" property="goodsId" />
+        <result column="img_url" property="imgUrl" />
         <result column="jump_url" property="jumpUrl" />
+        <result column="is_head" property="isHead" />
         <result column="mod_rank" property="modRank" />
         <result column="is_deleted" property="isDeleted" />
         <result column="desc1" property="desc1" />
@@ -17,5 +19,45 @@
         <result column="update_time" property="updateTime" />
         <result column="update_user" property="updateUser" />
     </resultMap>
+    
+    <resultMap id="detailListResultMap" type="ltd.newbee.mall.dto.ModuleDetailRes" extends="BaseResultMap">
+        <result column="goods_name" property="goodsName" />
+        <result column="selling_price" property="sellingPrice" />
+        <result column="profit" property="profit" />
+    </resultMap>
 
+    <select id="getModuleDetailList" parameterType="map" resultMap="detailListResultMap">
+        SELECT
+        md.*,
+        g.`goods_name`,
+        g.`selling_price`,
+        g.`profit`
+        FROM
+        tb_module_detail md
+        LEFT JOIN tb_goods_info g
+        ON md.`goods_id` = g.`goods_id`
+        <where>
+            <if test="modId != null and modId != ''">
+                and md.mod_id = #{modId}
+            </if>
+        </where>
+        ORDER BY md.mod_rank,md.is_head DESC
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <select id="getModuleDetailCount" parameterType="map" resultType="int">
+        SELECT
+        count(1)
+        FROM
+        tb_module_detail md
+        LEFT JOIN tb_goods_info g
+        ON md.`goods_id` = g.`goods_id`
+        <where>
+            <if test="modId != null and modId != ''">
+                and md.mod_id = #{modId}
+            </if>
+        </where>
+    </select>
 </mapper>

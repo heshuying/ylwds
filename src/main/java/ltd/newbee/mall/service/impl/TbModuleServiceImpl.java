@@ -88,7 +88,7 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
     @Override
     public List<TbModule> getModuleList(){
         List<TbModule> tbModules=baseMapper.selectList(new QueryWrapper<TbModule>()
-                .eq("mod_key", Const.Mod_Module_Key)
+//                .eq("mod_key", Const.Mod_Module_Key)
                 .eq("is_deleted", 0)
                 .orderByDesc("mod_rank")
         );

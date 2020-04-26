@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbModule">
         <id column="id" property="id" />
         <result column="mod_name" property="modName" />
+        <result column="mod_key" property="modKey" />
         <result column="mod_desc" property="modDesc" />
         <result column="mod_rank" property="modRank" />
         <result column="is_deleted" property="isDeleted" />

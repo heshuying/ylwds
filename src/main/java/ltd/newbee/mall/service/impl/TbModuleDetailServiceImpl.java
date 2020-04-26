@@ -1,10 +1,16 @@
 package ltd.newbee.mall.service.impl;
 
-import ltd.newbee.mall.entity.TbModuleDetail;
-import ltd.newbee.mall.dao.TbModuleDetailDao;
-import ltd.newbee.mall.service.TbModuleDetailService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ltd.newbee.mall.dao.TbModuleDetailDao;
+import ltd.newbee.mall.dto.ModuleDetailRes;
+import ltd.newbee.mall.entity.TbModuleDetail;
+import ltd.newbee.mall.service.TbModuleDetailService;
+import ltd.newbee.mall.util.PageQueryUtil;
+import ltd.newbee.mall.util.PageResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +23,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class TbModuleDetailServiceImpl extends ServiceImpl<TbModuleDetailDao, TbModuleDetail> implements TbModuleDetailService {
 
+    @Autowired TbModuleDetailDao moduleDetailDao;
+
+    @Override
+    public PageResult getModuleDetails(PageQueryUtil pageUtil){
+        List<ModuleDetailRes> list = moduleDetailDao.getModuleDetailList(pageUtil);
+        int count = moduleDetailDao.getModuleDetailCount(pageUtil);
+        PageResult pageResult = new PageResult(list, count, pageUtil.getLimit(), pageUtil.getPage());
+        return pageResult;
+    }
 }

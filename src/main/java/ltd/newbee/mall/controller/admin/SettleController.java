@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/settle")
 public class SettleController {
 
     @Autowired

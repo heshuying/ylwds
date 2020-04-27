@@ -144,7 +144,17 @@ public class AdminGoodsController {
      */
     @ResponseBody
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
-    public Result list(@RequestParam Map<String, Object> params) {
+    public Result list(@RequestParam Map<String, Object> params, HttpSession session) {
+        // 设置登录人
+        Long userId = (Long)session.getAttribute("loginUserId");
+        String userType = (String)session.getAttribute("loginType");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        if("04".equals(userType)){
+            params.put("userId", userId);
+        }
+
         if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
             return ResultGenerator.genFailResult("参数异常！");
         }

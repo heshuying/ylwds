@@ -100,6 +100,9 @@
         left join tb_user u on g.user_id = u.user_id
         left join tb_user_profile p on p.user_id = u.user_id
         <where>
+            <if test="userId!=null and userId!=''">
+                and u.user_id = #{userId}
+            </if>
             <if test="goodsName!=null and goodsName!=''">
                 and g.goods_name like CONCAT('%',#{goodsName},'%')
             </if>

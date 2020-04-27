@@ -91,6 +91,10 @@ public class AdminController {
         session.setAttribute("loginType", adminUser.getUserType());
         session.setAttribute("checked", adminUser.getUserStatus()==0?false:true);
 
+        if("04".equals(adminUser.getUserType())
+                && adminUser.getUserStatus()==0){
+            return "redirect:https://www.baidu.com";
+        }
         //session过期时间设置为7200秒 即两小时
         //session.setMaxInactiveInterval(60 * 60 * 2);
         return "redirect:/admin/index";

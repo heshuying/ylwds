@@ -5,11 +5,13 @@ import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallUserVO;
 import ltd.newbee.mall.entity.MallUser;
+import ltd.newbee.mall.entity.TbUser;
 import ltd.newbee.mall.entity.TbUserAddr;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
 import ltd.newbee.mall.service.NewBeeMallUserService;
 import ltd.newbee.mall.service.TbUserAddrService;
 import ltd.newbee.mall.service.TbUserService;
+import ltd.newbee.mall.util.BeanUtil;
 import ltd.newbee.mall.util.MD5Util;
 import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
@@ -35,6 +37,8 @@ public class PersonalController {
     private NewBeeMallOrderService orderService;
     @Autowired
     private TbUserAddrService userAddrService;
+    @Autowired
+    private TbUserService userService;
 
     @GetMapping("/personal")
     public String personalPage(HttpServletRequest request,
@@ -84,9 +88,25 @@ public class PersonalController {
 //            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_ERROR.getResult());
 //        }
         //todo 清verifyCode
-        String loginResult = newBeeMallUserService.login(loginName, MD5Util.MD5Encode(password, "UTF-8"), httpSession);
+        String loginResult=ServiceResultEnum.SUCCESS.getResult();
+        TbUser user = userService.getOne(new QueryWrapper<TbUser>()
+                .eq("login_name",loginName)
+                .eq("password_md5", MD5Util.MD5Encode(password, "UTF-8"))
+                .in("user_type",new String[]{"01","02"}));
+        if (user == null||user.getUserStatus()==4) {
+            loginResult= "用户名或密码错误";
+
+        }else if(user.getUserStatus()==2){
+            loginResult= "用户已被锁定";
+        }else if(user.getUserStatus()==0){
+            loginResult= "用户资料还未审核";
+        }
+
         //登录成功
         if (ServiceResultEnum.SUCCESS.getResult().equals(loginResult)) {
+            NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
+            BeanUtil.copyProperties(user, newBeeMallUserVO);
+            httpSession.setAttribute(Constants.MALL_USER_SESSION_KEY, user);
             return ResultGenerator.genSuccessResult();
         }
         //登录失败

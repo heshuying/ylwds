@@ -75,3 +75,4 @@ ul.thumbnails.image_picker_selector li .thumbnail {
     border: 1px solid #dddddd; }
 ul.thumbnails.image_picker_selector li .thumbnail.selected {
     background: #0088cc; }
+.hide-item {display: none;}

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,7 @@ public class AdminGoodsController {
     private CategoryService newBeeMallCategoryService;
 
     @GetMapping("/goods")
-    public String goodsPage(HttpServletRequest request) {
+    public String goodsPage(HttpServletRequest request,HttpSession session) {
         //查询所有的一级分类
         List<UserListDto> companyList = goodsService.queryCompanyNameList();
         List<GoodsCategory> firstLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(0L), NewBeeMallCategoryLevelEnum.LEVEL_ONE.getLevel());
@@ -50,9 +51,12 @@ public class AdminGoodsController {
         request.setAttribute("firstLevelCategories", firstLevelCategories);
         request.setAttribute("goodsStatus", goodsStatus);
         request.setAttribute("path", "newbee_mall_goods");
-        // return "admin/newbee_mall_goods";
-        return "admin/platGoodsManage";
-        // return "admin/busiGoodsManage";
+        String userType = session.getAttribute("loginType").toString().trim();
+        if("03".equals( userType )) {
+            return "admin/platGoodsManage";
+        } else {
+            return "admin/busiGoodsManage";
+        }
     }
 
     @GetMapping("/goods/edit")
@@ -140,7 +144,17 @@ public class AdminGoodsController {
      */
     @ResponseBody
     @RequestMapping(value = "/goods/list", method = RequestMethod.GET)
-    public Result list(@RequestParam Map<String, Object> params) {
+    public Result list(@RequestParam Map<String, Object> params, HttpSession session) {
+        // 设置登录人
+        Long userId = (Long)session.getAttribute("loginUserId");
+        String userType = (String)session.getAttribute("loginType");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        if("04".equals(userType)){
+            params.put("userId", userId);
+        }
+
         if (StringUtils.isEmpty(params.get("page")) || StringUtils.isEmpty(params.get("limit"))) {
             return ResultGenerator.genFailResult("参数异常！");
         }

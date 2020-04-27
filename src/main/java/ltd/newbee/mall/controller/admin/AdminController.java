@@ -86,13 +86,17 @@ public class AdminController {
             session.setAttribute("errorMsg", "用户已被锁定");
             return "admin/login";
         }
+        if(adminUser.getUserStatus()==0) {
+            session.setAttribute("errorMsg", "用户资料还未审核");
+            return "admin/login";
+        }
         session.setAttribute("loginUser", adminUser.getNickName());
         session.setAttribute("loginUserId", adminUser.getUserId());
         session.setAttribute("loginType", adminUser.getUserType());
         session.setAttribute("checked", adminUser.getUserStatus()==0?false:true);
 
         if("04".equals(adminUser.getUserType())
-                && adminUser.getUserStatus()==0){
+                && adminUser.getUserStatus()==3){
             return "redirect:https://www.baidu.com";
         }
         //session过期时间设置为7200秒 即两小时

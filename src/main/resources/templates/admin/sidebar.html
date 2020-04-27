@@ -99,8 +99,16 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a th:href="@{/admin/orders/supplier/page}" th:class="${path}=='orders'?'nav-link active':'nav-link'">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
+                    <a th:href="@{/admin/orders/platform/page}" th:class="${path}=='newbee_mall_platform_order'?'nav-link active':'nav-link'">
+                        <i class="fa fa-money nav-icon" aria-hidden="true"></i>
+                        <p>
+                            订单管理
+                        </p>
+                    </a>
+                </li>
+                <li th:class="${session.loginType}=='04'?'nav-item':'hide-item'">
+                    <a th:href="@{/admin/orders/supplier/page}" th:class="${path}=='newbee_mall_supplier_order'?'nav-link active':'nav-link'">
                         <i class="fa fa-money nav-icon" aria-hidden="true"></i>
                         <p>
                             订单管理

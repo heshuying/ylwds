@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header-fragment">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/main.css}">
+</head>
 <aside th:fragment="sidebar-fragment(path)" class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a th:href="@{/admin/index}" class="brand-link">
@@ -16,8 +19,8 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
-                <li class="nav-header">Dashboard</li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-header':'hide-item'">Dashboard</li>
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/index}" th:class="${path}=='index'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-dashboard"></i>
                         <p>
@@ -25,7 +28,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/goods/edit}" th:class="${path}=='goods-edit'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-plus"></i>
                         <p>
@@ -33,8 +36,8 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-header">首页配置</li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-header':'hide-item'">首页配置</li>
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/carousels}"
                        th:class="${path}=='newbee_mall_carousel'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-file-image-o"></i>
@@ -43,7 +46,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/indexConfigs?configType=3}"
                        th:class="${path}=='INDEX_GOODS_HOTS'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
@@ -52,7 +55,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/indexConfigs?configType=4}"
                        th:class="${path}=='INDEX_GOODS_NEW'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
@@ -61,7 +64,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/indexConfigs?configType=5}"
                        th:class="${path}=='INDEX_GOODS_RECOMMOND'?'nav-link active':'nav-link'">
                         <i class="nav-icon fa fa-hand-o-up"></i>
@@ -70,8 +73,8 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-header">管理模块</li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-header':'hide-item'">管理模块</li>
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/categories?parentId=0&categoryLevel=1&backParentId=0}"
                        th:class="${path}=='newbee_mall_category'?'nav-link active':'nav-link'">
                         <i class="fa fa-list-alt nav-icon" aria-hidden="true"></i>
@@ -88,7 +91,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/users}" th:class="${path}=='users'?'nav-link active':'nav-link'">
                         <i class="fa fa-users nav-icon" aria-hidden="true"></i>
                         <p>
@@ -104,8 +107,8 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-header">系统管理</li>
-                <li class="nav-item">
+                <li th:class="${session.loginType}=='03'?'nav-header':'hide-item'">系统管理</li>
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/profile}"
                        th:class="${path}=='profile'?'nav-link active':'nav-link'">
                         <i class="fa fa-user-secret nav-icon"></i>

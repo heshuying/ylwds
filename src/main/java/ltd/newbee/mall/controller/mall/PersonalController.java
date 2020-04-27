@@ -1,13 +1,20 @@
 package ltd.newbee.mall.controller.mall;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.ServiceResultEnum;
 import ltd.newbee.mall.controller.vo.NewBeeMallUserVO;
 import ltd.newbee.mall.entity.MallUser;
+import ltd.newbee.mall.entity.TbUserAddr;
+import ltd.newbee.mall.service.NewBeeMallOrderService;
 import ltd.newbee.mall.service.NewBeeMallUserService;
+import ltd.newbee.mall.service.TbUserAddrService;
+import ltd.newbee.mall.service.TbUserService;
 import ltd.newbee.mall.util.MD5Util;
+import ltd.newbee.mall.util.PageQueryUtil;
 import ltd.newbee.mall.util.Result;
 import ltd.newbee.mall.util.ResultGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +22,19 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class PersonalController {
 
     @Resource
     private NewBeeMallUserService newBeeMallUserService;
+    @Autowired
+    private NewBeeMallOrderService orderService;
+    @Autowired
+    private TbUserAddrService userAddrService;
 
     @GetMapping("/personal")
     public String personalPage(HttpServletRequest request,
@@ -120,5 +134,94 @@ public class PersonalController {
             Result result = ResultGenerator.genSuccessResult();
             return result;
         }
+    }
+
+    /**
+     * 我的订单列表
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/my/orders")
+    public String orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        params.put("customerId", user.getUserId());
+        if (StringUtils.isEmpty(params.get("page"))) {
+            params.put("page", 1);
+        }
+        params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+        //封装我的订单数据
+        PageQueryUtil pageUtil = new PageQueryUtil(params);
+        request.setAttribute("orderPageResult", orderService.getMyOrdersForSupplier(pageUtil));
+        request.setAttribute("path", "orders");
+        return "mall/my-orders";
+    }
+
+    /**
+     * 我的收获地址
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/my/delivery")
+    public String delivery(HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
+        List<TbUserAddr> userAddrList=userAddrService.list(
+                new QueryWrapper<TbUserAddr>()
+                .eq("user_id",user.getUserId())
+                .eq("status",0)
+        );
+        request.setAttribute("userAddrList", userAddrList);
+        request.setAttribute("path", "");
+        return "";
+    }
+
+    @PostMapping("/my/delivery/add")
+    public String addDelivery(@RequestBody TbUserAddr userAddr, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
+        userAddr.setUserId(user.getUserId());
+        userAddr.setCreateTime(new Date());
+        userAddr.setStatus(0);
+        userAddr.setIsDefault(false);
+        userAddrService.save(userAddr);
+        return "";
+    }
+
+    @PostMapping("/my/delivery/del")
+    public String delDelivery(@RequestBody Long deliveryId, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        TbUserAddr userAddr=userAddrService.getById(deliveryId);
+        userAddr.setStatus(1);
+        userAddr.setUserId(user.getUserId());
+        userAddr.setCreateTime(new Date());
+        userAddrService.updateById(userAddr);
+        return "";
+    }
+
+    @PostMapping("/my/delivery/update")
+    public String updateDelivery(@RequestBody TbUserAddr userAddr, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
+        userAddrService.updateById(userAddr);
+        return "";
+    }
+
+    @PostMapping("/my/delivery/default")
+    public String updateDelivery(@RequestBody Long deliveryId, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        TbUserAddr exists=new TbUserAddr();
+        exists.setUserId(user.getUserId());
+        exists.setIsDefault(false);
+        userAddrService.update(exists,new QueryWrapper<TbUserAddr>()
+        .eq("user_id", user.getUserId()));
+
+        TbUserAddr defaultAddr=new TbUserAddr();
+        defaultAddr.setAddrId(deliveryId);
+        defaultAddr.setIsDefault(true);
+        userAddrService.updateById(defaultAddr);
+        return "";
     }
 }

@@ -51,7 +51,14 @@ public class TbUserAddr extends Model<TbUserAddr> {
      * 区
      */
     private String area;
-
+    /**
+     * 街道
+     */
+    private String street;
+    /**
+     * 是否默认
+     */
+    private Boolean isDefault;
     /**
      * 详细地址
      */

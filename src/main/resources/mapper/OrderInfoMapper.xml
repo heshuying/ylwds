@@ -231,6 +231,9 @@
       <if test="userId!=null and userId!=''">
         and supplier_id = #{userId}
       </if>
+      <if test="customerId!=null and customerId!=''">
+        and customer_id = #{customerId},
+      </if>
       <if test="beginTime!=null">
         and create_time > #{beginTime}
       </if>

@@ -113,7 +113,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         }
 
         TbUserAddr existUserAddr=userAddrService.getOne(
-                new QueryWrapper<TbUserAddr>().eq("user_id",dto.getUserId())
+                new QueryWrapper<TbUserAddr>().eq("user_id",dto.getUserId()).eq("status",0)
         );
         TbUserAddr tbUserAddr=new TbUserAddr();
         tbUserAddr.setProvince(dto.getDeliveryProv());
@@ -122,6 +122,8 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         tbUserAddr.setDetail(dto.getDeliveryDetail());
         tbUserAddr.setPhone(dto.getDeliveryPhone());
         tbUserAddr.setUserId(dto.getUserId());
+        tbUserAddr.setStatus(0);
+        tbUserAddr.setIsDefault(true);
         tbUserAddr.setAcceptor(dto.getAcceptor());
         if(existUserAddr==null){
             userAddrService.save(tbUserAddr);

@@ -105,12 +105,14 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         BeanUtils.copyProperties(dto, tbUserProfile);
         profileService.update(tbUserProfile, new QueryWrapper<TbUserProfile>()
                 .eq("user_id",dto.getUserId()));
+        //更新状态
+        TbUser user=new TbUser();
+        user.setUserId(dto.getUserId());
+        user.setUserStatus(Const.UserStatus.Uncheck.getKey());
         if(StringUtils.isNoneBlank(dto.getRegCellphone())){
-            TbUser user=new TbUser();
-            user.setUserId(dto.getUserId());
             user.setCellphone(dto.getRegCellphone());
-            baseMapper.updateById(user);
         }
+        baseMapper.updateById(user);
 
         TbUserAddr existUserAddr=userAddrService.getOne(
                 new QueryWrapper<TbUserAddr>().eq("user_id",dto.getUserId()).eq("status",0)

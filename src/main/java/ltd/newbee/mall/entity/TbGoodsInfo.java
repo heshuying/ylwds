@@ -14,6 +14,8 @@ public class TbGoodsInfo {
     @TableId(value = "goods_id", type = IdType.AUTO)
     private Long goodsId;
 
+    private Long userId;
+
     private String goodsName;
 
     private String goodsIntro;
@@ -287,5 +289,13 @@ public class TbGoodsInfo {
 
     public void setUpdateUser(Long updateUser) {
         this.updateUser = updateUser;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

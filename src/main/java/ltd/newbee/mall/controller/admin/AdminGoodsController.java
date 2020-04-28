@@ -217,6 +217,7 @@ public class AdminGoodsController {
         }
         newBeeMallGoods.setCreateUser(userId);
         newBeeMallGoods.setUpdateUser(userId);
+        newBeeMallGoods.setUserId(userId);
 
         if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())

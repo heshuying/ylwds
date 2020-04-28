@@ -88,6 +88,8 @@
         color: #477FFF;
         text-align: right;
         margin: 15px 0;
+    }
+    .goods-operiton-line span {
         cursor: pointer;
     }
     .dialog-all-div {
@@ -143,9 +145,9 @@
                 <el-button type="primary" @click="queryTableData">搜索</el-button>
             </div>
             <div class="tab-line">
-                <div class="goods-operiton-line" @click="addGoods">
-                   <span>+</span>
-                    新增商品
+                <div class="goods-operiton-line">
+                   +
+                    <span @click="addGoods">新增商品</span>
                 </div>
                 <el-table
                         ref="multipleTable"

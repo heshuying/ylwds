@@ -171,7 +171,12 @@ public class NewBeeMallOrderController {
         params.put("userId", user.getUserId());*/
             params.put("page",1);
             params.put("limit",3);
-
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
+            params.put("supplierId",userId);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Object beginTime = params.get("beginTime");
             if(beginTime != null && !((String)beginTime).equals("")){
@@ -294,13 +299,21 @@ public class NewBeeMallOrderController {
 
     @PostMapping("/orders/cutDown")
     @ResponseBody
-    public CommonResult cutDownPrice(@RequestBody CutDownPriceParam params){
+    public Result cutDownPrice(@RequestBody CutDownPriceParam params, HttpServletRequest request, HttpSession httpSession){
         try{
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
             newBeeMallOrderService.cutDownPrice(params);
-            return new CommonResult("200","减免成功");
+            return ResultGenerator.genFailResult("减免成功");
+        }catch (BusinessException e){
+            e.printStackTrace();
+            return ResultGenerator.genFailResult(e.getMessage());
         }catch (Exception e){
             e.printStackTrace();
-            return new CommonResult("301","减免失败");
+            return ResultGenerator.genFailResult("减免失败");
         }
     }
 

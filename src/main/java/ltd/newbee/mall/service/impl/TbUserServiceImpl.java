@@ -151,6 +151,8 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         );
         ProfileDto profileDto=new ProfileDto();
         BeanUtils.copyProperties(tbUserProfile, profileDto);
+        TbUser user=baseMapper.selectById(userId);
+        profileDto.setRegCellphone(user.getCellphone());
         if(tbUserAddr!=null){
             profileDto.setDeliveryProv(tbUserAddr.getProvince());
             profileDto.setDeliveryCity(tbUserAddr.getCity());

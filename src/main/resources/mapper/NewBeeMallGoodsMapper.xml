@@ -270,7 +270,7 @@
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </delete>
     <insert id="insert" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
-    insert into tb_goods_info (goods_id, goods_name, goods_intro, 
+    insert into tb_goods_info (goods_id, goods_name, goods_intro,
       goods_cover_img, goods_carousel, original_price, 
       selling_price, stock_num, tag, price,profit,
       goods_sell_status, create_user, create_time, 
@@ -340,6 +340,33 @@
             <if test="goodsDetailContent != null">
                 goods_detail_content,
             </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="transitMoney != null">
+                transit_money,
+            </if>
+            <if test="saleTotal != null">
+                sale_total,
+            </if>
+            <if test="goodsSno != null">
+                goods_sno,
+            </if>
+            <if test="goodsAttribute != null">
+                goods_attribute,
+            </if>
+            <if test="createSno != null">
+                createSno,
+            </if>
+            <if test="msgOffline != null">
+                msg_offline,
+            </if>
+            <if test="msgReject != null">
+                msg_reject,
+            </if>
+            <if test="onlineTime != null">
+                online_time,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">
@@ -395,6 +422,33 @@
             </if>
             <if test="goodsDetailContent != null">
                 #{goodsDetailContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="transitMoney != null">
+                #{transitMoney},
+            </if>
+            <if test="saleTotal != null">
+                #{saleTotal},
+            </if>
+            <if test="goodsSno != null">
+                #{goodsSno},
+            </if>
+            <if test="goodsAttribute != null">
+                #{goodsAttribute},
+            </if>
+            <if test="createSno != null">
+                #{createSno},
+            </if>
+            <if test="msgOffline != null">
+                #{msgOffline},
+            </if>
+            <if test="msgReject != null">
+                #{msgReject},
+            </if>
+            <if test="onlineTime != null">
+                #{onlineTime},
             </if>
         </trim>
     </insert>

@@ -1,6 +1,7 @@
 package ltd.newbee.mall.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -14,6 +15,7 @@ public class TbGoodsInfo {
     @TableId(value = "goods_id", type = IdType.AUTO)
     private Long goodsId;
 
+    @TableField("user_id")
     private Long userId;
 
     private String goodsName;

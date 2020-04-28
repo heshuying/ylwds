@@ -100,6 +100,8 @@ public class PersonalController {
             loginResult= "用户已被锁定";
         }else if(user.getUserStatus()==0){
             loginResult= "用户资料还未审核";
+        }else if(user.getUserStatus()==3){
+            loginResult= "checkFail,"+ user.getUserId();
         }
 
         //登录成功

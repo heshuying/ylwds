@@ -272,13 +272,13 @@
     <insert id="insert" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
     insert into tb_goods_info (goods_id, goods_name, goods_intro, 
       goods_cover_img, goods_carousel, original_price, 
-      selling_price, stock_num, tag, price,profit
+      selling_price, stock_num, tag, price,profit,
       goods_sell_status, create_user, create_time, 
       update_user, update_time, goods_detail_content
       )
     values (#{goodsId,jdbcType=BIGINT}, #{goodsName,jdbcType=VARCHAR}, #{goodsIntro,jdbcType=VARCHAR}, 
       #{goodsCoverImg,jdbcType=VARCHAR}, #{goodsCarousel,jdbcType=VARCHAR}, #{originalPrice,jdbcType=INTEGER}, 
-      #{sellingPrice,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, #{price,jdbcType=VARCHAR}, #{profit,jdbcType=VARCHAR}
+      #{sellingPrice,jdbcType=INTEGER}, #{stockNum,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, #{price,jdbcType=VARCHAR}, #{profit,jdbcType=VARCHAR},
       #{goodsSellStatus,jdbcType=TINYINT}, #{createUser,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{goodsDetailContent,jdbcType=LONGVARCHAR}
       )

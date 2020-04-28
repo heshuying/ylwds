@@ -118,8 +118,11 @@ public class NewBeeMallOrderController {
     @ResponseBody
     public Result supplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
-            String userId = (String) httpSession.getAttribute("loginUserId");
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
             String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
             params.put("supplierId",userId);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty((String)params.get("page"))) {
@@ -148,9 +151,12 @@ public class NewBeeMallOrderController {
             PageQueryUtil pageUtil = new PageQueryUtil(params);
             PageResult result = newBeeMallOrderService.getMyOrdersForSupplier(pageUtil);
             return ResultGenerator.genSuccessResult(result);
+        } catch (BusinessException e){
+            e.printStackTrace();
+            return ResultGenerator.genFailResult(e.getMessage());
         } catch (Exception e){
             e.printStackTrace();
-            return ResultGenerator.genFailResult("");
+            return ResultGenerator.genFailResult("资源方订单列表查询失败");
         }
     }
 
@@ -165,7 +171,12 @@ public class NewBeeMallOrderController {
         params.put("userId", user.getUserId());*/
             params.put("page",1);
             params.put("limit",3);
-
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
+            params.put("supplierId",userId);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Object beginTime = params.get("beginTime");
             if(beginTime != null && !((String)beginTime).equals("")){
@@ -247,6 +258,11 @@ public class NewBeeMallOrderController {
     @ResponseBody
     public Result platformOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             if (StringUtils.isEmpty((String)params.get("page"))) {
                 params.put("page", 1);
@@ -277,19 +293,27 @@ public class NewBeeMallOrderController {
             return ResultGenerator.genSuccessResult(result);
         } catch (Exception e){
             e.printStackTrace();
-            return ResultGenerator.genFailResult("");
+            return ResultGenerator.genFailResult("平台方订单列表查询失败");
         }
     }
 
     @PostMapping("/orders/cutDown")
     @ResponseBody
-    public CommonResult cutDownPrice(@RequestBody CutDownPriceParam params){
+    public Result cutDownPrice(@RequestBody CutDownPriceParam params, HttpServletRequest request, HttpSession httpSession){
         try{
+            String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(userId) || StringUtils.isBlank(loginType) ){
+                throw new BusinessException("用户状态异常");
+            }
             newBeeMallOrderService.cutDownPrice(params);
-            return new CommonResult("200","减免成功");
+            return ResultGenerator.genSuccessResult("减免成功");
+        }catch (BusinessException e){
+            e.printStackTrace();
+            return ResultGenerator.genFailResult(e.getMessage());
         }catch (Exception e){
             e.printStackTrace();
-            return new CommonResult("301","减免失败");
+            return ResultGenerator.genFailResult("减免失败");
         }
     }
 

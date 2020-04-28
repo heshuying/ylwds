@@ -175,9 +175,14 @@
                 if (result.resultCode == 200) {
                     window.location.href = '/index';
                 } else {
-                    swal(result.message, {
-                        icon: "error",
-                    });
+                    if(result.message.indexOf('checkFail') > -1) {
+                        var userId = result.message.split(",")[1];
+                        window.location.href = 'http://localhost:8002/outer/registerCustom/customContact?userId=' + userId;
+                    } else {
+                        swal(result.message, {
+                            icon: "error",
+                        });
+                    }
                 }
                 ;
             },

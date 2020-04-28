@@ -18,7 +18,7 @@ import java.util.*;
 
 
 @Controller
-@RequestMapping("/category")
+@RequestMapping("/admin")
 public class GoodsCategoryController {
 
     @Resource

@@ -493,7 +493,7 @@
                     userStatus = 4;
                 }
                 $.ajax({
-                    url: '/admin/users/list?page=' + this.currentPage + '&limit=' + this.pagesize + '' + '&userStatus=' + userStatus +
+                    url: '/custom/users/list?page=' + this.currentPage + '&limit=' + this.pagesize + '' + '&userStatus=' + userStatus +
                     '&userType=' + this.userType + '&loginName=' + this.loginName,
                     type: 'GET',
                     success: function (result) {
@@ -581,7 +581,7 @@
                 var _this = this;
                 $.ajax({
                     type: "POST",
-                    url: "/admin/users/lock/" + status,
+                    url: "/custom/users/lock/" + status,
                     contentType: "application/json",
                     data: JSON.stringify(postArr),
                     success: function (result) {

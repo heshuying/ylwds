@@ -228,8 +228,8 @@
       <if test="status!=null and status!=''">
         and status = #{status}
       </if>
-      <if test="userId!=null and userId!=''">
-        and supplier_id = #{userId}
+      <if test="supplierId!=null and supplierId!=''">
+        and supplier_id = #{supplierId}
       </if>
       <if test="customerId!=null and customerId!=''">
         and customer_id = #{customerId},

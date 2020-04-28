@@ -1,6 +1,5 @@
 package ltd.newbee.mall.controller.admin;
 
-import com.haier.openplatform.BusinessException;
 import ltd.newbee.mall.common.Constants;
 import ltd.newbee.mall.common.NewBeeMallOrderStatusEnum;
 import ltd.newbee.mall.common.ServiceResultEnum;
@@ -11,13 +10,14 @@ import ltd.newbee.mall.entity.NewBeeMallOrder;
 import ltd.newbee.mall.entity.order.CommonResult;
 import ltd.newbee.mall.entity.order.CutDownPriceParam;
 import ltd.newbee.mall.entity.order.DeliverGoodsParam;
+import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.service.NewBeeMallIndexConfigService;
 import ltd.newbee.mall.service.NewBeeMallOrderService;
 import ltd.newbee.mall.service.NewBeeMallShoppingCartService;
 import ltd.newbee.mall.util.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +41,35 @@ public class NewBeeMallOrderController {
     @Resource
     private NewBeeMallOrderService newBeeMallOrderService;
 
+    /**
+     *
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/orders/page")
+    public String orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        try{
+            String loginUserId = (String) httpSession.getAttribute("loginUserId");
+            String loginType = (String) httpSession.getAttribute("loginType");
+            if(StringUtils.isBlank(loginUserId)){
+                return "error/error_5xx";
+            }
+            if("03".equals(loginType)){
+                request.setAttribute("path", "newbee_mall_supplier_order");
+                return "admin/busiOrderManage";
+            }else if("04".equals(loginType)){
+                request.setAttribute("path", "newbee_mall_platform_order");
+                return "admin/platOrderManage";
+            }else {
+                return "error/error_5xx";
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            return "error/error_5xx";
+        }
+    }
 
     /**
      * 资源方-订单列表页面
@@ -50,7 +79,7 @@ public class NewBeeMallOrderController {
      * @return
      */
     @GetMapping("/orders/supplier/page")
-    public String SupplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    public String supplierOrderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
             request.setAttribute("path", "newbee_mall_supplier_order");
             return "admin/busiOrderManage";
@@ -87,11 +116,13 @@ public class NewBeeMallOrderController {
      */
     @GetMapping("/orders/supplier")
     @ResponseBody
-    public Result SupplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+    public Result supplierOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
-           /* NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-            params.put("userId", user.getUserId());*/           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            if (StringUtils.isEmpty(params.get("page"))) {
+            String userId = (String) httpSession.getAttribute("loginUserId");
+            String loginType = (String) httpSession.getAttribute("loginType");
+            params.put("supplierId",userId);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if (StringUtils.isEmpty((String)params.get("page"))) {
                 params.put("page", 1);
             }
             Object beginTime = params.get("beginTime");
@@ -217,7 +248,7 @@ public class NewBeeMallOrderController {
     public Result platformOrderList(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         try{
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            if (StringUtils.isEmpty(params.get("page"))) {
+            if (StringUtils.isEmpty((String)params.get("page"))) {
                 params.put("page", 1);
             }
             Object beginTime = params.get("beginTime");

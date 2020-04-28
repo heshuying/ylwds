@@ -43,7 +43,7 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
         goods.setCreateTime(new Date());
         goods.setUpdateTime(new Date());
 
-        if (baseMapper.insert(goods) > 0) {
+        if (goodsMapper.insertSelective(goods) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }
         return ServiceResultEnum.DB_ERROR.getResult();

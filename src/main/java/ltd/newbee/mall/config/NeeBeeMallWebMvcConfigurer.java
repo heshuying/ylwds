@@ -22,11 +22,11 @@ public class NeeBeeMallWebMvcConfigurer implements WebMvcConfigurer {
 
     public void addInterceptors(InterceptorRegistry registry) {
         // 添加一个拦截器，拦截以/admin为前缀的url路径（后台登陆拦截）
-        registry.addInterceptor(adminLoginInterceptor)
-                .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login")
-                .excludePathPatterns("/admin/dist/**")
-                .excludePathPatterns("/admin/plugins/**");
+//        registry.addInterceptor(adminLoginInterceptor)
+//                .addPathPatterns("/admin/**")
+//                .excludePathPatterns("/admin/login")
+//                .excludePathPatterns("/admin/dist/**")
+//                .excludePathPatterns("/admin/plugins/**");
         // 购物车中的数量统一处理
         registry.addInterceptor(newBeeMallCartNumberInterceptor)
                 .excludePathPatterns("/admin/**")

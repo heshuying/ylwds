@@ -105,3 +105,13 @@ ftp:
   username: 200001725622
   password: Pk43K6_yTj
   basePath: /opt/jsh/200001725622/photo
+
+#swagger 启用
+swagger:
+  enable: true
+  basePackage: ltd.newbee.mall.controller.api
+  info:
+    title: 衣联网B2B电商API文档
+    description: 衣联网B2B电商API文档
+    version: 1.0
+    serviceUrl: ylwbtb.hoptest.haier.net

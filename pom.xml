@@ -38,6 +38,7 @@
         <commons.codec.version>1.6</commons.codec.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <com.google.zxing.core>3.3.0</com.google.zxing.core>
+        <swagger.version>2.7.0</swagger.version>
     </properties>
 
     <dependencies>
@@ -159,6 +160,16 @@
             <version>${lombok.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.alibaba.spring.boot</groupId>

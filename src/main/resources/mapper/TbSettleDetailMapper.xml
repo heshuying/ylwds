@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ltd.newbee.mall.dao.TbSettleDetailDao">
+<mapper namespace="com.hailian.ylwmall.dao.TbSettleDetailDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbSettleDetail">
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbSettleDetail">
         <id column="id" property="id" />
         <result column="settle_id" property="settleId" />
         <result column="order_id" property="orderId" />

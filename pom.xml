@@ -286,7 +286,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <mainClass>ltd.newbee.mall.B2BMallApplication</mainClass>
+                            <mainClass>com.hailian.ylwmall.B2BMallApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

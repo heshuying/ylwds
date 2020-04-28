@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ltd.newbee.mall.dao.NewBeeMallGoodsMapper">
+<mapper namespace="com.hailian.ylwmall.dao.NewBeeMallGoodsMapper">
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbGoodsInfo">
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbGoodsInfo">
         <id column="goods_id" property="goodsId" />
         <result column="goods_name" property="goodsName" />
         <result column="goods_intro" property="goodsIntro" />
@@ -30,11 +30,11 @@
         <result column="update_time" property="updateTime" />
         <result column="online_time" property="onlineTime" />
     </resultMap>
-    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="ltd.newbee.mall.entity.TbGoodsInfo">
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.hailian.ylwmall.entity.TbGoodsInfo">
         <result column="goods_detail_content" jdbcType="LONGVARCHAR" property="goodsDetailContent"/>
     </resultMap>
 
-    <resultMap extends="BaseResultMap" id="ResultMapGoodsAndCompay" type="ltd.newbee.mall.dto.GoodsAndCompayResDTO">
+    <resultMap extends="BaseResultMap" id="ResultMapGoodsAndCompay" type="com.hailian.ylwmall.dto.GoodsAndCompayResDTO">
         <result column="user_id" property="userId"/>
         <result column="company_name" property="companyName"/>
     </resultMap>
@@ -269,7 +269,7 @@
     delete from tb_goods_info
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </delete>
-    <insert id="insert" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
+    <insert id="insert" parameterType="com.hailian.ylwmall.entity.TbGoodsInfo">
     insert into tb_goods_info (goods_id, goods_name, goods_intro,
       goods_cover_img, goods_carousel, original_price, 
       selling_price, stock_num, tag, price,profit,
@@ -283,7 +283,7 @@
       #{updateUser,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{goodsDetailContent,jdbcType=LONGVARCHAR}
       )
   </insert>
-    <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
+    <insert id="insertSelective" parameterType="com.hailian.ylwmall.entity.TbGoodsInfo">
         insert into tb_goods_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsId != null">
@@ -452,7 +452,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
+    <update id="updateByPrimaryKeySelective" parameterType="com.hailian.ylwmall.entity.TbGoodsInfo">
         update tb_goods_info
         <set>
             <if test="goodsName != null">
@@ -509,7 +509,7 @@
         </set>
         where goods_id = #{goodsId,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.hailian.ylwmall.entity.TbGoodsInfo">
     update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},
@@ -527,7 +527,7 @@
       goods_detail_content = #{goodsDetailContent,jdbcType=LONGVARCHAR}
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </update>
-    <update id="updateByPrimaryKey" parameterType="ltd.newbee.mall.entity.TbGoodsInfo">
+    <update id="updateByPrimaryKey" parameterType="com.hailian.ylwmall.entity.TbGoodsInfo">
     update tb_goods_info
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_intro = #{goodsIntro,jdbcType=VARCHAR},

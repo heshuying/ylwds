@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ltd.newbee.mall.dao.TbUserProfileDao">
+<mapper namespace="com.hailian.ylwmall.dao.TbUserProfileDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbUserProfile">
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbUserProfile">
         <id column="profile_id" property="profileId" />
         <result column="user_id" property="userId" />
         <result column="company_name" property="companyName" />

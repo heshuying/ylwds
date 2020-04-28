@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ltd.newbee.mall.dao.TbUserDao">
+<mapper namespace="com.hailian.ylwmall.dao.TbUserDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbUser">
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbUser">
     <id column="user_id" property="userId" />
     <result column="nick_name" property="nickName" />
     <result column="login_name" property="loginName" />
@@ -17,7 +17,7 @@
     <result column="create_time" property="createTime" />
     </resultMap>
 
-    <resultMap id="UserListMapper" type="ltd.newbee.mall.dto.UserListDto">
+    <resultMap id="UserListMapper" type="com.hailian.ylwmall.dto.UserListDto">
         <id column="user_id" property="userId" />
         <result column="login_name" property="loginName" />
         <result column="user_type" property="userType" />
@@ -29,7 +29,7 @@
     </resultMap>
 
     <select id="queryUser" resultMap="UserListMapper"
-            parameterType="ltd.newbee.mall.dto.UserListDto">
+            parameterType="com.hailian.ylwmall.dto.UserListDto">
         select tu.user_id, tu.login_name,tu.user_type,tu.user_status,'' as mdm_code,
         tup.company_name,tup.contactor,tup.contactor_phone from tb_user tu
         join tb_user_profile tup on tu.user_id=tup.user_id
@@ -65,7 +65,7 @@
     </update>
 
     <select id="queryCompanyNameList" resultMap="UserListMapper"
-            parameterType="ltd.newbee.mall.dto.UserListDto">
+            parameterType="com.hailian.ylwmall.dto.UserListDto">
         select tu.user_id, tu.login_name,tu.user_type,tu.user_status,'' as mdm_code,
         tup.company_name,tup.contactor,tup.contactor_phone from tb_user tu
         join tb_user_profile tup on tu.user_id=tup.user_id

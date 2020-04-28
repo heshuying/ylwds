@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ltd.newbee.mall.dao.TbModuleDetailDao">
+<mapper namespace="com.hailian.ylwmall.dao.TbModuleDetailDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.TbModuleDetail">
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbModuleDetail">
         <id column="id" property="id" />
         <result column="mod_id" property="modId" />
         <result column="goods_id" property="goodsId" />
@@ -20,7 +20,7 @@
         <result column="update_user" property="updateUser" />
     </resultMap>
     
-    <resultMap id="detailListResultMap" type="ltd.newbee.mall.dto.ModuleDetailRes" extends="BaseResultMap">
+    <resultMap id="detailListResultMap" type="com.hailian.ylwmall.dto.ModuleDetailRes" extends="BaseResultMap">
         <result column="goods_name" property="goodsName" />
         <result column="selling_price" property="sellingPrice" />
         <result column="profit" property="profit" />

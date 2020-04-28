@@ -19,7 +19,7 @@ spring:
       retries: 3
       check: true
     server: true
-    scan: ltd.newbee.mall
+    scan: com.hailian.ylwmall
   thymeleaf:
     cache: false
   datasource:
@@ -64,7 +64,7 @@ mybatis:
 mybatis-plus:
   #实体扫描，多个package用逗号或者分号分隔
   mapper-locations: classpath:/mapper/*Mapper.xml
-  typeAliasesPackage: ltd.newbee.mall.entity
+  typeAliasesPackage: com.hailian.ylwmall.entity
   global-config:
     #数据库相关配置
     db-config:
@@ -109,7 +109,7 @@ ftp:
 #swagger 启用
 swagger:
   enable: true
-  basePackage: ltd.newbee.mall.controller.api
+  basePackage: com.hailian.ylwmall.controller.api
   info:
     title: 衣联网B2B电商API文档
     description: 衣联网B2B电商API文档

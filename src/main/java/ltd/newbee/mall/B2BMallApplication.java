@@ -14,8 +14,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @MapperScan("ltd.newbee.mall.dao")
 @EnableDubboConfiguration
 @SpringBootApplication
-public class NewBeeMallApplication {
+public class B2BMallApplication {
     public static void main(String[] args) {
-        SpringApplication.run(NewBeeMallApplication.class, args);
+        SpringApplication.run(B2BMallApplication.class, args);
     }
 }

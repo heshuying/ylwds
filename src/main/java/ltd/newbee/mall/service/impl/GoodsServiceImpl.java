@@ -40,6 +40,9 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
 
     @Override
     public String saveNewBeeMallGoods(TbGoodsInfo goods) {
+        goods.setCreateTime(new Date());
+        goods.setUpdateTime(new Date());
+
         if (baseMapper.insert(goods) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }

@@ -43,7 +43,7 @@ public class TbGoodsInfo {
      */
     private Integer goodsSellStatus;
 
-    private Integer createUser;
+    private Long createUser;
     /**
      * 运费
      */
@@ -69,7 +69,7 @@ public class TbGoodsInfo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    private Integer updateUser;
+    private Long updateUser;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
@@ -145,28 +145,12 @@ public class TbGoodsInfo {
         this.tag = tag == null ? null : tag.trim();
     }
 
-    public Integer getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(Integer createUser) {
-        this.createUser = createUser;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public Integer getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(Integer updateUser) {
-        this.updateUser = updateUser;
     }
 
     public Date getUpdateTime() {
@@ -287,5 +271,21 @@ public class TbGoodsInfo {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Long getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(Long createUser) {
+        this.createUser = createUser;
+    }
+
+    public Long getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(Long updateUser) {
+        this.updateUser = updateUser;
     }
 }

@@ -210,7 +210,14 @@ public class AdminGoodsController {
      */
     @RequestMapping(value = "/goods/save", method = RequestMethod.POST)
     @ResponseBody
-    public Result save(@RequestBody TbGoodsInfo newBeeMallGoods) {
+    public Result save(@RequestBody TbGoodsInfo newBeeMallGoods, HttpSession session) {
+        Long userId = (Long)session.getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        newBeeMallGoods.setCreateUser(userId);
+        newBeeMallGoods.setUpdateUser(userId);
+
         if (StringUtils.isEmpty(newBeeMallGoods.getGoodsName())
                 || Objects.isNull(newBeeMallGoods.getOriginalPrice())
                 || Objects.isNull(newBeeMallGoods.getSellingPrice())
@@ -236,10 +243,17 @@ public class AdminGoodsController {
      */
     @RequestMapping(value = "/goods/update", method = RequestMethod.POST)
     @ResponseBody
-    public Result update(@RequestBody TbGoodsInfo newBeeMallGoods) {
+    public Result update(@RequestBody TbGoodsInfo newBeeMallGoods, HttpSession session) {
+        Long userId = (Long)session.getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        newBeeMallGoods.setUpdateUser(userId);
+
         if (Objects.isNull(newBeeMallGoods.getGoodsId())) {
             return ResultGenerator.genFailResult("参数异常！");
         }
+
         String result = goodsService.updateNewBeeMallGoods(newBeeMallGoods);
         if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
             return ResultGenerator.genSuccessResult();

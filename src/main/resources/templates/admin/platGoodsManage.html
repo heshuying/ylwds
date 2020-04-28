@@ -342,7 +342,8 @@
                             for (var i in result.data.list) {
                                 result.data.list[i].sellingPriceShow = '¥' + result.data.list[i].sellingPrice;
                                 result.data.list[i].originalPriceShow = '¥' + result.data.list[i].originalPrice;
-                                result.data.list[i].priceShow = '¥' + result.data.list[i].price;
+                                var returnPrice = result.data.list[i].price == null ? '' : result.data.list[i].price;
+                                result.data.list[i].priceShow = '¥' + returnPrice;
                                 result.data.list[i].profitShow = '¥' + result.data.list[i].profit;
                                 result.data.list[i].profitInput = "";
                             }

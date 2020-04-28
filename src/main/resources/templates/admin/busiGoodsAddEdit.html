@@ -105,6 +105,14 @@
         margin-left: 8px;
         cursor: pointer;
     }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
 </style>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -166,7 +174,7 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <el-input placeholder="30个汉字以内(60个字符)" maxlength="60" show-word-limit v-model="goodsName"></el-input>
+                        <el-input placeholder="请填写商品名称" maxlength="60" show-word-limit v-model="goodsName"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
@@ -175,7 +183,7 @@
                         <span class="span-hide">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <el-input type="textarea" placeholder="50个汉字以内(100个字符)" maxlength="100" show-word-limit v-model="goodsIntro"></el-input>
+                        <el-input type="textarea" placeholder="请填写商品简介" maxlength="100" show-word-limit v-model="goodsIntro"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
@@ -184,14 +192,14 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="3">
-                        <el-input placeholder="原价" v-model="originalPrice">
+                        <el-input type="number" placeholder="原价" v-model="originalPrice">
                             <span slot="prefix" style="margin-left: 5px;">
                                 ¥
                             </span>
                         </el-input>
                     </el-col>
                     <el-col :span="3">
-                        <el-input placeholder="供货价" v-model="sellingPrice">
+                        <el-input type="number" placeholder="供货价" v-model="sellingPrice">
                              <span slot="prefix" style="margin-left: 5px;">
                                 ¥
                             </span>
@@ -201,7 +209,7 @@
                         <span>运费</span>
                     </el-col>
                     <el-col :span="3">
-                        <el-input v-model="transitMoney">
+                        <el-input type="number" v-model="transitMoney">
                              <span slot="prefix" style="margin-left: 5px;">
                                 ¥
                             </span>
@@ -212,7 +220,7 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="3">
-                        <el-input placeholder="可销售数量" v-model="stockNum"></el-input>
+                        <el-input type="number" placeholder="可销售数量" v-model="stockNum"></el-input>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line-with-intro">
@@ -387,7 +395,7 @@
             handleCategoryChange(val) {
                 var _this = this;
                 $.ajax({
-                    url: '/category/categories/listForSelect?categoryId=' + val,
+                    url: '/admin/categories/listForSelect?categoryId=' + val,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {

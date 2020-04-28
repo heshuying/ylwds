@@ -376,7 +376,7 @@
                     contentType: "application/json",
                     data: JSON.stringify(postObj),
                     success: function (result) {
-                        if (result.code == 200) {
+                        if (result.resultCode == 200) {
                             _this.$message.success('操作成功');
                             _this.queryTableData();
                         } else {

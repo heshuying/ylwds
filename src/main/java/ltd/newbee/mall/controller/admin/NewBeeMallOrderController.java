@@ -307,7 +307,7 @@ public class NewBeeMallOrderController {
                 throw new BusinessException("用户状态异常");
             }
             newBeeMallOrderService.cutDownPrice(params);
-            return ResultGenerator.genFailResult("减免成功");
+            return ResultGenerator.genSuccessResult("减免成功");
         }catch (BusinessException e){
             e.printStackTrace();
             return ResultGenerator.genFailResult(e.getMessage());

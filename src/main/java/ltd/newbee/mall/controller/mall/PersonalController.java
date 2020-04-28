@@ -106,7 +106,7 @@ public class PersonalController {
         if (ServiceResultEnum.SUCCESS.getResult().equals(loginResult)) {
             NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
             BeanUtil.copyProperties(user, newBeeMallUserVO);
-            httpSession.setAttribute(Constants.MALL_USER_SESSION_KEY, user);
+            httpSession.setAttribute(Constants.MALL_USER_SESSION_KEY, newBeeMallUserVO);
             return ResultGenerator.genSuccessResult();
         }
         //登录失败

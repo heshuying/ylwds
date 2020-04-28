@@ -18,11 +18,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin")
-public class NewBeeMallUserController {
-
-    @Resource
-    private NewBeeMallUserService newBeeMallUserService;
+@RequestMapping("/custom")
+public class CustomController {
 
    @Autowired
    private TbUserService userService;

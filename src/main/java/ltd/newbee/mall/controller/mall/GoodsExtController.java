@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Controller
-public class GoodsController {
+public class GoodsExtController {
 
     @Resource
     private GoodsService newBeeMallGoodsService;

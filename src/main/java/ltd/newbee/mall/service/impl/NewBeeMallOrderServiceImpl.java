@@ -68,7 +68,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Override
     public PageResult getMyOrdersForSupplier(PageQueryUtil pageUtil) {
         //获取总条数
-        int total = orderInfoMapper.count();
+        int total = orderInfoMapper.countForSupplier(pageUtil);
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForSupplier(pageUtil);
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
@@ -102,7 +102,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Override
     public PageResult getMyOrdersForPlatform(PageQueryUtil pageUtil) {
         //获取总条数
-        int total = orderInfoMapper.count();
+        int total = orderInfoMapper.countForPlatform(pageUtil);
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForPlatform(pageUtil);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

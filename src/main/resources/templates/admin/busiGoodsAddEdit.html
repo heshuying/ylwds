@@ -387,7 +387,7 @@
             handleCategoryChange(val) {
                 var _this = this;
                 $.ajax({
-                    url: '/admin/categories/listForSelect?categoryId=' + val,
+                    url: '/category/categories/listForSelect?categoryId=' + val,
                     type: 'GET',
                     success: function (result) {
                         if (result.resultCode == 200) {

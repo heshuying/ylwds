@@ -42,6 +42,10 @@
         text-align: right;
     }
 
+    .query-condition-line > div:first-child {
+        margin-right: 20px;
+    }
+
     .el-select {
         width: 250px;
     }
@@ -164,7 +168,9 @@
                     <el-date-picker
                             v-model="orderDate"
                             type="datetimerange"
-                            value-format="yyyy-MM-dd hh:mm:ss"
+                            align="right"
+                            format="yyyy-MM-dd HH:mm:ss"
+                            value-format="yyyy-MM-dd HH:mm:ss"
                             range-separator="至"
                             start-placeholder="开始日期"
                             end-placeholder="结束日期">
@@ -198,7 +204,7 @@
                                 :show-file-list="false"
                                 :on-success="handleUploadSuccess"
                         >
-                            <span>导出Excel</span>
+                            <span>导入Excel</span>
                         </el-upload>
                     </div>
                 </div>
@@ -346,7 +352,7 @@
                     {label:'已结算',value: '8'},
                     {label:'已取消',value: '9'},
                 ],
-                orderDate: '',
+                orderDate: [],
                 orderId: '',
                 tableData: [],
                 sortType: '',
@@ -395,8 +401,12 @@
             },
             // 导出excel
             exportSheet() {
-                var beginTime = this.orderDate[0] || '';
-                var endTime = this.orderDate[1] || '';
+                var beginTime =  '';
+                var endTime =  '';
+                if(this.orderDate && this.orderDate.length > 0) {
+                    beginTime = this.orderDate[0];
+                    endTime = this.orderDate[1];
+                }
                 window.location.href = '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime + '&endTime=' + endTime;
 //                var _this = this;
 //                $.ajax({
@@ -472,8 +482,12 @@
             },
             // 查询表格数据
             queryTableData() {
-                var beginTime = this.orderDate[0] || '';
-                var endTime = this.orderDate[1] || '';
+                var beginTime =  '';
+                var endTime =  '';
+                if(this.orderDate && this.orderDate.length > 0) {
+                    beginTime = this.orderDate[0];
+                    endTime = this.orderDate[1];
+                }
                 var _this = this;
                 $.ajax({
                     url: '/admin/orders/supplier?page=' + this.currentPage + '&limit=' + this.pagesize +

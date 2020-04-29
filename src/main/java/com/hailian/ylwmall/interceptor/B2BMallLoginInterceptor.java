@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @link https://github.com/newbee-ltd
  */
 @Component
-public class NewBeeMallLoginInterceptor implements HandlerInterceptor {
+public class B2BMallLoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {

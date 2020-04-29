@@ -1,7 +1,7 @@
 package com.hailian.ylwmall.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hailian.ylwmall.common.NewBeeMallOrderStatusEnum;
+import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.controller.vo.OrderInfoVo;
 import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
@@ -82,7 +82,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
@@ -116,7 +116,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);

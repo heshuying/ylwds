@@ -1,6 +1,6 @@
 package com.hailian.ylwmall.controller.admin;
 
-import com.hailian.ylwmall.common.NewBeeMallCategoryLevelEnum;
+import com.hailian.ylwmall.common.CategoryLevelEnum;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.entity.GoodsCategory;
 import com.hailian.ylwmall.service.CategoryService;
@@ -62,24 +62,24 @@ public class GoodsCategoryController {
         }
         GoodsCategory category = newBeeMallCategoryService.getGoodsCategoryById(categoryId);
         //既不是一级分类也不是二级分类则为不返回数据
-        if (category == null || category.getCategoryLevel() == NewBeeMallCategoryLevelEnum.LEVEL_THREE.getLevel()) {
+        if (category == null || category.getCategoryLevel() == CategoryLevelEnum.LEVEL_THREE.getLevel()) {
             return ResultGenerator.genFailResult("参数异常！");
         }
         Map categoryResult = new HashMap(2);
-        if (category.getCategoryLevel() == NewBeeMallCategoryLevelEnum.LEVEL_ONE.getLevel()) {
+        if (category.getCategoryLevel() == CategoryLevelEnum.LEVEL_ONE.getLevel()) {
             //如果是一级分类则返回当前一级分类下的所有二级分类，以及二级分类列表中第一条数据下的所有三级分类列表
             //查询一级分类列表中第一个实体的所有二级分类
-            List<GoodsCategory> secondLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(categoryId), NewBeeMallCategoryLevelEnum.LEVEL_TWO.getLevel());
+            List<GoodsCategory> secondLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(categoryId), CategoryLevelEnum.LEVEL_TWO.getLevel());
             if (!CollectionUtils.isEmpty(secondLevelCategories)) {
                 //查询二级分类列表中第一个实体的所有三级分类
-                List<GoodsCategory> thirdLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(secondLevelCategories.get(0).getCategoryId()), NewBeeMallCategoryLevelEnum.LEVEL_THREE.getLevel());
+                List<GoodsCategory> thirdLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(secondLevelCategories.get(0).getCategoryId()), CategoryLevelEnum.LEVEL_THREE.getLevel());
                 categoryResult.put("secondLevelCategories", secondLevelCategories);
                 categoryResult.put("thirdLevelCategories", thirdLevelCategories);
             }
         }
-        if (category.getCategoryLevel() == NewBeeMallCategoryLevelEnum.LEVEL_TWO.getLevel()) {
+        if (category.getCategoryLevel() == CategoryLevelEnum.LEVEL_TWO.getLevel()) {
             //如果是二级分类则返回当前分类下的所有三级分类列表
-            List<GoodsCategory> thirdLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(categoryId), NewBeeMallCategoryLevelEnum.LEVEL_THREE.getLevel());
+            List<GoodsCategory> thirdLevelCategories = newBeeMallCategoryService.selectByLevelAndParentIdsAndNumber(Collections.singletonList(categoryId), CategoryLevelEnum.LEVEL_THREE.getLevel());
             categoryResult.put("thirdLevelCategories", thirdLevelCategories);
         }
         return ResultGenerator.genSuccessResult(categoryResult);

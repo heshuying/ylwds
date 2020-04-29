@@ -5,7 +5,6 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.haier.openplatform.hfs.client.dto.FileResult;
 import com.hailian.ylwmall.common.Constants;
-import com.hailian.ylwmall.service.impl.HfsClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +32,7 @@ public class CommonController {
 
     @Autowired
     private DefaultKaptcha captchaProducer;
-    @Autowired
-    private HfsClientService hfsClientService;
+
 
     @GetMapping("/common/kaptcha")
     public void defaultKaptcha(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
@@ -99,44 +97,4 @@ public class CommonController {
         responseOutputStream.close();
     }
 
-
-    @RequestMapping("/common/file/{fileId}")
-    public void download(HttpServletRequest request, HttpServletResponse res, @PathVariable String fileId){
-        FileResult fileResult = null;
-        try{
-            fileResult = hfsClientService.findFile(fileId);
-        }catch (Exception e){
-        }
-
-        if(fileResult.isSuccess()){
-            String suffixName = "jpg";
-            if(!StringUtils.isEmpty(fileResult.getFileName())){
-                suffixName = fileResult.getFileName().substring(fileResult.getFileName().lastIndexOf(".")+1);
-            }
-            //设置相应类型,告诉浏览器输出的内容为图片
-            if("jpg".equalsIgnoreCase(suffixName)
-                    ||"jpeg".equalsIgnoreCase(suffixName)) {
-                res.setContentType("image/jpeg");
-            }else{
-                res.setContentType("image/"+suffixName);
-            }
-            OutputStream stream = null;
-            try {
-                stream = res.getOutputStream();
-                stream.write(fileResult.getFileBytes());
-                stream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(stream !=null){
-                    try {
-                        stream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return;
-    }
 }

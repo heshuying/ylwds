@@ -2,8 +2,8 @@ package com.hailian.ylwmall.config;
 
 import com.hailian.ylwmall.interceptor.AdminLoginInterceptor;
 import com.hailian.ylwmall.common.Constants;
-import com.hailian.ylwmall.interceptor.NewBeeMallCartNumberInterceptor;
-import com.hailian.ylwmall.interceptor.NewBeeMallLoginInterceptor;
+import com.hailian.ylwmall.interceptor.B2BMallCartNumberInterceptor;
+import com.hailian.ylwmall.interceptor.B2BMallLoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,14 +11,14 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class NeeBeeMallWebMvcConfigurer implements WebMvcConfigurer {
+public class B2BWebMvcConfigurer implements WebMvcConfigurer {
 
     @Autowired
     private AdminLoginInterceptor adminLoginInterceptor;
     @Autowired
-    private NewBeeMallLoginInterceptor newBeeMallLoginInterceptor;
+    private B2BMallLoginInterceptor newBeeMallLoginInterceptor;
     @Autowired
-    private NewBeeMallCartNumberInterceptor newBeeMallCartNumberInterceptor;
+    private B2BMallCartNumberInterceptor newBeeMallCartNumberInterceptor;
 
     public void addInterceptors(InterceptorRegistry registry) {
         // 添加一个拦截器，拦截以/admin为前缀的url路径（后台登陆拦截）
@@ -52,7 +52,7 @@ public class NeeBeeMallWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/upload/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
-        registry.addResourceHandler("/goods-img/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
+       // registry.addResourceHandler("/upload/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
+        //registry.addResourceHandler("/goods-img/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
     }
 }

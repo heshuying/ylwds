@@ -1,6 +1,6 @@
 package com.hailian.ylwmall.controller.common;
 
-import com.hailian.ylwmall.common.NewBeeMallException;
+import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.util.Result;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,7 +19,7 @@ public class BizExceptionHandler {
         Result result = new Result();
         result.setResultCode(500);
         //区分是否为自定义异常
-        if (e instanceof NewBeeMallException) {
+        if (e instanceof B2BMallException) {
             result.setMessage(e.getMessage());
         } else {
             e.printStackTrace();

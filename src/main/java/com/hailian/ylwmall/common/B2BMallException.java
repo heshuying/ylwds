@@ -1,11 +1,11 @@
 package com.hailian.ylwmall.common;
 
-public class NewBeeMallException extends RuntimeException {
+public class B2BMallException extends RuntimeException {
 
-    public NewBeeMallException() {
+    public B2BMallException() {
     }
 
-    public NewBeeMallException(String message) {
+    public B2BMallException(String message) {
         super(message);
     }
 
@@ -15,7 +15,7 @@ public class NewBeeMallException extends RuntimeException {
      * @param message
      */
     public static void fail(String message) {
-        throw new NewBeeMallException(message);
+        throw new B2BMallException(message);
     }
 
 }

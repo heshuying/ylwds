@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 
-import com.hailian.ylwmall.config.DubboServiceContants;
 import com.hailian.ylwmall.config.KjtConfig;
 import com.hailian.ylwmall.config.KjtConstants;
 import com.hailian.ylwmall.dto.InstantTradeBizContent;
@@ -40,7 +39,7 @@ import java.util.Set;
  * Created by 01440590 on 2019/1/22.
  */
 @Component
-@Service(version = DubboServiceContants.DUBBO_SERVICE_VERSION)
+@Service
 public class KjtServiceImpl implements KjtService {
     @Autowired
     private KjtConfig kjtConfig;

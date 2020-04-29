@@ -1,9 +1,9 @@
 package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
-import com.hailian.ylwmall.common.NewBeeMallException;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallSearchGoodsVO;
 import com.hailian.ylwmall.dao.TbUserDao;
@@ -80,7 +80,7 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
         if(sellStatus == 6){
             for(Long id : requstBean.getIds()){
                 if(!this.checkCanOffline(id)){
-                    throw new NewBeeMallException("有未完成订单不可以下架，请前端下架");
+                    throw new B2BMallException("有未完成订单不可以下架，请前端下架");
                 }
             }
         }

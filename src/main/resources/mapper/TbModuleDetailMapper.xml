@@ -43,7 +43,7 @@
         tb_module_detail md
         JOIN tb_goods_info g
         ON md.`goods_id` = g.`goods_id`
-        where md.is_del=0
+        where md.is_deleted=0
     </select>
 
     <select id="getModuleDetailList" parameterType="map" resultMap="detailListResultMap">

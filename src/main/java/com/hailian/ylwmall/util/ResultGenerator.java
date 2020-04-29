@@ -24,10 +24,11 @@ public class ResultGenerator {
         return result;
     }
 
-    public static Result genSuccessResult(String message) {
+    public static Result genSuccessData(String data) {
         Result result = new Result();
         result.setResultCode(RESULT_CODE_SUCCESS);
-        result.setMessage(message);
+        result.setMessage(DEFAULT_SUCCESS_MESSAGE);
+        result.setData(data);
         return result;
     }
 

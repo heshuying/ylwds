@@ -73,7 +73,10 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
                     .compareTo(m.getModId())==0)
                     .sorted(Comparator.comparing(TbModuleDetail::getModRank)).collect(Collectors.toList());
             dto.setList(currDetails);
-
+            TbModuleDetail head=currDetails.stream().filter(
+                    m->m.getIsHead().equals("1")
+            ).findAny().orElse(null);
+            dto.setHeadProd(head);
             list.add(dto);
         }
         Result result= ResultGenerator.genSuccessResult();

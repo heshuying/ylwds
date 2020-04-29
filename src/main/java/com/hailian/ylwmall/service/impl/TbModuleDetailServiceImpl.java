@@ -32,4 +32,9 @@ public class TbModuleDetailServiceImpl extends ServiceImpl<TbModuleDetailDao, Tb
         PageResult pageResult = new PageResult(list, count, pageUtil.getLimit(), pageUtil.getPage());
         return pageResult;
     }
+
+    @Override
+    public List<ModuleDetailRes> getModeleDetails() {
+        return moduleDetailDao.getAllModule();
+    }
 }

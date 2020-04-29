@@ -13,6 +13,6 @@ public class ModuleListDto {
     private String modKey;
     private String modName;
     private String modDesc;
-    private TbModuleDetail headProd;
-    private List<TbModuleDetail> list;
+    private ModuleDetailRes headProd;
+    private List<ModuleDetailRes> list;
 }

@@ -2,6 +2,7 @@ package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.dao.TbModuleDao;
+import com.hailian.ylwmall.dto.ModuleDetailRes;
 import com.hailian.ylwmall.service.TbModuleDetailService;
 import com.hailian.ylwmall.service.TbModuleService;
 import com.hailian.ylwmall.util.Const;
@@ -58,25 +59,23 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
                 .orderByDesc("mod_rank")
         );
         List<Long> ids=tbModules.stream().map(m->m.getId()).collect(Collectors.toList());
-        List<TbModuleDetail> details=tbModuleDetailService.list(
-                new QueryWrapper<TbModuleDetail>()
-                        .in("mod_id",ids)
-                        .eq("is_deleted", 0)
-        );
+        List<ModuleDetailRes> details=tbModuleDetailService.getModeleDetails();
         List<ModuleListDto> list=new ArrayList<>();
         for (TbModule module: tbModules
              ) {
             ModuleListDto dto=new ModuleListDto();
             BeanUtils.copyProperties(module, dto);
 
-            List<TbModuleDetail> currDetails=details.stream().filter(m->module.getId()
+            List<ModuleDetailRes> currDetails=details.stream().filter(m->module.getId()
                     .compareTo(m.getModId())==0).collect(Collectors.toList());
             //专区产品
-            List<TbModuleDetail> nonHead=currDetails.stream().filter(m->m.getIsHead().equals("0"))
-                    .sorted(Comparator.comparing(TbModuleDetail::getModRank)).collect(Collectors.toList());
+            List<ModuleDetailRes> nonHead=currDetails.stream().filter(m->m.getIsHead().equals("0"))
+                    .sorted(Comparator.comparing(TbModuleDetail::getModRank))
+                    .limit(4).collect(Collectors.toList());
+
             dto.setList(nonHead);
             //首图
-            TbModuleDetail head=currDetails.stream().filter(
+            ModuleDetailRes head=currDetails.stream().filter(
                     m->m.getIsHead().equals("1")
             ).findAny().orElse(null);
             dto.setHeadProd(head);

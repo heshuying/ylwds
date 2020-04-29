@@ -20,4 +20,6 @@ public interface TbModuleDetailDao extends BaseMapper<TbModuleDetail> {
 
     List<ModuleDetailRes> getModuleDetailList(Map map);
 
+    List<ModuleDetailRes>  getAllModule();
+
 }

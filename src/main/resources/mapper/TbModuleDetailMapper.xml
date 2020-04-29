@@ -22,9 +22,29 @@
     
     <resultMap id="detailListResultMap" type="com.hailian.ylwmall.dto.ModuleDetailRes" extends="BaseResultMap">
         <result column="goods_name" property="goodsName" />
+        <result column="goods_intro" property="goodsIntro" />
+
         <result column="selling_price" property="sellingPrice" />
         <result column="profit" property="profit" />
+        <result column="price" property="price" />
+        <result column="original_price" property="originalPrice" />
     </resultMap>
+
+    <select id="getAllModule"  resultMap="detailListResultMap">
+        SELECT
+        md.*,
+        g.`goods_name`,
+        g.`goods_intro`,
+        g.`selling_price`,
+        g.`price`,
+        g.`original_price`,
+        g.`profit`
+        FROM
+        tb_module_detail md
+        JOIN tb_goods_info g
+        ON md.`goods_id` = g.`goods_id`
+        where md.is_del=0
+    </select>
 
     <select id="getModuleDetailList" parameterType="map" resultMap="detailListResultMap">
         SELECT

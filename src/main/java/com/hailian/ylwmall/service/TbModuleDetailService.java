@@ -1,9 +1,12 @@
 package com.hailian.ylwmall.service;
 
+import com.hailian.ylwmall.dto.ModuleDetailRes;
 import com.hailian.ylwmall.util.PageResult;
 import com.hailian.ylwmall.entity.TbModuleDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.PageQueryUtil;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,4 +19,6 @@ import com.hailian.ylwmall.util.PageQueryUtil;
 public interface TbModuleDetailService extends IService<TbModuleDetail> {
 
     PageResult getModuleDetails(PageQueryUtil pageUtil);
+
+    List<ModuleDetailRes> getModeleDetails();
 }

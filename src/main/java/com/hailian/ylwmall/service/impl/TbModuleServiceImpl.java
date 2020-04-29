@@ -70,9 +70,12 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
             BeanUtils.copyProperties(module, dto);
 
             List<TbModuleDetail> currDetails=details.stream().filter(m->module.getId()
-                    .compareTo(m.getModId())==0)
+                    .compareTo(m.getModId())==0).collect(Collectors.toList());
+            //专区产品
+            List<TbModuleDetail> nonHead=currDetails.stream().filter(m->m.getIsHead().equals("0"))
                     .sorted(Comparator.comparing(TbModuleDetail::getModRank)).collect(Collectors.toList());
-            dto.setList(currDetails);
+            dto.setList(nonHead);
+            //首图
             TbModuleDetail head=currDetails.stream().filter(
                     m->m.getIsHead().equals("1")
             ).findAny().orElse(null);

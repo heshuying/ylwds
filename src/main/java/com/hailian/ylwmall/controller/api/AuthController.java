@@ -40,7 +40,7 @@ public class AuthController {
     @Autowired
     private HttpSession httpSession;
 
-
+    @ApiOperation(value = "登陆")
     @PostMapping("/login")
     @ResponseBody
     public Result login(@RequestParam("loginName") String loginName,

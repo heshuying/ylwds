@@ -9,6 +9,8 @@ import com.hailian.ylwmall.util.NewBeeMallUtils;
 import com.hailian.ylwmall.util.ResponseUtils;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,11 +35,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+@Api(value = "文件上传下载接口", tags = {"文件上传下载接口"})
 @Slf4j
 @Controller
 @RequestMapping("/api")
 public class UploadController {
 
+    @ApiOperation(value = "文件上传")
     @PostMapping({"/upload/file"})
     @ResponseBody
     public Result upload(HttpServletRequest httpServletRequest,
@@ -45,6 +49,7 @@ public class UploadController {
        return FileUtil.upload(file);
     }
 
+    @ApiOperation(value = "文件下载")
     @GetMapping("/download/pic/{fileId}")
     public void download(@PathVariable String fileId ,
                          HttpServletRequest request, HttpServletResponse res){

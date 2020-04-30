@@ -1,9 +1,13 @@
 package com.hailian.ylwmall.controller.api;
 
+import com.hailian.ylwmall.common.Constants;
+import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.ProfileDto;
 import com.hailian.ylwmall.dto.RegisterFirstDto;
 import com.hailian.ylwmall.service.TbUserService;
+import com.hailian.ylwmall.util.BeanUtil;
 import com.hailian.ylwmall.util.Result;
+import com.hailian.ylwmall.util.ResultGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 /**
  * Created by 19012964 on 2020/4/15.
  */
@@ -25,6 +32,8 @@ public class AuthController {
 
     @Autowired
     private TbUserService userService;
+    @Autowired
+    private HttpSession httpSession;
 
     @ApiOperation(value = "注册")
     @PostMapping("/register/first")
@@ -48,5 +57,11 @@ public class AuthController {
         return userService.updateUserProfile(dto);
     }
 
-
+    @ApiOperation(value = "获取session信息")
+    @GetMapping("/user/info")
+    @ResponseBody
+    public Result loginUser(){
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        return ResultGenerator.genSuccessResult(user);
+    }
 }

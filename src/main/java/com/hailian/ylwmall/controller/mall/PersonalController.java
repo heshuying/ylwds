@@ -68,52 +68,7 @@ public class PersonalController {
         return "mall/addresses";
     }
 
-    @PostMapping("/login")
-    @ResponseBody
-    public Result login(@RequestParam("loginName") String loginName,
-                        @RequestParam("verifyCode") String verifyCode,
-                        @RequestParam("password") String password,
-                        HttpSession httpSession) {
-        if (StringUtils.isEmpty(loginName)) {
-            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_NAME_NULL.getResult());
-        }
-        if (StringUtils.isEmpty(password)) {
-            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_PASSWORD_NULL.getResult());
-        }
-//        if (StringUtils.isEmpty(verifyCode)) {
-//            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_NULL.getResult());
-//        }
-        String kaptchaCode = httpSession.getAttribute(Constants.MALL_VERIFY_CODE_KEY) + "";
-//        if (StringUtils.isEmpty(kaptchaCode) || !verifyCode.equals(kaptchaCode)) {
-//            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_ERROR.getResult());
-//        }
-        //todo 清verifyCode
-        String loginResult=ServiceResultEnum.SUCCESS.getResult();
-        TbUser user = userService.getOne(new QueryWrapper<TbUser>()
-                .eq("login_name",loginName)
-                .eq("password_md5", MD5Util.MD5Encode(password, "UTF-8"))
-                .in("user_type",new String[]{"01","02"}));
-        if (user == null||user.getUserStatus()==4) {
-            loginResult= "用户名或密码错误";
 
-        }else if(user.getUserStatus()==2){
-            loginResult= "用户已被锁定";
-        }else if(user.getUserStatus()==0){
-            loginResult= "用户资料还未审核";
-        }else if(user.getUserStatus()==3){
-            loginResult= "checkFail,"+ user.getUserId();
-        }
-
-        //登录成功
-        if (ServiceResultEnum.SUCCESS.getResult().equals(loginResult)) {
-            NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
-            BeanUtil.copyProperties(user, newBeeMallUserVO);
-            httpSession.setAttribute(Constants.MALL_USER_SESSION_KEY, newBeeMallUserVO);
-            return ResultGenerator.genSuccessResult();
-        }
-        //登录失败
-        return ResultGenerator.genFailResult(loginResult);
-    }
 
     @PostMapping("/register")
     @ResponseBody

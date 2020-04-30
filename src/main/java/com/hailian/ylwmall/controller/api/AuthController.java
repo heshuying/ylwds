@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
+import com.hailian.ylwmall.dto.LoginDto;
 import com.hailian.ylwmall.dto.ProfileDto;
 import com.hailian.ylwmall.dto.RegisterFirstDto;
 import com.hailian.ylwmall.entity.TbUser;
@@ -43,15 +44,11 @@ public class AuthController {
     @ApiOperation(value = "登陆")
     @PostMapping("/login")
     @ResponseBody
-    public Result login(@RequestParam("loginName") String loginName,
-                        @RequestParam("verifyCode") String verifyCode,
-                        @RequestParam("password") String password,
-                        HttpSession httpSession) {
-        if (StringUtils.isEmpty(loginName)) {
+    public Result login(@RequestBody LoginDto loginDto) {
+        if (loginDto==null||
+                StringUtils.isEmpty(loginDto.getLoginName())
+                ||StringUtils.isEmpty(loginDto.getPassword())) {
             return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_NAME_NULL.getResult());
-        }
-        if (StringUtils.isEmpty(password)) {
-            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_PASSWORD_NULL.getResult());
         }
 //        if (StringUtils.isEmpty(verifyCode)) {
 //            return ResultGenerator.genFailResult(ServiceResultEnum.LOGIN_VERIFY_CODE_NULL.getResult());
@@ -63,8 +60,8 @@ public class AuthController {
         //todo 清verifyCode
         String loginResult=ServiceResultEnum.SUCCESS.getResult();
         TbUser user = userService.getOne(new QueryWrapper<TbUser>()
-                .eq("login_name",loginName)
-                .eq("password_md5", MD5Util.MD5Encode(password, "UTF-8"))
+                .eq("login_name",loginDto.getLoginName())
+                .eq("password_md5", MD5Util.MD5Encode(loginDto.getPassword(), "UTF-8"))
                 .in("user_type",new String[]{"01","02"}));
         if (user == null||user.getUserStatus()==4) {
             loginResult= "用户名或密码错误";

@@ -1,12 +1,22 @@
 package com.hailian.ylwmall.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
+import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.common.pay.CertificatesTypeEnum;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.config.KjtConfig;
+import com.hailian.ylwmall.dao.OrderGoodInfoMapper;
+import com.hailian.ylwmall.dao.OrderInfoMapper;
+import com.hailian.ylwmall.dao.TbOrderPayDao;
+import com.hailian.ylwmall.dao.TbUserPayDao;
 import com.hailian.ylwmall.dto.pay.CardRegisterApplyAndPayBean;
+import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
+import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
+import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.exception.BusinessException;
+import com.hailian.ylwmall.util.CommonUtil;
 import com.hailian.ylwmall.util.KJTPayUtil;
 import com.hailian.ylwmall.util.RestUtils;
 import com.kjtpay.gateway.common.constant.ReqValue;
@@ -16,6 +26,7 @@ import com.kjtpay.gateway.common.domain.base.ResponseParameter;
 import com.kjtpay.gateway.common.util.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -34,6 +45,14 @@ public class PayServiceBase {
     KjtConfig kjtConfig;
     @Autowired
     SecurityService securityService;
+    @Autowired
+    OrderInfoMapper orderInfoMapper;
+    @Autowired
+    TbOrderPayDao orderPayDao;
+    @Autowired
+    OrderGoodInfoMapper orderGoodInfoMapper;
+    @Autowired
+    TbUserPayDao userPayDao;
 
     Gson gson = new Gson();
 
@@ -75,28 +94,57 @@ public class PayServiceBase {
      * 支付方式构建
      * @return
      */
-    protected Map<String, String> getPayMap(String payType, BigDecimal price){
+    protected EnsureTradeBean setPay(EnsureTradeBean tradeBean, EnsureTradeReq reqBean, Long userId, BigDecimal price){
         // 支付方式设置
-        if("1".equals(payType)){
-            Map<String,String> payMethod = new HashMap<>();
-            payMethod.put("pay_product_code", "20");
-            payMethod.put("amount", price.toString());
-            payMethod.put("bank_code", "CCB");
-            return payMethod;
-        }else if("2".equals(payType)){
+        if("1".equals(reqBean.getPayType())){
+//            Map<String,String> payMethod = new HashMap<>();
+//            payMethod.put("pay_product_code", "20");
+//            payMethod.put("amount", price.toString());
+//            payMethod.put("bank_code", "CCB");
+            // 直接跳转到网银选择页面
+            Map<String,String> customMap = new HashMap<>();
+            customMap.put("go_cashier", "Y");
+            customMap.put("cashier_login", "N");
+            customMap.put("need_login", "N");
+            tradeBean.setMerchantCustom(customMap);
+            tradeBean.setPayMethod(null);
+            return tradeBean;
+        }else if("2".equals(reqBean.getPayType())){
+            TbUserPay userPay = userPayDao.selectOne(new QueryWrapper<TbUserPay>().eq("user_id", userId));
+            if(userPay == null){
+                if(StringUtils.isBlank(reqBean.getBankCardNo())
+                        || StringUtils.isBlank(reqBean.getBankAccountName())
+                        || StringUtils.isBlank(reqBean.getCertificatesType())
+                        || StringUtils.isBlank(reqBean.getCertificatesNumber())
+                        || StringUtils.isBlank(reqBean.getPhoneNum())){
+                    B2BMallException.fail("协议支付银行卡信息不全");
+                }
+                userPay = CommonUtil.convertBean(reqBean, TbUserPay.class);
+                userPay.setUserId(userId);
+                userPay.setCreateTime(new Date());
+                userPay.setUpdateTime(new Date());
+                userPayDao.insert(userPay);
+            }
+
             CardRegisterApplyAndPayBean payBean = new CardRegisterApplyAndPayBean();
             payBean.setPayProductCode("51");
             payBean.setAmount(price.toString());
-            payBean.setSigningPay("Y");
-            payBean.setBankCardNo("6217002390010212212");
-            payBean.setPhoneNum("15610026960");
-            payBean.setBankAccountName("何树营");
-            payBean.setCertificatesType(CertificatesTypeEnum.ID_CARD.getCode());
-            payBean.setCertificatesNumber("230722198504031210");
-            return KJTPayUtil.objToMap(payBean);
+            if(!StringUtils.isBlank(userPay.getTokenId())){
+                payBean.setSigningPay("N");
+                payBean.setTokenId(userPay.getTokenId());
+            }else{
+                payBean.setSigningPay("Y");
+                payBean.setBankCardNo(reqBean.getBankCardNo());
+                payBean.setPhoneNum(reqBean.getPhoneNum());
+                payBean.setBankAccountName(reqBean.getBankAccountName());
+                payBean.setCertificatesType(CertificatesTypeEnum.ID_CARD.getCode());
+                payBean.setCertificatesNumber(reqBean.getCertificatesNumber());
+            }
+            tradeBean.setPayMethod(KJTPayUtil.objToMap(payBean));
+            return tradeBean;
         }
 
-        return null;
+        return tradeBean;
 
     }
 

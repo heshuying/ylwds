@@ -1,18 +1,18 @@
 package com.hailian.ylwmall.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.gson.Gson;
-import com.hailian.ylwmall.common.PayStatusEnum;
 import com.hailian.ylwmall.common.pay.KJTConstants;
+import com.hailian.ylwmall.common.pay.PayStatusEnum;
 import com.hailian.ylwmall.common.pay.ProductCodeEnum;
 import com.hailian.ylwmall.config.KjtConstants;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
-import com.hailian.ylwmall.dao.OrderGoodInfoMapper;
-import com.hailian.ylwmall.dao.OrderInfoMapper;
-import com.hailian.ylwmall.dao.TbOrderPayDao;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
+import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.entity.TbOrderPay;
+import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.util.ArithmeticUtil;
@@ -22,11 +22,11 @@ import com.kjtpay.gateway.common.domain.VerifyResult;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
 import com.kjtpay.gateway.common.domain.base.ResponseParameter;
 import com.kjtpay.gateway.common.domain.instanttrade.TradeInfo;
+import com.kjtpay.gateway.common.enums.ReturnInfoEnum;
 import com.kjtpay.gateway.common.enums.Terminal;
 import com.kjtpay.gateway.common.util.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,14 +43,6 @@ import java.util.Map;
 @Slf4j
 @Service
 public class PayServiceImpl extends PayServiceBase implements PayService {
-
-    @Autowired
-    OrderInfoMapper orderInfoMapper;
-    @Autowired
-    TbOrderPayDao orderPayDao;
-    @Autowired
-    OrderGoodInfoMapper orderGoodInfoMapper;
-
 
     /*public RequestBase ensureTradeOld(String outTradeNo){
         // 交易信息
@@ -116,27 +108,30 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
      * 担保支付
      */
     @Override
-    public RequestBase ensureTrade(String orderId, String payType, HttpServletRequest request){
+    public RequestBase ensureTrade(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
-        String outTradeNo = GetCodeUtil.getOrderId(userId);
-        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(orderId));
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
         List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
         List<TbOrderPay> orderPayList = orderPayDao.selectList(new QueryWrapper<TbOrderPay>().eq("order_id", orderInfo.getId()));
+        TbOrderPay orderPay = null;
         if(orderPayList == null || orderPayList.isEmpty()){
+            String outTradeNo = GetCodeUtil.getOrderId(userId);
             // 保存支付表
-            TbOrderPay orderPay = new TbOrderPay();
+            orderPay = new TbOrderPay();
             orderPay.setOrderId(orderInfo.getId());
             orderPay.setOutTradeNo(outTradeNo);
             orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
             orderPay.setPayTime(new Date());
             orderPayDao.insert(orderPay);
+        }else {
+            orderPay = orderPayList.get(0);
         }
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setOutTradeNo(outTradeNo);//平台（商户）单号
+        tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
         tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
         tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
         tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
@@ -157,15 +152,107 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
         tradeBizContent.setTradeInfo(tradeInfo);
         // 支付方式设置
-        Map<String,String> payMethod = getPayMap(payType, orderInfo.getRealPrice());
-        tradeBizContent.setPayMethod(payMethod); // 传空值或者不设置跳转到快捷通收银台
+        tradeBizContent = setPay(tradeBizContent, reqBean, userId, orderInfo.getRealPrice());
         // 终端信息设置
         Map<String,String> terminalInfo = new HashMap<>();
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
         terminalInfo.put("ip",ip);
         tradeBizContent.setTerminalInfo(terminalInfo);
 
-        return genRequestBase(gson.toJson(tradeBizContent), outTradeNo, KJTConstants.SERVICE_ENSURE_TRADE);
+        return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
+    }
+
+    /**
+     * 协议支付
+     * @param reqBean
+     * @param request
+     * @return
+     */
+    @Override
+    public String ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request){
+        // 生成支付订单号
+        String ip = GetCilentIP.getIpAddr(request);
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
+        List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
+        List<TbOrderPay> orderPayList = orderPayDao.selectList(new QueryWrapper<TbOrderPay>().eq("order_id", orderInfo.getId()));
+        TbOrderPay orderPay = null;
+        if(orderPayList == null || orderPayList.isEmpty()){
+            String outTradeNo = GetCodeUtil.getOrderId(userId);
+            // 保存支付表
+            orderPay = new TbOrderPay();
+            orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
+            orderPay.setOrderId(orderInfo.getId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
+            orderPay.setPayTime(new Date());
+            orderPayDao.insert(orderPay);
+        }else {
+            orderPay = orderPayList.get(0);
+        }
+
+        // 交易信息
+        TradeInfo tradeInfo = new TradeInfo();
+        tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
+        tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
+        tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
+        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
+        tradeInfo.setQuantity("1");//数量
+        tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
+        tradeInfo.setPayeeIdentityType("1");
+        tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
+        tradeInfo.setNotifyUrl(kjtConfig.getInstantTradeAsyncNotify());//服务器异步通知地址
+
+        // 业务信息
+        EnsureTradeBean tradeBizContent = new EnsureTradeBean();
+        tradeBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
+        tradeBizContent.setPayerPlatformType(KjtConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
+        tradeBizContent.setPayerIdentity(KjtConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
+        tradeBizContent.setPayerIp(ip);
+        tradeBizContent.setBizProductCode(ProductCodeEnum.ENSURE_TRADE_20702.getCode());
+        tradeBizContent.setCashierType("WEB");
+        tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
+        tradeBizContent.setTradeInfo(tradeInfo);
+        // 支付方式设置
+        tradeBizContent = setPay(tradeBizContent, reqBean, userId, orderInfo.getRealPrice());
+        // 终端信息设置
+        Map<String,String> terminalInfo = new HashMap<>();
+        terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
+        terminalInfo.put("ip",ip);
+        tradeBizContent.setTerminalInfo(terminalInfo);
+
+        RequestBase requestBase = genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
+        ResponseParameter result = callKjt(requestBase);
+        if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付失败
+            orderPay.setFailCode(result.getCode());
+            orderPay.setFailMsg(result.getMsg());
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+        }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付成功
+            JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+
+            // 签约成功保存token_id
+            TbUserPay userPay = userPayDao.selectOne(new QueryWrapper<TbUserPay>().eq("user_id", userId));
+            if(StringUtils.isBlank(userPay.getTokenId()) && StringUtils.isNotBlank(jsonObject.getString("token_id"))){
+                userPay.setTokenId(jsonObject.getString("token_id"));
+                userPay.setUpdateTime(new Date());
+                userPayDao.updateById(userPay);
+            }
+            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
+            if(StringUtils.isNotBlank(jsonObject.getString("pay_token"))){
+                orderPay.setTokenId(jsonObject.getString("token_id"));
+                orderPay.setPayToken(jsonObject.getString("pay_token"));
+            }
+            orderPay.setTradeNo(jsonObject.getString("trade_no"));
+            orderPay.setNeedSmsconfirm(jsonObject.getString("status"));
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+        }
+
+        return gson.toJson(result);
     }
 
     @Override

@@ -76,6 +76,14 @@ public class TbOrderPay extends Model<TbOrderPay> {
      */
     private Date payconfirmTime;
 
+    private String failMsg;
+
+    private String failCode;
+
+    private Date updateTime;
+
+    // 协议支付时是否需要短信确认
+    private String needSmsconfirm;
 
     @Override
     protected Serializable pkVal() {

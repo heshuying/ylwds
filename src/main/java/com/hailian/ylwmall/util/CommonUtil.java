@@ -36,4 +36,5 @@ public class CommonUtil {
             throw new RuntimeException("拷贝属性异常");
         }
     }
+
 }

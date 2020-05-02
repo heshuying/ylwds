@@ -6,6 +6,7 @@ import com.hailian.ylwmall.controller.vo.NewBeeMallShoppingCartItemVO;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
+import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsUpdateDto;
 import com.hailian.ylwmall.entity.TbUserAddr;
 import com.hailian.ylwmall.service.NewBeeMallOrderService;
@@ -187,11 +188,19 @@ public class MyController {
         return shoppingCartService.delShoppingCart(newBeeMallShoppingCartItemId);
     }
 
-    @ApiOperation(value = "下单")
-    @PostMapping("/orders")
+    @ApiOperation(value = "下单确认")
+    @PostMapping("/order/confirm")
     @ResponseBody
     public Result settlePage(@RequestBody OrderFormDto orderFormDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         return orderinfoService.confirmOrder(orderFormDto);
+    }
+
+    @ApiOperation(value = "下单")
+    @PostMapping("/order")
+    @ResponseBody
+    public Result settlePage(@RequestBody OrderSubmitDto dto) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        return orderinfoService.doOrder(user.getUserId(),dto);
     }
 }

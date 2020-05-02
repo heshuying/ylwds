@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hailian.ylwmall.dao.TbOrderOrderinfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbOrderOrderinfo">
+        <id column="id" property="id" />
+        <result column="status" property="status" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_time" property="createTime" />
+        <result column="delivery_address" property="deliveryAddress" />
+        <result column="express_company" property="expressCompany" />
+        <result column="express_id" property="expressId" />
+        <result column="user_remark" property="userRemark" />
+        <result column="customer_id" property="customerId" />
+        <result column="supplier_id" property="supplierId" />
+        <result column="cut_down" property="cutDown" />
+        <result column="total_price" property="totalPrice" />
+        <result column="gross_profit" property="grossProfit" />
+        <result column="buying_price" property="buyingPrice" />
+        <result column="real_price" property="realPrice" />
+    </resultMap>
+
+</mapper>

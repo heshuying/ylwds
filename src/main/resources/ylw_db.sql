@@ -220,17 +220,16 @@ CREATE TABLE `tb_settle_detail` (
 -- ----------------------------
 -- 购物车
 -- ----------------------------
-DROP TABLE IF EXISTS `tb_shopping_cart_item`;
-CREATE TABLE `tb_shopping_cart_item`  (
-  `cart_item_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '购物项主键id',
+DROP TABLE IF EXISTS `tb_shopping_cart`;
+CREATE TABLE `tb_shopping_cart`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '购物主键id',
   `user_id` bigint(20) NOT NULL COMMENT '用户主键id',
   `goods_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '关联商品id',
-  `goods_count` int(11) NOT NULL DEFAULT 1 COMMENT '数量(最大为5)',
-  `is_deleted` tinyint(4) NOT NULL DEFAULT 0 COMMENT '删除标识字段(0-未删除 1-已删除)',
+  `goods_count` int(11) NOT NULL DEFAULT 0 COMMENT '数量',
+  `goods_attr` varchar(80) not null default '' comment '规格',
   `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最新修改时间',
-  PRIMARY KEY (`cart_item_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 69 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- 用户表
@@ -306,3 +305,19 @@ CREATE TABLE `tb_user_addr`  (
   index idx_addr_user(user_id) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
+
+-- ----------------------------
+-- 用户收藏浏览产品
+-- ----------------------------
+DROP TABLE IF EXISTS `tb_user_oper`;
+CREATE TABLE `tb_user_oper`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `user_id` bigint(20) NOT NULL default 0 COMMENT '用户主键id',
+  `goods_id` bigint(20) NOT NULL default 0 COMMENT '产品ID',
+  `oper` varchar(50) NOT NULL DEFAULT '' COMMENT 'Fav; Click',
+  `create_time` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  index idx_addr_user(user_id) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+alter table tb_order_goodinfo add goods_attr varchar(80) not null default '' comment '规格'

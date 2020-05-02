@@ -5,9 +5,10 @@
     <id column="order_id" property="orderId" jdbcType="BIGINT" />
     <id column="good_id" property="goodId" jdbcType="BIGINT" />
     <result column="number" property="number" jdbcType="INTEGER" />
+    <result column="goods_attr" property="goodsAttr" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    order_id, good_id, number
+    order_id, good_id, number,goods_attr
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.hailian.ylwmall.entity.order.OrderGoodInfoKey" >
     select 

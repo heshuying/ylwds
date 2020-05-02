@@ -1,4 +1,4 @@
-package com.hailian.ylwmall.controller.mall;
+package com.hailian.ylwmall.controller.api;
 
 import org.springframework.stereotype.Controller;
 

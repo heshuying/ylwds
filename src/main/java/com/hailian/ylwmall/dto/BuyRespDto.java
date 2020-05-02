@@ -10,7 +10,7 @@ import java.util.List;
  * Created by 19012964 on 2020/5/2.
  */
 @Data
-public class ShoppingCartRespDto {
+public class BuyRespDto {
     private List<ShoppingGoodsDto> list;
     private BigDecimal total;
     private BigDecimal expressFee;

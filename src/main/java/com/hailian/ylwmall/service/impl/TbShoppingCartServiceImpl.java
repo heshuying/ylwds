@@ -2,8 +2,8 @@ package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.common.ServiceResultEnum;
-import com.hailian.ylwmall.dto.ShoppingCartFormDto;
-import com.hailian.ylwmall.dto.ShoppingCartRespDto;
+import com.hailian.ylwmall.dto.BuyFormDto;
+import com.hailian.ylwmall.dto.BuyRespDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsUpdateDto;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
@@ -35,7 +35,7 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
     @Autowired
     private GoodsService goodsService;
     @Override
-    public Result addShoppingCart(ShoppingCartFormDto dto) {
+    public Result addShoppingCart(BuyFormDto dto) {
         if(dto==null
                 ||dto.getGoodsId()==null||dto.getGoodsId()<=0
                 ||dto.getUserId()==null||dto.getGoodsId()<=0){
@@ -82,7 +82,7 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
         }
 
         List<ShoppingGoodsDto> list=baseMapper.queryShoppingGoods(userId);
-        ShoppingCartRespDto respDto=new ShoppingCartRespDto();
+        BuyRespDto respDto=new BuyRespDto();
         respDto.setList(list);
         if(list==null||list.isEmpty()){
             respDto.setTotal(BigDecimal.ZERO);
@@ -103,7 +103,11 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
 
     @Override
     public Result delShoppingCart(Long shoppingCartId) {
-        return null;
+        if(shoppingCartId==null||shoppingCartId<0){
+            return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
+        }
+        baseMapper.deleteById(shoppingCartId);
+        return ResultGenerator.genSuccessResult();
     }
 
     @Override

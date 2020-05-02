@@ -4,11 +4,33 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbShoppingCart">
+    <id column="id" property="id" />
+    <result column="user_id" property="userId" />
+    <result column="goods_id" property="goodsId" />
+    <result column="goods_count" property="goodsCount" />
+    <result column="create_time" property="createTime" />
+</resultMap>
+
+    <resultMap id="ShoppingGoodsMap" type="com.hailian.ylwmall.dto.ShoppingGoodsDto">
         <id column="id" property="id" />
         <result column="user_id" property="userId" />
         <result column="goods_id" property="goodsId" />
         <result column="goods_count" property="goodsCount" />
         <result column="create_time" property="createTime" />
+        <result column="goods_name" property="goodsName" />
+        <result column="goods_cover_img" property="goodsCoverImg" />
+        <result column="original_price" property="originalPrice" />
+        <result column="selling_price" property="sellingPrice" />
+        <result column="profit" property="profit" />
+        <result column="price" property="price" />
+        <result column="transit_money" property="transitMoney" />
     </resultMap>
 
+    <select id="queryShoppingGoods" parameterType="java.lang.Long"
+        resultMap="ShoppingGoodsMap">
+        select sc.*, gi.goods_name, gi.goods_cover_img, gi.price, gi.profit,
+        gi.selling_price, gi.transit_money, gi.original_price
+        from tb_shopping_cart sc join tb_goods_info gi on sc.goods_id=gi.goods_id
+        where sc.user_id=#{userId}
+    </select>
 </mapper>

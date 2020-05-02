@@ -1,6 +1,7 @@
 package com.hailian.ylwmall.service;
 
 import com.hailian.ylwmall.dto.ShoppingCartFormDto;
+import com.hailian.ylwmall.dto.ShoppingGoodsUpdateDto;
 import com.hailian.ylwmall.entity.TbShoppingCart;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.Result;
@@ -15,5 +16,8 @@ import com.hailian.ylwmall.util.Result;
  */
 public interface TbShoppingCartService extends IService<TbShoppingCart> {
     Result addShoppingCart(ShoppingCartFormDto dto);
+    Result shoppingCarts(Long userId);
+    Result delShoppingCart(Long shoppingCartId);
+    Result updateShoppingNum(ShoppingGoodsUpdateDto updateDto);
 
 }

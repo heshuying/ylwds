@@ -21,22 +21,42 @@ public class PayController {
     PayService payService;
 
     /**
-     * 担保支付
+     * 担保支付(网银)
      */
-    @GetMapping("/ensureTrade")
-    public String ensureTrade(@ModelAttribute EnsureTradeReq ensureTradeReq, HttpServletRequest request) {
+    @GetMapping("/ensureTradeBank")
+    public String ensureTradeBank(@ModelAttribute EnsureTradeReq reqBean, HttpServletRequest request) {
         // 设置登录人
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
         if(Objects.isNull(userId)){
             return "error/error";
         }
-        if(StringUtils.isBlank(ensureTradeReq.getOrderId()) || StringUtils.isBlank(ensureTradeReq.getPayType())){
+        if(StringUtils.isBlank(reqBean.getOrderId()) || StringUtils.isBlank(reqBean.getPayType())){
             return "error/error";
         }
-        RequestBase requestBase = payService.ensureTrade(ensureTradeReq.getOrderId(), ensureTradeReq.getPayType(), request);
+        reqBean.setPayType("1");
+        RequestBase requestBase = payService.ensureTrade(reqBean, request);
         Map<String,String> req = KJTPayUtil.objToMap(requestBase);
         request.setAttribute("map", req);
         return "mall/send";
+    }
+
+    /**
+     * 担保支付(网银)
+     */
+    @ResponseBody
+    @GetMapping("/ensureTradeAgreement")
+    public String ensureTradeAgreement(@ModelAttribute EnsureTradeReq reqBean, HttpServletRequest request) {
+        // 设置登录人
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return "error/error";
+        }
+        if(StringUtils.isBlank(reqBean.getOrderId())){
+            return "error/error";
+        }
+        reqBean.setPayType("2");
+        String result = payService.ensureTradeAgreement(reqBean, request);
+        return result;
     }
 
     /**

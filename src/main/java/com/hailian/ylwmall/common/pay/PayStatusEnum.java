@@ -5,9 +5,11 @@ package com.hailian.ylwmall.common.pay;
  */
 public enum PayStatusEnum {
 
-    PAY_ING(0, "待支付"),
-    PAY_SUCCESS(1, "已支付"),
-    PAY_FAIL(2, "支付失败");
+    PAY_FAIL(-1, "支付失败"),
+    PAY_ING(0, "支付中"),
+    PAY_WAIT(1, "待付款"),
+    PAY_WAIT_CONFIRM(2, "待达成"),
+    PAY_SUCCESS(3, "支付成功");
 
     private int payStatus;
 

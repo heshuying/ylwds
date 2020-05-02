@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hailian.ylwmall.dao.TbUserPayDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hailian.ylwmall.entity.TbUserPay">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="token_id" property="tokenId" />
+        <result column="bank_card_no" property="bankCardNo" />
+        <result column="bank_account_name" property="bankAccountName" />
+        <result column="cvv2" property="cvv2" />
+        <result column="valid_date" property="validDate" />
+        <result column="phone_num" property="phoneNum" />
+        <result column="certificates_type" property="certificatesType" />
+        <result column="certificates_number" property="certificatesNumber" />
+    </resultMap>
+
+</mapper>

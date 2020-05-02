@@ -43,7 +43,7 @@ public class EnsureTradeBean {
 
     @SerializedName("merchant_custom")
     @Expose
-    private String merchantCustom;//商户自定义域
+    private Map<String,String> merchantCustom;//商户自定义域
 
     @SerializedName("return_url")
     @Expose

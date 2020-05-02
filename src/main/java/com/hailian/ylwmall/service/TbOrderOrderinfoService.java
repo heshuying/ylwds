@@ -2,6 +2,7 @@ package com.hailian.ylwmall.service;
 
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
+import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.Result;
@@ -17,5 +18,5 @@ import com.hailian.ylwmall.util.Result;
 public interface TbOrderOrderinfoService extends IService<TbOrderOrderinfo> {
     Result confirmOrder(OrderFormDto dto);
     Result payOrder(String orderNo);
-    Result doOrder();
+    Result doOrder(Long userId, OrderSubmitDto dto);
 }

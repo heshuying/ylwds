@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -37,12 +39,12 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
     /**
      * 更新时间
      */
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     /**
      * 下单时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 收货地址
@@ -98,6 +100,11 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
      * 订单最终售价
      */
     private BigDecimal realPrice;
+
+    /**
+     * 收货地址ID
+     */
+    private Long deliveryId;
 
 
     @Override

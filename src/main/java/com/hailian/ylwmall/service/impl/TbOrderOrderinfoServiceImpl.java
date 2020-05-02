@@ -5,6 +5,7 @@ import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.BuyRespDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
+import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
@@ -17,6 +18,7 @@ import com.hailian.ylwmall.util.ResultGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -73,8 +75,11 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         return null;
     }
 
+    @Transactional
     @Override
-    public Result doOrder() {
+    public Result doOrder(Long userId, OrderSubmitDto dto) {
+
+        TbOrderOrderinfo order=new TbOrderOrderinfo();
         return null;
     }
 }

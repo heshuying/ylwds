@@ -86,6 +86,11 @@ public class TbUserPay extends Model<TbUserPay> {
      */
     private Date createTime;
 
+    /**
+     * token是否已验证：0未验证 1已验证
+     */
+    private int tokenIsvalid;
+
 
     @Override
     protected Serializable pkVal() {

@@ -129,7 +129,7 @@ public class PayServiceBase {
             CardRegisterApplyAndPayBean payBean = new CardRegisterApplyAndPayBean();
             payBean.setPayProductCode("51");
             payBean.setAmount(price.toString());
-            if(!StringUtils.isBlank(userPay.getTokenId())){
+            if(!StringUtils.isBlank(userPay.getTokenId())  && userPay.getTokenIsvalid() == 1){
                 payBean.setSigningPay("N");
                 payBean.setTokenId(userPay.getTokenId());
             }else{

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.Objects;
 
 @Api(value = "支付相关接口", tags = {"支付相关接口"})
 @Controller
@@ -95,7 +94,7 @@ public class PayController {
             return ResultGenerator.genFailResult("用户未登录");
         }
 
-        Result result = payService.agreementPayConfirm(orderId, phoneCheckCode);
+        Result result = payService.agreementPayConfirm(user.getUserId(), orderId, phoneCheckCode);
         return result;
     }
 }

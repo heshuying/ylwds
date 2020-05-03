@@ -245,6 +245,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             TbUserPay userPay = userPayDao.selectOne(new QueryWrapper<TbUserPay>().eq("user_id", user.getUserId()));
             if(StringUtils.isBlank(userPay.getTokenId()) && StringUtils.isNotBlank(jsonObject.getString("token_id"))){
                 userPay.setTokenId(jsonObject.getString("token_id"));
+                userPay.setTokenIsvalid(0);
                 userPay.setUpdateTime(new Date());
                 userPayDao.updateById(userPay);
             }
@@ -302,7 +303,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     }
 
     @Override
-    public Result agreementPayConfirm(String orderId, String phoneCheckCode){
+    public Result agreementPayConfirm(Long userId, String orderId, String phoneCheckCode){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
                 .eq("is_deleted", "0"));
@@ -327,6 +328,13 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+            // 签约成功保存token_id
+            TbUserPay userPay = userPayDao.selectOne(new QueryWrapper<TbUserPay>().eq("user_id", userId));
+            if(StringUtils.isNotBlank(userPay.getTokenId()) && userPay.getTokenIsvalid() != 1){
+                userPay.setTokenIsvalid(1);
+                userPay.setUpdateTime(new Date());
+                userPayDao.updateById(userPay);
+            }
 
             orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
             orderPay.setUpdateTime(new Date());

@@ -26,7 +26,6 @@ import com.kjtpay.gateway.common.domain.base.ResponseParameter;
 import com.kjtpay.gateway.common.util.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -121,6 +120,7 @@ public class PayServiceBase {
                 }
                 userPay = CommonUtil.convertBean(reqBean, TbUserPay.class);
                 userPay.setUserId(userId);
+                userPay.setTokenIsvalid(0);
                 userPay.setCreateTime(new Date());
                 userPay.setUpdateTime(new Date());
                 userPayDao.insert(userPay);
@@ -133,12 +133,26 @@ public class PayServiceBase {
                 payBean.setSigningPay("N");
                 payBean.setTokenId(userPay.getTokenId());
             }else{
+                if(StringUtils.isBlank(reqBean.getBankCardNo())
+                        || StringUtils.isBlank(reqBean.getBankAccountName())
+                        || StringUtils.isBlank(reqBean.getCertificatesType())
+                        || StringUtils.isBlank(reqBean.getCertificatesNumber())
+                        || StringUtils.isBlank(reqBean.getPhoneNum())){
+                    B2BMallException.fail("协议支付银行卡信息不全");
+                }
+                userPay = CommonUtil.convertBean(reqBean, TbUserPay.class);
+                userPay.setUserId(userId);
+                userPay.setTokenIsvalid(0);
+                userPay.setUpdateTime(new Date());
+                userPayDao.updateById(userPay);
+
                 payBean.setSigningPay("Y");
                 payBean.setBankCardNo(reqBean.getBankCardNo());
                 payBean.setPhoneNum(reqBean.getPhoneNum());
                 payBean.setBankAccountName(reqBean.getBankAccountName());
                 payBean.setCertificatesType(CertificatesTypeEnum.ID_CARD.getCode());
                 payBean.setCertificatesNumber(reqBean.getCertificatesNumber());
+
             }
             tradeBean.setPayMethod(KJTPayUtil.objToMap(payBean));
             return tradeBean;

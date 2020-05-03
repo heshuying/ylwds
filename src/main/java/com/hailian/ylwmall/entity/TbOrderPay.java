@@ -84,6 +84,8 @@ public class TbOrderPay extends Model<TbOrderPay> {
 
     // 协议支付时是否需要短信确认
     private String needSmsconfirm;
+    // 删除标识字段(0-未删除 1-已删除)
+    private int isDeleted;
 
     @Override
     protected Serializable pkVal() {

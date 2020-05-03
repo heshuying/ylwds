@@ -14,7 +14,7 @@ public interface PayService {
 
     Result ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request);
 
-    ResponseParameter tradeSettle(String origOutTradeNo);
+    Result tradeSettle(String origOutTradeNo, Long userId);
 
-    ResponseParameter agreementPayConfirm(String payToken, String phoneCheckCode);
+    Result agreementPayConfirm(String payToken, String phoneCheckCode);
 }

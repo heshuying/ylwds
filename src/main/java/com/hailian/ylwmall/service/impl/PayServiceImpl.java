@@ -15,9 +15,7 @@ import com.hailian.ylwmall.entity.TbOrderPay;
 import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.service.PayService;
-import com.hailian.ylwmall.util.ArithmeticUtil;
-import com.hailian.ylwmall.util.GetCilentIP;
-import com.hailian.ylwmall.util.GetCodeUtil;
+import com.hailian.ylwmall.util.*;
 import com.kjtpay.gateway.common.domain.VerifyResult;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
 import com.kjtpay.gateway.common.domain.base.ResponseParameter;
@@ -169,7 +167,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
      * @return
      */
     @Override
-    public String ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request){
+    public Result ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
@@ -230,6 +228,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(result.getMsg());
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 支付成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
@@ -250,9 +249,10 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setNeedSmsconfirm(jsonObject.getString("status"));
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
+            return ResultGenerator.genSuccessResult(jsonObject);
         }
+        return ResultGenerator.genFailResult("支付未成功");
 
-        return gson.toJson(result);
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.util.Objects;
 
 @Api(value = "支付相关接口", tags = {"支付相关接口"})
 @Controller
-@RequestMapping("/pay")
+@RequestMapping("/api/pay")
 public class PayController {
     @Autowired
     PayService payService;
@@ -68,15 +68,12 @@ public class PayController {
 
     /**
      * 交易达成
-     * @param outTradeNo
-     * @param request
-     * @return
      */
     @ApiOperation(value = "交易达成")
     @ResponseBody
-    @GetMapping("/tradeSettle/{outTradeNo}")
-    public ResponseParameter tradeSettle(@PathVariable String outTradeNo, HttpServletRequest request) {
-        ResponseParameter result = payService.tradeSettle(outTradeNo);
+    @GetMapping("/tradeSettle/{orderId}")
+    public ResponseParameter tradeSettle(@PathVariable String orderId, HttpServletRequest request) {
+        ResponseParameter result = payService.tradeSettle(orderId);
         return result;
     }
 

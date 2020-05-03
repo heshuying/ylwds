@@ -41,7 +41,10 @@ public class SystemUtil {
             return null;
         }
     }
-
+    public static Long buildOrderNo(Long supplerId){
+        String no=sdf.format(new Date())+(1 + (int) (Math.random() * 10000))+supplerId;
+        return Long.parseLong(no);
+    }
     public static String buildSettleNo(Long supplerId){
         String no=sdf.format(new Date())+(1 + (int) (Math.random() * 10000))+supplerId;
         return no;

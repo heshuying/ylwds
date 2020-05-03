@@ -69,12 +69,12 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
     /**
      * 下单用户的id
      */
-    private Integer customerId;
+    private Long customerId;
 
     /**
      * 供货商的id
      */
-    private Integer supplierId;
+    private Long supplierId;
 
     /**
      * 平台减免金额
@@ -82,22 +82,22 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
     private BigDecimal cutDown;
 
     /**
-     * 订单原售价
+     * 订单原售价 页面划线价
      */
     private BigDecimal totalPrice;
 
     /**
-     * 订单毛利润
+     * 订单毛利润 =平台利润-平台减免
      */
     private BigDecimal grossProfit;
 
     /**
-     * 订单进货价
+     * 订单进货价=供应商价格
      */
     private BigDecimal buyingPrice;
 
     /**
-     * 订单最终售价
+     * 订单最终售价=供应商价格+平台利润+运费-平台减免
      */
     private BigDecimal realPrice;
 

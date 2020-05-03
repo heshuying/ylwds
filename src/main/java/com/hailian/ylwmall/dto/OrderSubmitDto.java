@@ -9,7 +9,7 @@ import java.util.List;
  */
 @Data
 public class OrderSubmitDto {
-    private List<BuyRespDto> list;
+    private BuyRespDto buyGoods;
     private Long deliveryId;
     private String payType;
 }

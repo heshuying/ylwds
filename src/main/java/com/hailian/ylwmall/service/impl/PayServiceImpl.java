@@ -268,6 +268,10 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
                 .eq("is_deleted", "0"));
+        if(orderPay == null){
+            return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+
         String outTradeNo = GetCodeUtil.getOrderId(userId);
         Map<String,String> bizContent = new HashMap<>();
         bizContent.put("orig_out_trade_no", orderPay.getOutTradeNo());
@@ -275,6 +279,42 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         bizContent.put("royalty_info", null);
 
         RequestBase requestBase = genRequestBase(gson.toJson(bizContent), outTradeNo, KJTConstants.SERVICE_TRADE_SETTLE);
+        ResponseParameter result = callKjt(requestBase);
+        if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 失败
+            orderPay.setFailCode(result.getCode());
+            orderPay.setFailMsg(result.getMsg());
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(result.getMsg());
+        }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 成功
+            JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+
+            orderPay.setPayStatus(PayStatusEnum.PAY_SUCCESS.getPayStatus());
+            orderPay.setPayconfirmTime(new Date());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genSuccessResult(jsonObject);
+        }
+        return ResultGenerator.genFailResult("交易达成未成功");
+    }
+
+    @Override
+    public Result agreementPayConfirm(String orderId, String phoneCheckCode){
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", orderId)
+                .eq("is_deleted", "0"));
+        if(orderPay == null){
+            return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+        String outTradeNo = String.valueOf(System.currentTimeMillis());
+        Map<String,String> bizContent = new HashMap<>();
+        bizContent.put("phone_check_code", phoneCheckCode);
+        bizContent.put("pay_token", orderPay.getPayToken());
+
+        RequestBase requestBase = genRequestBase(gson.toJson(bizContent), outTradeNo, KJTConstants.SERVICE_AGREEMENT_PAY_CONFIRM);
         ResponseParameter result = callKjt(requestBase);
         if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 支付失败
@@ -285,39 +325,14 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPayDao.updateById(orderPay);
             return ResultGenerator.genFailResult(result.getMsg());
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
-            // 支付成功
+            // 成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
 
-            // 签约成功保存token_id
-            TbUserPay userPay = userPayDao.selectOne(new QueryWrapper<TbUserPay>().eq("user_id", userId));
-            if(StringUtils.isBlank(userPay.getTokenId()) && StringUtils.isNotBlank(jsonObject.getString("token_id"))){
-                userPay.setTokenId(jsonObject.getString("token_id"));
-                userPay.setUpdateTime(new Date());
-                userPayDao.updateById(userPay);
-            }
-            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
-            if(StringUtils.isNotBlank(jsonObject.getString("pay_token"))){
-                orderPay.setTokenId(jsonObject.getString("token_id"));
-                orderPay.setPayToken(jsonObject.getString("pay_token"));
-            }
-            orderPay.setTradeNo(jsonObject.getString("trade_no"));
-            orderPay.setNeedSmsconfirm(jsonObject.getString("status"));
+            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
             return ResultGenerator.genSuccessResult(jsonObject);
         }
-        return ResultGenerator.genFailResult("交易达成未成功");
-    }
-
-    @Override
-    public Result agreementPayConfirm(String payToken, String phoneCheckCode){
-        String outTradeNo = String.valueOf(System.currentTimeMillis());
-        Map<String,String> bizContent = new HashMap<>();
-        bizContent.put("phone_check_code", phoneCheckCode);
-        bizContent.put("pay_token", payToken);
-
-        RequestBase requestBase = genRequestBase(gson.toJson(bizContent), outTradeNo, KJTConstants.SERVICE_AGREEMENT_PAY_CONFIRM);
-        ResponseParameter result = callKjt(requestBase);
         return ResultGenerator.genSuccessResult();
     }
     /**

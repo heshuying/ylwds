@@ -16,5 +16,5 @@ public interface PayService {
 
     Result tradeSettle(String origOutTradeNo, Long userId);
 
-    Result agreementPayConfirm(String payToken, String phoneCheckCode);
+    Result agreementPayConfirm(String orderId, String phoneCheckCode);
 }

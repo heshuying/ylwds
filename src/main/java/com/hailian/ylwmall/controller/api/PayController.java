@@ -88,13 +88,14 @@ public class PayController {
      */
     @ApiOperation(value = "协议支付/ 直接支付-支付确认")
     @ResponseBody
-    @GetMapping("/agreementPayConfirm/{payToken}/{phoneCheckCode}")
-    public Result agreementPayConfirm(@PathVariable String payToken, @PathVariable String phoneCheckCode, HttpServletRequest request) {
-        Long userId = (Long)request.getSession().getAttribute("loginUserId");
-        if(Objects.isNull(userId)){
+    @GetMapping("/agreementPayConfirm/orderId/{phoneCheckCode}")
+    public Result agreementPayConfirm(@PathVariable String orderId, @PathVariable String phoneCheckCode, HttpServletRequest request) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
+        if(user == null){
             return ResultGenerator.genFailResult("用户未登录");
         }
-        Result result = payService.agreementPayConfirm(payToken, phoneCheckCode);
+
+        Result result = payService.agreementPayConfirm(orderId, phoneCheckCode);
         return result;
     }
 }

@@ -21,9 +21,13 @@ public class ShoppingGoodsDto {
      * 关联商品id
      */
     private Long goodsId;
-
+    private Long supplierId;
     /**
-     * 数量(最大为5)
+     * 规格
+     */
+    private String goodsAttr;
+    /**
+     * 数量
      */
     private Integer goodsCount;
 

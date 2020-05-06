@@ -10,6 +10,7 @@ import com.hailian.ylwmall.dao.TbUserDao;
 import com.hailian.ylwmall.dto.GoodsAndCompayResDTO;
 import com.hailian.ylwmall.dto.GoodsStatusUpdateReqDTO;
 import com.hailian.ylwmall.dto.UserListDto;
+import com.hailian.ylwmall.entity.TbUser;
 import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.util.BeanUtil;
 import com.hailian.ylwmall.util.PageQueryUtil;
@@ -71,7 +72,10 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
 
     @Override
     public TbGoodsInfo getNewBeeMallGoodsById(Long id) {
-        return goodsMapper.selectByPrimaryKey(id);
+        TbGoodsInfo goodsInfo= goodsMapper.selectByPrimaryKey(id);
+        TbUser user=tbUserDao.selectById(goodsInfo.getCreateUser());
+        goodsInfo.setCreatorName(user==null?"":user.getLoginName());
+        return goodsInfo;
     }
     
     @Override

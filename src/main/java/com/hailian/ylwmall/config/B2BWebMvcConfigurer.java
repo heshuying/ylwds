@@ -32,6 +32,8 @@ public class B2BWebMvcConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/admin/**")
                 .excludePathPatterns("/register")
                 .excludePathPatterns("/login")
+                .excludePathPatterns("/api/my/**")
+                .excludePathPatterns("/api/pay/**")
                 .excludePathPatterns("/logout");
         // 商城页面登陆拦截
         registry.addInterceptor(newBeeMallLoginInterceptor)
@@ -39,7 +41,8 @@ public class B2BWebMvcConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/register")
                 .excludePathPatterns("/login")
                 .excludePathPatterns("/logout")
-                .addPathPatterns("/goods/detail/**")
+                .addPathPatterns("/api/my/**")
+                .addPathPatterns("/api/pay/**")
                 .addPathPatterns("/shop-cart")
                 .addPathPatterns("/shop-cart/**")
                 .addPathPatterns("/saveOrder")

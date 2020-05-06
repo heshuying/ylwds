@@ -15,12 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * newbee-mall购物车数量处理
- *
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
+ * 购物车数量处理
  */
 @Component
 public class B2BMallCartNumberInterceptor implements HandlerInterceptor {

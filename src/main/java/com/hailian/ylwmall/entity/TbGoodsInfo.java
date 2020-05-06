@@ -75,6 +75,8 @@ public class TbGoodsInfo {
 
     private Long updateUser;
 
+    private String creatorName;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
     /**
@@ -299,5 +301,13 @@ public class TbGoodsInfo {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 }

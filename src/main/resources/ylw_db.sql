@@ -321,3 +321,4 @@ CREATE TABLE `tb_user_oper`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 alter table tb_order_goodinfo add goods_attr varchar(80) not null default '' comment '规格'
+alter table tb_order_orderinfo add delivery_id bigint(20) not null default 0 comment '发货地址ID'

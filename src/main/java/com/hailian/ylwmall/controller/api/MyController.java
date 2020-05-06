@@ -193,6 +193,7 @@ public class MyController {
     @ResponseBody
     public Result settlePage(@RequestBody OrderFormDto orderFormDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
         return orderinfoService.confirmOrder(orderFormDto);
     }
 

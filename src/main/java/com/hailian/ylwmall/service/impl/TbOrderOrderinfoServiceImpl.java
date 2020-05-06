@@ -61,10 +61,12 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         for(BuyFormDto buyFormDto:dto.getGoods()){
             ShoppingGoodsDto shoppingGoodsDto=new ShoppingGoodsDto();
             BeanUtils.copyProperties(buyFormDto, shoppingGoodsDto);
+            shoppingGoodsDto.setGoodsCount(buyFormDto.getGoodsNum());
             TbGoodsInfo current=goodsInfos.stream().filter(
                     m->buyFormDto.getGoodsId().compareTo(m.getGoodsId())==0).findAny().orElse(null);
             if(current!=null){
                 BeanUtils.copyProperties(current, shoppingGoodsDto);
+                shoppingGoodsDto.setSupplierId(current.getCreateUser());
             }
             list.add(shoppingGoodsDto);
             total.add(shoppingGoodsDto.getPrice().multiply(new BigDecimal(

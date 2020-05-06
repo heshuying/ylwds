@@ -7,7 +7,9 @@ import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.LoginDto;
 import com.hailian.ylwmall.dto.ProfileDto;
 import com.hailian.ylwmall.dto.RegisterFirstDto;
+import com.hailian.ylwmall.entity.TbShoppingCart;
 import com.hailian.ylwmall.entity.TbUser;
+import com.hailian.ylwmall.service.TbShoppingCartService;
 import com.hailian.ylwmall.service.TbUserService;
 import com.hailian.ylwmall.util.BeanUtil;
 import com.hailian.ylwmall.util.MD5Util;
@@ -40,7 +42,9 @@ public class AuthController {
     private TbUserService userService;
     @Autowired
     private HttpSession httpSession;
-
+    @Autowired
+    private TbShoppingCartService shoppingCartService;
+    
     @ApiOperation(value = "登陆")
     @PostMapping("/login")
     @ResponseBody
@@ -78,6 +82,9 @@ public class AuthController {
         if (ServiceResultEnum.SUCCESS.getResult().equals(loginResult)) {
             NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
             BeanUtil.copyProperties(user, newBeeMallUserVO);
+            //设置购物车中的数量
+            newBeeMallUserVO.setShopCartItemCount(shoppingCartService.count(new QueryWrapper<TbShoppingCart>()
+                    .eq("user_id",newBeeMallUserVO.getUserId())));
             httpSession.setAttribute(Constants.MALL_USER_SESSION_KEY, newBeeMallUserVO);
             return ResultGenerator.genSuccessResult(newBeeMallUserVO);
         }

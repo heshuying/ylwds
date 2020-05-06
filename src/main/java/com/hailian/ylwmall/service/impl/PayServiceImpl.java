@@ -9,7 +9,6 @@ import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.common.pay.PayStatusEnum;
 import com.hailian.ylwmall.common.pay.ProductCodeEnum;
-import com.hailian.ylwmall.config.KjtConstants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
@@ -143,13 +142,13 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
         tradeInfo.setPayeeIdentityType("1");
         tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
-        tradeInfo.setNotifyUrl(kjtConfig.getInstantTradeAsyncNotify());//服务器异步通知地址
+        tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
 
         // 业务信息
         EnsureTradeBean tradeBizContent = new EnsureTradeBean();
-        tradeBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
-        tradeBizContent.setPayerPlatformType(KjtConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
-        tradeBizContent.setPayerIdentity(KjtConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
+        tradeBizContent.setPayerIdentityType("1");
+        tradeBizContent.setPayerPlatformType("1");
+        tradeBizContent.setPayerIdentity("anonymous");
         tradeBizContent.setPayerIp(ip);
         tradeBizContent.setBizProductCode(ProductCodeEnum.ENSURE_TRADE_20702.getCode());
         tradeBizContent.setCashierType("WEB");
@@ -162,6 +161,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
         terminalInfo.put("ip",ip);
         tradeBizContent.setTerminalInfo(terminalInfo);
+        tradeBizContent.setReturnUrl(kjtConfig.getEnsureTradeReturnUrl()); // 同步返回地址
 
         return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
     }
@@ -211,9 +211,9 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
         // 业务信息
         EnsureTradeBean tradeBizContent = new EnsureTradeBean();
-        tradeBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
-        tradeBizContent.setPayerPlatformType(KjtConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
-        tradeBizContent.setPayerIdentity(KjtConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
+        tradeBizContent.setPayerIdentityType("1");
+        tradeBizContent.setPayerPlatformType("1");
+        tradeBizContent.setPayerIdentity("anonymous");
         tradeBizContent.setPayerIp(ip);
         tradeBizContent.setBizProductCode(ProductCodeEnum.ENSURE_TRADE_20702.getCode());
         tradeBizContent.setCashierType("WEB");

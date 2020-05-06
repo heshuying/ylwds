@@ -1,6 +1,7 @@
 package com.hailian.ylwmall.controller.api;
 
 import com.hailian.ylwmall.common.Constants;
+import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.service.PayService;
@@ -10,6 +11,7 @@ import com.hailian.ylwmall.util.ResultGenerator;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+@Slf4j
 @Api(value = "支付相关接口", tags = {"支付相关接口"})
 @Controller
 @RequestMapping("/api/pay")
@@ -97,4 +100,13 @@ public class PayController {
         Result result = payService.agreementPayConfirm(user.getUserId(), orderId, phoneCheckCode);
         return result;
     }
+
+    @ResponseBody
+    @RequestMapping("/ensureTradeAsyncNotify")
+    public String ensureTradeAsyncNotify(HttpServletRequest request) {
+        log.info("ensureTradeAsyncNotify收到异步回调");
+
+        return KJTConstants.NOTIFY_RET_SUCCESS;
+    }
+
 }

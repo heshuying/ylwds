@@ -19,6 +19,8 @@ public class KjtConfig {
     private String transferToCardAsyncNotify;//体现回写接口
     private String tradeRefundAsyncNotify;//退款回写接口
     private String transferToAccountAsyncNotify;//转账到户回写接口
+    private String ensureTradeAsyncNotify; //担保支付异步通知接口
+    private String ensureTradeReturnUrl; //担保支付完成跳转页面地址
     private String recvOrder;//快捷通个人账号快速注册接口
     private String verifyFlag;//1，校验；0，不校验
     private String productCode;//业务产品码 10310-会员转账（实时） 10311-会员转账（普通） 10312-会员转账（次日）

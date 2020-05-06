@@ -11,7 +11,16 @@ import java.util.List;
  */
 @Data
 public class BuyRespDto {
-    private List<ShoppingGoodsDto> list;
+    /**
+     * 按供应商区分 购物车产品
+     */
+    private List<SupplierCartDto> list;
+    /**
+     * 总价
+     */
     private BigDecimal total;
+    /**
+     * 运费
+     */
     private BigDecimal expressFee;
 }

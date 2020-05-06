@@ -6,12 +6,15 @@ import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.BuyRespDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsUpdateDto;
+import com.hailian.ylwmall.dto.SupplierCartDto;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.entity.TbShoppingCart;
 import com.hailian.ylwmall.dao.TbShoppingCartDao;
+import com.hailian.ylwmall.entity.TbUser;
 import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.service.TbShoppingCartService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hailian.ylwmall.service.TbUserService;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import org.springframework.beans.BeanUtils;
@@ -19,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,6 +39,8 @@ import java.util.List;
 public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, TbShoppingCart> implements TbShoppingCartService {
     @Autowired
     private GoodsService goodsService;
+    @Autowired
+    private TbUserService userService;
     @Override
     public Result addShoppingCart(BuyFormDto dto) {
         if(dto==null
@@ -82,12 +89,33 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
         }
 
         List<ShoppingGoodsDto> list=baseMapper.queryShoppingGoods(userId);
+
         BuyRespDto respDto=new BuyRespDto();
-        respDto.setList(list);
+
         if(list==null||list.isEmpty()){
             respDto.setTotal(BigDecimal.ZERO);
             respDto.setExpressFee(BigDecimal.ZERO);
         }else{
+            List<Long> supplierIds=list.stream().map(m->m.getSupplierId())
+                    .distinct().collect(Collectors.toList());
+            List<TbUser> users=userService.list(
+                    new QueryWrapper<TbUser>()
+                    .in("user_id",supplierIds)
+            );
+            List<SupplierCartDto> supplierCartDtos=new ArrayList<>();
+            for (Long curr: supplierIds){
+                List<ShoppingGoodsDto> currSuppGoods=list.stream().filter(
+                        m->curr.compareTo(m.getSupplierId())==0
+                ).collect(Collectors.toList());
+                TbUser currenUser=users.stream()
+                        .filter(m->m.getUserId().compareTo(curr)==0).findAny().orElse(null);
+                SupplierCartDto supplierCartDto=new SupplierCartDto();
+                supplierCartDto.setSupplierId(curr);
+                supplierCartDto.setSupplierName(currenUser==null?"":currenUser.getLoginName());
+                supplierCartDto.setList(currSuppGoods);
+                supplierCartDtos.add(supplierCartDto);
+            }
+            respDto.setList(supplierCartDtos);
             double total=list.stream().mapToDouble(
                     m->m.getPrice().multiply(new BigDecimal(String.valueOf(m.getGoodsCount()) )).doubleValue()
             ).sum();

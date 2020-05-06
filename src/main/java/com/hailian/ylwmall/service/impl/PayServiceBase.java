@@ -7,13 +7,12 @@ import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.common.pay.CertificatesTypeEnum;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.config.KjtConfig;
-import com.hailian.ylwmall.dao.OrderGoodInfoMapper;
-import com.hailian.ylwmall.dao.OrderInfoMapper;
-import com.hailian.ylwmall.dao.TbOrderPayDao;
-import com.hailian.ylwmall.dao.TbUserPayDao;
+import com.hailian.ylwmall.dao.*;
 import com.hailian.ylwmall.dto.pay.CardRegisterApplyAndPayBean;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
+import com.hailian.ylwmall.entity.TbPayRevlog;
+import com.hailian.ylwmall.entity.TbPaySenlog;
 import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.util.CommonUtil;
@@ -26,7 +25,6 @@ import com.kjtpay.gateway.common.domain.base.ResponseParameter;
 import com.kjtpay.gateway.common.util.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -53,6 +51,10 @@ public class PayServiceBase {
     OrderGoodInfoMapper orderGoodInfoMapper;
     @Autowired
     TbUserPayDao userPayDao;
+    @Autowired
+    TbPaySenlogDao paySenlogDao;
+    @Autowired
+    TbPayRevlogDao payRevlogDao;
 
     Gson gson = new Gson();
 
@@ -87,6 +89,7 @@ public class PayServiceBase {
         requestBase.setSign(signDataStr);
         log.info("最终请求数据requestBase： {}", gson.toJson(requestBase));
 
+        insertSendLog(requestNo, service, bizContent);
         return requestBase;
     }
 
@@ -121,6 +124,7 @@ public class PayServiceBase {
                 }
                 userPay = CommonUtil.convertBean(reqBean, TbUserPay.class);
                 userPay.setUserId(userId);
+                userPay.setTokenIsvalid(0);
                 userPay.setCreateTime(new Date());
                 userPay.setUpdateTime(new Date());
                 userPayDao.insert(userPay);
@@ -129,16 +133,30 @@ public class PayServiceBase {
             CardRegisterApplyAndPayBean payBean = new CardRegisterApplyAndPayBean();
             payBean.setPayProductCode("51");
             payBean.setAmount(price.toString());
-            if(!StringUtils.isBlank(userPay.getTokenId())){
+            if(!StringUtils.isBlank(userPay.getTokenId())  && userPay.getTokenIsvalid() == 1){
                 payBean.setSigningPay("N");
                 payBean.setTokenId(userPay.getTokenId());
             }else{
+                if(StringUtils.isBlank(reqBean.getBankCardNo())
+                        || StringUtils.isBlank(reqBean.getBankAccountName())
+                        || StringUtils.isBlank(reqBean.getCertificatesType())
+                        || StringUtils.isBlank(reqBean.getCertificatesNumber())
+                        || StringUtils.isBlank(reqBean.getPhoneNum())){
+                    B2BMallException.fail("协议支付银行卡信息不全");
+                }
+                userPay = CommonUtil.convertBean(reqBean, TbUserPay.class);
+                userPay.setUserId(userId);
+                userPay.setTokenIsvalid(0);
+                userPay.setUpdateTime(new Date());
+                userPayDao.updateById(userPay);
+
                 payBean.setSigningPay("Y");
                 payBean.setBankCardNo(reqBean.getBankCardNo());
                 payBean.setPhoneNum(reqBean.getPhoneNum());
                 payBean.setBankAccountName(reqBean.getBankAccountName());
                 payBean.setCertificatesType(CertificatesTypeEnum.ID_CARD.getCode());
                 payBean.setCertificatesNumber(reqBean.getCertificatesNumber());
+
             }
             tradeBean.setPayMethod(KJTPayUtil.objToMap(payBean));
             return tradeBean;
@@ -159,6 +177,7 @@ public class PayServiceBase {
         VerifyResult verifyResult;
         if(StringUtils.isNotBlank(resultKjt)){
             rp = gson.fromJson(resultKjt, rp.getClass());
+            insertRevLog(requestBase.getRequestNo(), requestBase.getService(), gson.toJson(rp.getBizContent()), resultKjt);
             String bizContent = rp.getBizContent()==null ? null : JSON.toJSONString(rp.getBizContent());
             rp.setBizContent(bizContent);
 
@@ -182,5 +201,28 @@ public class PayServiceBase {
             throw new BusinessException("快捷通接口调用失败，返回null");
         }
         return rp;
+    }
+
+    public int insertSendLog(String outTradeNo, String serviceName, String bizContent){
+        TbPaySenlog senlog = new TbPaySenlog();
+        senlog.setOutTradeNo(outTradeNo);
+        senlog.setServiceName(serviceName);
+        senlog.setBizContent(bizContent);
+        senlog.setStatusCall(0);
+        senlog.setCreateTime(new Date());
+        senlog.setUpdateTime(new Date());
+        return paySenlogDao.insert(senlog);
+    }
+
+    public int insertRevLog(String outTradeNo, String serviceName, String bizContent, String revJson){
+        TbPayRevlog revlog = new TbPayRevlog();
+        revlog.setOutTradeNo(outTradeNo);
+        revlog.setServiceName(serviceName);
+        revlog.setBizContent(bizContent);
+        revlog.setRevJson(revJson);
+        revlog.setStatusCall(0);
+        revlog.setCreateTime(new Date());
+        revlog.setUpdateTime(new Date());
+        return payRevlogDao.insert(revlog);
     }
 }

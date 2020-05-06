@@ -3,7 +3,6 @@ package com.hailian.ylwmall.service;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.util.Result;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
-import com.kjtpay.gateway.common.domain.base.ResponseParameter;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,7 +13,7 @@ public interface PayService {
 
     Result ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request);
 
-    ResponseParameter tradeSettle(String origOutTradeNo);
+    Result tradeSettle(String origOutTradeNo, Long userId);
 
-    ResponseParameter agreementPayConfirm(String payToken, String phoneCheckCode);
+    Result agreementPayConfirm(Long userId, String orderId, String phoneCheckCode);
 }

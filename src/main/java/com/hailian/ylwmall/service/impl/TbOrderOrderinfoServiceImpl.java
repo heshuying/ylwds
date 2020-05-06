@@ -6,6 +6,7 @@ import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.BuyRespDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
+import com.hailian.ylwmall.dto.OrderRespDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
 import com.hailian.ylwmall.entity.StockNumDTO;
@@ -54,7 +55,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 new QueryWrapper<TbGoodsInfo>().in("goods_id",
                         dto.getGoods().stream().map(m->m.getGoodsId()).collect(Collectors.toList()))
         );
-        BuyRespDto respDto=new BuyRespDto();
+        OrderRespDto respDto=new OrderRespDto();
         List<ShoppingGoodsDto> list=new ArrayList<>();
         BigDecimal total=BigDecimal.ZERO;
         BigDecimal expressFee=BigDecimal.ZERO;
@@ -89,7 +90,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     @Override
     public Result doOrder(Long userId, OrderSubmitDto dto) {
         //根据供应商分开产生订单，目前只支持一个供应商
-        BuyRespDto buyRespDto=dto.getBuyGoods();
+        OrderRespDto buyRespDto=dto.getBuyGoods();
         List<ShoppingGoodsDto> orderGoods=buyRespDto.getList();
         List<Long> supplierIds=orderGoods.stream().map(m->m.getSupplierId()).distinct().collect(Collectors.toList());
         List<TbOrderOrderinfo> orders=new ArrayList<>();

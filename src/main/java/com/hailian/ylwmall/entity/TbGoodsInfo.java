@@ -75,6 +75,7 @@ public class TbGoodsInfo {
 
     private Long updateUser;
 
+    @TableField(exist = false)
     private String creatorName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

@@ -85,13 +85,15 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     @Transactional
     @Override
     public Result doOrder(Long userId, OrderSubmitDto dto) {
-        //根据供应商分开产生订单
+        //根据供应商分开产生订单，目前只支持一个供应商
         BuyRespDto buyRespDto=dto.getBuyGoods();
         List<ShoppingGoodsDto> orderGoods=buyRespDto.getList();
         List<Long> supplierIds=orderGoods.stream().map(m->m.getSupplierId()).distinct().collect(Collectors.toList());
         List<TbOrderOrderinfo> orders=new ArrayList<>();
         List<TbOrderGoodinfo> orderGoodinfos=new ArrayList<>();
         List<Long> orderIds=new ArrayList<>();
+        List<TbGoodsInfo> goodsInfos=new ArrayList<>();
+
         for (Long supplier : supplierIds){
             List<ShoppingGoodsDto> currentSupplierGoods=orderGoods.stream().filter(
                     m->supplier.compareTo(m.getSupplierId())==0
@@ -125,6 +127,12 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 orderGoodinfo.setOrderId(orderId);
                 orderGoodinfo.setNumber(shoppingGoodsDto.getGoodsCount());
                 orderGoodinfos.add(orderGoodinfo);
+
+                //更新产品的库存和销量
+                TbGoodsInfo upGoods=new TbGoodsInfo();
+                upGoods.setGoodsId(shoppingGoodsDto.getGoodsId());
+                upGoods.setSaleTotal(shoppingGoodsDto.getGoodsCount());
+                goodsInfos.add(upGoods);
             }
             order.setCutDown(BigDecimal.ZERO);
             order.setBuyingPrice(supplierFee);
@@ -136,7 +144,8 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         }
         saveBatch(orders,orders.size());
         orderGoodsService.saveBatch(orderGoodinfos);
-
+        //更新销量和库存
+        //goodsService.updateStockNum
         return ResultGenerator.genSuccessResult(orderIds);
     }
 }

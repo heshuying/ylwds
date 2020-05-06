@@ -3,6 +3,7 @@ package com.hailian.ylwmall.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
+import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallSearchGoodsVO;
@@ -131,5 +132,10 @@ public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoods
         dto.setUserType("04");
         dto.setUserStatus(1);
         return tbUserDao.queryCompanyNameList(dto);
+    }
+
+    @Override
+    public Integer updateGoodsStock(List<StockNumDTO> list) {
+        return baseMapper.updateStockNum(list);
     }
 }

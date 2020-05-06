@@ -3,6 +3,7 @@ package com.hailian.ylwmall.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.dto.GoodsStatusUpdateReqDTO;
 import com.hailian.ylwmall.dto.UserListDto;
+import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.util.PageQueryUtil;
 import com.hailian.ylwmall.util.PageResult;
@@ -69,4 +70,11 @@ public interface GoodsService extends IService<TbGoodsInfo> {
     PageResult searchNewBeeMallGoods(PageQueryUtil pageUtil);
 
     List<UserListDto> queryCompanyNameList();
+
+    /**
+     * 批量更新库存
+     * @param list
+     * @return
+     */
+    Integer updateGoodsStock(List<StockNumDTO> list);
 }

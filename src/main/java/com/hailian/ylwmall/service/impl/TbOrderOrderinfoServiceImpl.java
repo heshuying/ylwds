@@ -8,6 +8,7 @@ import com.hailian.ylwmall.dto.BuyRespDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
+import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.entity.TbOrderGoodinfo;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
@@ -92,7 +93,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         List<TbOrderOrderinfo> orders=new ArrayList<>();
         List<TbOrderGoodinfo> orderGoodinfos=new ArrayList<>();
         List<Long> orderIds=new ArrayList<>();
-        List<TbGoodsInfo> goodsInfos=new ArrayList<>();
+        List<StockNumDTO> goodsInfos=new ArrayList<>();
 
         for (Long supplier : supplierIds){
             List<ShoppingGoodsDto> currentSupplierGoods=orderGoods.stream().filter(
@@ -129,9 +130,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 orderGoodinfos.add(orderGoodinfo);
 
                 //更新产品的库存和销量
-                TbGoodsInfo upGoods=new TbGoodsInfo();
+                StockNumDTO upGoods=new StockNumDTO();
                 upGoods.setGoodsId(shoppingGoodsDto.getGoodsId());
-                upGoods.setSaleTotal(shoppingGoodsDto.getGoodsCount());
+                upGoods.setGoodsCount(shoppingGoodsDto.getGoodsCount());
                 goodsInfos.add(upGoods);
             }
             order.setCutDown(BigDecimal.ZERO);
@@ -145,7 +146,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         saveBatch(orders,orders.size());
         orderGoodsService.saveBatch(orderGoodinfos);
         //更新销量和库存
-        //goodsService.updateStockNum
+        goodsService.updateGoodsStock(goodsInfos);
         return ResultGenerator.genSuccessResult(orderIds);
     }
 }

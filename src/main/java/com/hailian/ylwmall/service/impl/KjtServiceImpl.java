@@ -5,12 +5,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-
+import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.config.KjtConfig;
-import com.hailian.ylwmall.config.KjtConstants;
 import com.hailian.ylwmall.dto.InstantTradeBizContent;
 import com.hailian.ylwmall.dto.MemberQuicklyRegisterReq;
 import com.hailian.ylwmall.dto.TradeCloseBizContent;
+import com.hailian.ylwmall.dto.TransferToCardBizContent;
+import com.hailian.ylwmall.service.KjtService;
 import com.hailian.ylwmall.util.ArithmeticUtil;
 import com.hailian.ylwmall.util.RestUtils;
 import com.kjtpay.gateway.common.domain.VerifyResult;
@@ -21,8 +22,6 @@ import com.kjtpay.gateway.common.domain.traderefund.TradeRefundReq;
 import com.kjtpay.gateway.common.domain.transfertoaccount.TransferToAccountReq;
 import com.kjtpay.gateway.common.util.JsonMapUtil;
 import com.kjtpay.gateway.common.util.security.SecurityService;
-import com.hailian.ylwmall.dto.TransferToCardBizContent;
-import com.hailian.ylwmall.service.KjtService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +51,7 @@ public class KjtServiceImpl implements KjtService {
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setOutTradeNo(outTradeNo);//平台（商户）单号
         tradeInfo.setSubject(subject);//商品名称
-        tradeInfo.setCurrency(KjtConstants.CurrencyType.CNY);
+        tradeInfo.setCurrency(KJTConstants.CurrencyType.CNY);
         tradeInfo.setPrice(ArithmeticUtil.strRound(price,2));//单价，精确到两位小数 5000.00
         tradeInfo.setQuantity(quantity);//数量
         tradeInfo.setTotalAmount(ArithmeticUtil.strRound(totalAmount,2));//交易金额
@@ -65,9 +64,9 @@ public class KjtServiceImpl implements KjtService {
 
         //===================================2.生成业务数据====================================================
         InstantTradeBizContent instantTradeBizContent = new InstantTradeBizContent();
-        instantTradeBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
-        instantTradeBizContent.setPayerPlatformType(KjtConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
-        instantTradeBizContent.setPayerIdentity(KjtConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
+        instantTradeBizContent.setPayerIdentityType(KJTConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
+        instantTradeBizContent.setPayerPlatformType(KJTConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
+        instantTradeBizContent.setPayerIdentity(KJTConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
         instantTradeBizContent.setPayerIp(payerIp);//买家公网ip
         String payMethodTempt;
 
@@ -89,9 +88,9 @@ public class KjtServiceImpl implements KjtService {
                 payMethodJson.put("target_organization","WECHAT");
         }
         payMethodTempt = payMethodJson.toJSONString();
-        instantTradeBizContent.setPayMethod(payMethodTempt);//KjtConstants.InstantTrade.BizContent.PayMethod
-        instantTradeBizContent.setBizProductCode(KjtConstants.InstantTrade.BizContent.BizProductCode.BIZ_PRODUCT_CODE_20601);
-        instantTradeBizContent.setCashierType(KjtConstants.InstantTrade.BizContent.CashierType.API);
+        instantTradeBizContent.setPayMethod(payMethodTempt);//KJTConstants.InstantTrade.BizContent.PayMethod
+        instantTradeBizContent.setBizProductCode(KJTConstants.InstantTrade.BizContent.BizProductCode.BIZ_PRODUCT_CODE_20601);
+        instantTradeBizContent.setCashierType(KJTConstants.InstantTrade.BizContent.CashierType.API);
         instantTradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
         instantTradeBizContent.setTradeInfo(tradeInfoStr);
         Map<String,String> terminal_info = new HashMap<>();//"terminal_type":"01","ip":"122.224.203.210"}
@@ -130,7 +129,7 @@ public class KjtServiceImpl implements KjtService {
         //============================================1.生成业务数据:start=========================================================
         TransferToCardBizContent transferToCardBizContent = new TransferToCardBizContent();
         transferToCardBizContent.setOutTradeNo(outTradeNo);//平台(商户)订单号
-        transferToCardBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);//出款快捷通会员标识类型，默认1
+        transferToCardBizContent.setPayerIdentityType(KJTConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);//出款快捷通会员标识类型，默认1
         transferToCardBizContent.setPayerIdentity(kjtConfig.getPayeeidentity());//出款账号
         transferToCardBizContent.setAmount(ArithmeticUtil.strRound(amount,2));//出款金额
         transferToCardBizContent.setCurrency("CNY");

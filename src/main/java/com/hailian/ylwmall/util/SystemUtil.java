@@ -17,6 +17,7 @@ public class SystemUtil {
     }
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private static final SimpleDateFormat ssdf = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * 登录或注册成功后,生成保持用户登录状态会话token值
@@ -42,7 +43,7 @@ public class SystemUtil {
         }
     }
     public static Long buildOrderNo(Long supplerId){
-        String no=sdf.format(new Date())+(1 + (int) (Math.random() * 10000))+supplerId;
+        String no=ssdf.format(new Date())+(1 + (int) (Math.random() * 10000))+supplerId;
         return Long.parseLong(no);
     }
     public static String buildSettleNo(Long supplerId){

@@ -69,9 +69,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 shoppingGoodsDto.setSupplierId(current.getCreateUser());
             }
             list.add(shoppingGoodsDto);
-            total.add(shoppingGoodsDto.getPrice().multiply(new BigDecimal(
+            total=total.add(shoppingGoodsDto.getPrice().multiply(new BigDecimal(
                     String.valueOf(shoppingGoodsDto.getGoodsCount()))));
-            expressFee.add(shoppingGoodsDto.getTransitMoney().multiply(new BigDecimal(
+            expressFee=expressFee.add(shoppingGoodsDto.getTransitMoney().multiply(new BigDecimal(
                     String.valueOf(shoppingGoodsDto.getGoodsCount()))));
         }
         respDto.setTotal(total.add(expressFee));
@@ -116,13 +116,13 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             BigDecimal originFee=BigDecimal.ZERO;
             BigDecimal plateFee=BigDecimal.ZERO;
             for(ShoppingGoodsDto shoppingGoodsDto:currentSupplierGoods){
-                supplierFee.add(shoppingGoodsDto.getSellingPrice().multiply(new BigDecimal(
+                supplierFee=supplierFee.add(shoppingGoodsDto.getSellingPrice().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
-                expressFee.add(shoppingGoodsDto.getTransitMoney().multiply(new BigDecimal(
+                expressFee=expressFee.add(shoppingGoodsDto.getTransitMoney().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
-                originFee.add(shoppingGoodsDto.getOriginalPrice().multiply(new BigDecimal(
+                originFee=originFee.add(shoppingGoodsDto.getOriginalPrice().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
-                plateFee.add(shoppingGoodsDto.getProfit().multiply(new BigDecimal(
+                plateFee=plateFee.add(shoppingGoodsDto.getProfit().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
                 TbOrderGoodinfo orderGoodinfo=new TbOrderGoodinfo();
                 orderGoodinfo.setGoodId(shoppingGoodsDto.getGoodsId());
@@ -148,7 +148,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         saveBatch(orders,orders.size());
         orderGoodsService.saveBatch(orderGoodinfos);
         //更新销量和库存
-        goodsService.updateGoodsStock(goodsInfos);
+        //goodsService.updateGoodsStock(goodsInfos);
         return ResultGenerator.genSuccessResult(orderIds);
     }
 }

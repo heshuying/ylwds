@@ -50,6 +50,27 @@ public class PayController {
     }
 
     /**
+     * 担保支付(聚合钱包)
+     */
+    @ApiOperation(value = "担保支付(聚合钱包)")
+    @GetMapping("/ensureTradePurse")
+    public String ensureTradePurse(@ModelAttribute EnsureTradeReq reqBean, HttpServletRequest request) {
+        // 设置登录人
+        NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
+        if(user == null){
+            return "error/error";
+        }
+        if(StringUtils.isBlank(reqBean.getOrderId())){
+            return "error/error";
+        }
+        reqBean.setPayType("3");
+        RequestBase requestBase = payService.ensureTrade(reqBean, request);
+        Map<String,String> req = KJTPayUtil.objToMap(requestBase);
+        request.setAttribute("map", req);
+        return "mall/send";
+    }
+
+    /**
      * 担保支付(协议)
      */
     @ApiOperation(value = "担保支付(协议)")
@@ -103,9 +124,9 @@ public class PayController {
 
     @ResponseBody
     @RequestMapping("/ensureTradeAsyncNotify")
-    public String ensureTradeAsyncNotify(HttpServletRequest request) {
+    public String ensureTradeAsyncNotify(@RequestBody Map<String, Object> params, HttpServletRequest request) {
         log.info("ensureTradeAsyncNotify收到异步回调");
-
+        log.info("notify_type: {}", params.get("notify_type"));
         return KJTConstants.NOTIFY_RET_SUCCESS;
     }
 

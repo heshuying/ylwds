@@ -160,6 +160,13 @@ public class PayServiceBase {
             }
             tradeBean.setPayMethod(KJTPayUtil.objToMap(payBean));
             return tradeBean;
+        }else if("3".equals(reqBean.getPayType())){
+            Map<String,String> payMethod = new HashMap<>();
+            payMethod.put("pay_product_code", "83");
+            payMethod.put("amount", price.toString());
+            payMethod.put("token_valid_minutes", "10");
+            tradeBean.setPayMethod(payMethod);
+            return tradeBean;
         }
 
         return tradeBean;
@@ -177,14 +184,14 @@ public class PayServiceBase {
         VerifyResult verifyResult;
         if(StringUtils.isNotBlank(resultKjt)){
             rp = gson.fromJson(resultKjt, rp.getClass());
-            insertRevLog(requestBase.getRequestNo(), requestBase.getService(), gson.toJson(rp.getBizContent()), resultKjt);
             String bizContent = rp.getBizContent()==null ? null : JSON.toJSONString(rp.getBizContent());
             rp.setBizContent(bizContent);
+            // 记录返回日志
+            insertRevLog(requestBase.getRequestNo(), requestBase.getService(), gson.toJson(rp.getBizContent()), resultKjt);
 
             String signType = rp.getSignType();
             String charset = rp.getCharset();
             String sign = rp.getSign();
-
             if("RSA".equals(signType)){
                 //RSA验签
                 verifyResult = securityService.verify(rp, sign, charset);

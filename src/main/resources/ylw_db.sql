@@ -265,3 +265,5 @@ CREATE TABLE `tb_user_oper`  (
 
 alter table tb_order_goodinfo add goods_attr varchar(80) not null default '' comment '规格'
 alter table tb_order_orderinfo add delivery_id bigint(20) not null default 0 comment '发货地址ID'
+alter table tb_order_orderinfo add pay_type varchar(20) not null default '' comment '支付方式'
+alter table tb_order_orderinfo add delivery_fee decimal(5,2) NOT NULL DEFAULT 0 comment '运费'

@@ -102,9 +102,16 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
     private BigDecimal realPrice;
 
     /**
+     * 运费
+     */
+    private BigDecimal deliveryFee;
+
+    /**
      * 收货地址ID
      */
     private Long deliveryId;
+
+    private String payType;
 
 
     @Override

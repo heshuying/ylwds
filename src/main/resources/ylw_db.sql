@@ -99,18 +99,20 @@ CREATE TABLE `tb_module_detail`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_order_goodinfo`;
 CREATE TABLE `tb_order_goodinfo` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `order_id` bigint(20) NOT NULL COMMENT '订单id',
   `good_id` bigint(20) NOT NULL COMMENT '商品id',
   `number` int(11) DEFAULT NULL COMMENT '下单商品数量',
-  PRIMARY KEY (`order_id`,`good_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `goods_attr` varchar(80) not null default '' comment '规格',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- 订单表
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_order_orderinfo`;
 CREATE TABLE `tb_order_orderinfo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '订单id',
+  `id` int(11) NOT NULL  COMMENT '订单id',
   `status` int(11) DEFAULT NULL COMMENT '订单状态：01-待支付    02-待发货   03-待收货   04-待评价   05-售后中    06-待结算    07-结算中     08-已结算',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `create_time` datetime DEFAULT NULL COMMENT '下单时间',
@@ -125,7 +127,7 @@ CREATE TABLE `tb_order_orderinfo` (
   `gross_profit` decimal(10,2) DEFAULT NULL COMMENT '订单毛利润',
   `buying_price` decimal(10,2) DEFAULT NULL COMMENT '供应商价格',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='订单表（主）';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='订单表（主）';
 
 -- ----------------------------
 -- 结算表

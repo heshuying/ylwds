@@ -13,11 +13,6 @@ public class ShoppingGoodsDto {
     private Long id;
 
     /**
-     * 用户主键id
-     */
-    private Long userId;
-
-    /**
      * 关联商品id
      */
     private Long goodsId;

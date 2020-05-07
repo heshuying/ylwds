@@ -7,10 +7,17 @@ import lombok.Data;
  */
 @Data
 public class BuyFormDto {
+    /**
+     * 商品ID
+     */
     private Long goodsId;
-    private Long userId;
-
+    /**
+     * 商品规格
+     */
     private String goodsAttr;
+    /**
+     * 销量
+     */
     private Integer goodsNum;
 
 }

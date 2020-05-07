@@ -159,8 +159,7 @@ public class MyController {
     @ResponseBody
     public Result addShoppingCart(@RequestBody BuyFormDto buyFormDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        buyFormDto.setUserId(user.getUserId());
-        return shoppingCartService.addShoppingCart(buyFormDto);
+        return shoppingCartService.addShoppingCart(user.getUserId(), buyFormDto);
     }
 
     @ApiOperation(value = "购物车列表")
@@ -193,7 +192,7 @@ public class MyController {
     public Result comfirmOrder(@RequestBody OrderFormDto orderFormDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
 
-        return orderinfoService.confirmOrder(orderFormDto);
+        return orderinfoService.confirmOrder(user.getUserId(), orderFormDto);
     }
 
     @ApiOperation(value = "下单")

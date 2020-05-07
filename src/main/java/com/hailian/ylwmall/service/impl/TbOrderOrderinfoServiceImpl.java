@@ -51,7 +51,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     @Autowired
     private TbShoppingCartService shoppingCartService;
     @Override
-    public Result confirmOrder(OrderFormDto dto) {
+    public Result confirmOrder(Long userId, OrderFormDto dto) {
         if(dto==null||dto.getGoods()==null){
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }

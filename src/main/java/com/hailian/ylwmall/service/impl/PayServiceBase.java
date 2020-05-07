@@ -56,7 +56,7 @@ public class PayServiceBase {
     @Autowired
     TbPayRevlogDao payRevlogDao;
     @Autowired
-    NewBeeMallGoodsMapper goodsMapper;
+    TbGoodsInfoMapper goodsMapper;
 
     Gson gson = new Gson();
 

@@ -96,7 +96,6 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         List<TbOrderOrderinfo> orders=new ArrayList<>();
         List<TbOrderGoodinfo> orderGoodinfos=new ArrayList<>();
         List<Long> orderIds=new ArrayList<>();
-        List<StockNumDTO> goodsInfos=new ArrayList<>();
 
         for (Long supplier : supplierIds){
             List<ShoppingGoodsDto> currentSupplierGoods=orderGoods.stream().filter(
@@ -131,12 +130,6 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 orderGoodinfo.setOrderId(orderId);
                 orderGoodinfo.setNumber(shoppingGoodsDto.getGoodsCount());
                 orderGoodinfos.add(orderGoodinfo);
-
-                //更新产品的库存和销量
-                StockNumDTO upGoods=new StockNumDTO();
-                upGoods.setGoodsId(shoppingGoodsDto.getGoodsId());
-                upGoods.setGoodsCount(shoppingGoodsDto.getGoodsCount());
-                goodsInfos.add(upGoods);
             }
             order.setCutDown(BigDecimal.ZERO);
             order.setBuyingPrice(supplierFee);

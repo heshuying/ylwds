@@ -107,6 +107,10 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
                 List<ShoppingGoodsDto> currSuppGoods=list.stream().filter(
                         m->curr.compareTo(m.getSupplierId())==0
                 ).collect(Collectors.toList());
+                for (ShoppingGoodsDto goodsDto:currSuppGoods){
+                    goodsDto.setTotal(goodsDto.getPrice()
+                            .multiply(new BigDecimal(String.valueOf(goodsDto.getGoodsCount()) )));
+                }
                 TbUser currenUser=users.stream()
                         .filter(m->m.getUserId().compareTo(curr)==0).findAny().orElse(null);
                 SupplierCartDto supplierCartDto=new SupplierCartDto();
@@ -117,7 +121,7 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
             }
             respDto.setList(supplierCartDtos);
             double total=list.stream().mapToDouble(
-                    m->m.getPrice().multiply(new BigDecimal(String.valueOf(m.getGoodsCount()) )).doubleValue()
+                    m->m.getTotal().doubleValue()
             ).sum();
             double expressFee=list.stream().mapToDouble(
                     m->m.getTransitMoney().doubleValue()

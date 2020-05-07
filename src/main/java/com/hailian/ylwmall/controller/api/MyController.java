@@ -182,10 +182,10 @@ public class MyController {
     @ApiOperation(value = "删除购物车列表")
     @PostMapping("/shoppingCart/del")
     @ResponseBody
-    public Result updateNewBeeMallShoppingCartItem(@PathVariable("newBeeMallShoppingCartItemId") Long newBeeMallShoppingCartItemId,
+    public Result updateNewBeeMallShoppingCartItem(@PathVariable("shoppingCartItemId") Long shoppingCartItemId,
                                                    HttpSession httpSession) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        return shoppingCartService.delShoppingCart(newBeeMallShoppingCartItemId);
+        return shoppingCartService.delShoppingCart(shoppingCartItemId);
     }
 
     @ApiOperation(value = "下单确认")

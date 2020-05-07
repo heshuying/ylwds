@@ -42,10 +42,10 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
     @Autowired
     private TbUserService userService;
     @Override
-    public Result addShoppingCart(BuyFormDto dto) {
+    public Result addShoppingCart(Long userId, BuyFormDto dto) {
         if(dto==null
                 ||dto.getGoodsId()==null||dto.getGoodsId()<=0
-                ||dto.getUserId()==null||dto.getGoodsId()<=0){
+                ||userId==null||dto.getGoodsId()<=0){
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }
         //获取商品
@@ -60,7 +60,7 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
         //添加购物车
         TbShoppingCart exits=baseMapper.selectOne(
                 new QueryWrapper<TbShoppingCart>()
-                        .eq("user_id",dto.getUserId())
+                        .eq("user_id",userId)
                 .eq("goods_id",dto.getGoodsId())
                 .eq("goods_attr",dto.getGoodsAttr())
         );

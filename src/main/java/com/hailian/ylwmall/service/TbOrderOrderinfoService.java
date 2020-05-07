@@ -16,7 +16,7 @@ import com.hailian.ylwmall.util.Result;
  * @since 2020-05-02
  */
 public interface TbOrderOrderinfoService extends IService<TbOrderOrderinfo> {
-    Result confirmOrder(OrderFormDto dto);
+    Result confirmOrder(Long userId, OrderFormDto dto);
     Result getOrderInfo(Long orderNo);
     Result doOrder(Long userId, OrderSubmitDto dto);
 }

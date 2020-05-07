@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.gson.Gson;
 import com.hailian.ylwmall.common.Constants;
+import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.common.pay.PayStatusEnum;
 import com.hailian.ylwmall.common.pay.ProductCodeEnum;
@@ -13,6 +14,7 @@ import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
+import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbOrderPay;
 import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.entity.order.OrderInfo;
@@ -36,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 支付服务类
@@ -166,6 +169,10 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
     }
 
+    /**
+     * 聚合钱包支付
+     */
+    @Override
     public RequestBase ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
@@ -225,9 +232,6 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
     /**
      * 协议支付
-     * @param reqBean
-     * @param request
-     * @return
      */
     @Override
     @Transactional
@@ -401,9 +405,12 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return ResultGenerator.genSuccessResult();
     }
 
-    public Result ensureTradeAsyncNotify(String orderId){
+    @Override
+    @Transactional
+    public Result ensureTradeAsyncNotify(Map<String, Object> params){
+        // 更新支付状态
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
-                .eq("order_id", orderId)
+                .eq("out_trade_no", params.get("outer_trade_no"))
                 .eq("is_deleted", "0"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
@@ -412,6 +419,24 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
         orderPay.setUpdateTime(new Date());
         orderPayDao.updateById(orderPay);
+
+        // 更新订单状态为待发货
+        OrderInfo info = new OrderInfo();
+        info.setId(orderPay.getOrderId());
+        info.setUpdateTime(new Date());
+        info.setStatus(OrderStatusEnum.OREDER_PRE_OUT.getOrderStatus());
+        orderInfoMapper.updateByPrimaryKeySelective(info);
+
+        // 更新库存
+        List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderPay.getOrderId());
+        List<StockNumDTO> list = orderGoodInfoVos.stream().map(m -> {
+            StockNumDTO stockNumDTO = new StockNumDTO();
+            stockNumDTO.setGoodsId(m.getGoodId());
+            stockNumDTO.setGoodsCount(m.getNumber());
+            return stockNumDTO;
+        }).collect(Collectors.toList());
+        goodsMapper.updateStockNum(list);
+
         return ResultGenerator.genSuccessResult();
     }
 

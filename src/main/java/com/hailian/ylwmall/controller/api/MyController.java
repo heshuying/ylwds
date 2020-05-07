@@ -174,24 +174,23 @@ public class MyController {
     @ApiOperation(value = "更新购物车商品数量")
     @PostMapping("/shoppingCart/update")
     @ResponseBody
-    public Result updateNewBeeMallShoppingCartItem(@RequestBody ShoppingGoodsUpdateDto updateDto) {
+    public Result updateShoppingCartItem(@RequestBody ShoppingGoodsUpdateDto updateDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         return shoppingCartService.updateShoppingNum(updateDto);
     }
 
     @ApiOperation(value = "删除购物车列表")
-    @PostMapping("/shoppingCart/del")
+    @PostMapping("/shoppingCart/del/{shoppingCartItemId}")
     @ResponseBody
-    public Result updateNewBeeMallShoppingCartItem(@PathVariable("newBeeMallShoppingCartItemId") Long newBeeMallShoppingCartItemId,
-                                                   HttpSession httpSession) {
+    public Result updateShoppingCartItem(@PathVariable("shoppingCartItemId") Long shoppingCartItemId) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        return shoppingCartService.delShoppingCart(newBeeMallShoppingCartItemId);
+        return shoppingCartService.delShoppingCart(shoppingCartItemId);
     }
 
     @ApiOperation(value = "下单确认")
     @PostMapping("/order/confirm")
     @ResponseBody
-    public Result settlePage(@RequestBody OrderFormDto orderFormDto) {
+    public Result comfirmOrder(@RequestBody OrderFormDto orderFormDto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
 
         return orderinfoService.confirmOrder(orderFormDto);
@@ -200,8 +199,16 @@ public class MyController {
     @ApiOperation(value = "下单")
     @PostMapping("/order")
     @ResponseBody
-    public Result settlePage(@RequestBody OrderSubmitDto dto) {
+    public Result doOrder(@RequestBody OrderSubmitDto dto) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         return orderinfoService.doOrder(user.getUserId(),dto);
+    }
+
+    @ApiOperation(value = "根据订单号获取订单")
+    @PostMapping("/order/info/{orderNo}")
+    @ResponseBody
+    public Result orderInfo(@PathVariable("orderNo") Long orderNo) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        return orderinfoService.getOrderInfo(orderNo);
     }
 }

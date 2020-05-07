@@ -5,6 +5,7 @@ import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.BuyRespDto;
+import com.hailian.ylwmall.dto.OrderDetailDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderRespDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
@@ -18,6 +19,7 @@ import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hailian.ylwmall.service.TbShoppingCartService;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import com.hailian.ylwmall.util.SystemUtil;
@@ -46,6 +48,8 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     private GoodsService goodsService;
     @Autowired
     private TbOrderGoodinfoService orderGoodsService;
+    @Autowired
+    private TbShoppingCartService shoppingCartService;
     @Override
     public Result confirmOrder(OrderFormDto dto) {
         if(dto==null||dto.getGoods()==null){
@@ -82,8 +86,39 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     }
 
     @Override
-    public Result payOrder(String orderNo) {
-        return null;
+    public Result getOrderInfo(Long orderNo) {
+        OrderDetailDto orderDetailDto=new OrderDetailDto();
+        TbOrderOrderinfo orderInfo=baseMapper.selectById(orderNo);
+        List<TbOrderGoodinfo> orderGoods=orderGoodsService.list(
+                new QueryWrapper<TbOrderGoodinfo>().eq("order_id",orderNo)
+        );
+        List<TbGoodsInfo> goodsInfos=goodsService.list(
+                new QueryWrapper<TbGoodsInfo>().in("goods_id",
+                        orderGoods.stream().map(m->m.getGoodId()).collect(Collectors.toList()))
+        );
+        orderDetailDto.setPayType(orderInfo.getPayType());
+        orderDetailDto.setTotal(orderInfo.getRealPrice());
+        orderDetailDto.setExpressFee(orderInfo.getDeliveryFee());
+        orderDetailDto.setOrderNo(orderInfo.getId());
+        List<ShoppingGoodsDto> list=new ArrayList<>();
+        for (TbOrderGoodinfo orderGoodinfo:orderGoods){
+            ShoppingGoodsDto goodsDto=new ShoppingGoodsDto();
+            TbGoodsInfo goodsInfo=goodsInfos.stream().filter(
+                    m->m.getGoodsId().compareTo(orderGoodinfo.getGoodId())==0
+            ).findAny().orElse(null);
+            if(goodsInfo!=null){
+                BeanUtils.copyProperties(goodsInfo, goodsDto);
+                goodsDto.setSupplierId(goodsInfo.getCreateUser());
+            }
+            goodsDto.setGoodsAttr(orderGoodinfo.getGoodsAttr());
+            goodsDto.setGoodsCount(orderGoodinfo.getNumber());
+            goodsDto.setTotal(goodsDto.getPrice()
+                    .multiply(new BigDecimal(String.valueOf(goodsDto.getGoodsCount()) )));
+            list.add(goodsDto);
+
+        }
+        orderDetailDto.setList(list);
+        return ResultGenerator.genSuccessResult(orderDetailDto);
     }
 
     @Transactional
@@ -96,7 +131,6 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         List<TbOrderOrderinfo> orders=new ArrayList<>();
         List<TbOrderGoodinfo> orderGoodinfos=new ArrayList<>();
         List<Long> orderIds=new ArrayList<>();
-        List<StockNumDTO> goodsInfos=new ArrayList<>();
 
         for (Long supplier : supplierIds){
             List<ShoppingGoodsDto> currentSupplierGoods=orderGoods.stream().filter(
@@ -110,7 +144,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             order.setSupplierId(supplier);
             order.setDeliveryId(dto.getDeliveryId());
             order.setStatus(OrderStatusEnum.ORDER_PRE_PAY.getOrderStatus());
-
+            order.setPayType(dto.getPayType());
             //供应商总价
             BigDecimal supplierFee=BigDecimal.ZERO;
             BigDecimal expressFee=BigDecimal.ZERO;
@@ -131,25 +165,22 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 orderGoodinfo.setOrderId(orderId);
                 orderGoodinfo.setNumber(shoppingGoodsDto.getGoodsCount());
                 orderGoodinfos.add(orderGoodinfo);
-
-                //更新产品的库存和销量
-                StockNumDTO upGoods=new StockNumDTO();
-                upGoods.setGoodsId(shoppingGoodsDto.getGoodsId());
-                upGoods.setGoodsCount(shoppingGoodsDto.getGoodsCount());
-                goodsInfos.add(upGoods);
             }
             order.setCutDown(BigDecimal.ZERO);
             order.setBuyingPrice(supplierFee);
             order.setRealPrice(supplierFee.add(plateFee).add(expressFee));
             order.setTotalPrice(originFee);
             order.setGrossProfit(plateFee);
+            order.setDeliveryFee(expressFee);
             orders.add(order);
             orderIds.add(orderId);
         }
         saveBatch(orders,orders.size());
         orderGoodsService.saveBatch(orderGoodinfos);
-        //更新销量和库存
-        //goodsService.updateGoodsStock(goodsInfos);
+        //清理购物车
+        shoppingCartService.cleanShoppingCart(userId,
+                orderGoods.stream().map(m->m.getGoodsId()).collect(Collectors.toList()) );
+
         return ResultGenerator.genSuccessResult(orderIds);
     }
 }

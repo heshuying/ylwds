@@ -47,4 +47,9 @@ public class ShoppingGoodsDto {
      * 运费
      */
     private BigDecimal transitMoney;
+
+    /**
+     * 合计：单价*数量
+     */
+    private BigDecimal total;
 }

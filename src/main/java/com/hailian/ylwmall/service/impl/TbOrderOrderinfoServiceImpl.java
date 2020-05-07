@@ -19,6 +19,7 @@ import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hailian.ylwmall.service.TbShoppingCartService;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import com.hailian.ylwmall.util.SystemUtil;
@@ -47,6 +48,8 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     private GoodsService goodsService;
     @Autowired
     private TbOrderGoodinfoService orderGoodsService;
+    @Autowired
+    private TbShoppingCartService shoppingCartService;
     @Override
     public Result confirmOrder(OrderFormDto dto) {
         if(dto==null||dto.getGoods()==null){
@@ -174,8 +177,10 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         }
         saveBatch(orders,orders.size());
         orderGoodsService.saveBatch(orderGoodinfos);
-        //更新销量和库存
-        //goodsService.updateGoodsStock(goodsInfos);
+        //清理购物车
+        shoppingCartService.cleanShoppingCart(userId,
+                orderGoods.stream().map(m->m.getGoodsId()).collect(Collectors.toList()) );
+
         return ResultGenerator.genSuccessResult(orderIds);
     }
 }

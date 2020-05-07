@@ -143,6 +143,21 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
     }
 
     @Override
+    public Result cleanShoppingCart(Long userId, List<Long> goodsIds) {
+        baseMapper.delete(new QueryWrapper<TbShoppingCart>()
+                .eq("user_id",userId)
+        .in("goods_id",goodsIds));
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @Override
+    public Result cleanShoppingCart(Long userId) {
+        baseMapper.delete(new QueryWrapper<TbShoppingCart>()
+        .eq("user_id",userId));
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @Override
     public Result updateShoppingNum(ShoppingGoodsUpdateDto updateDto) {
         if(updateDto==null||updateDto.getId()==null|| updateDto.getGoodsCount()<0){
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());

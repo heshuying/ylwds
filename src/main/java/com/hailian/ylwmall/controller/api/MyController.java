@@ -180,7 +180,7 @@ public class MyController {
     }
 
     @ApiOperation(value = "删除购物车列表")
-    @PostMapping("/shoppingCart/del")
+    @PostMapping("/shoppingCart/del/{shoppingCartItemId}")
     @ResponseBody
     public Result updateShoppingCartItem(@PathVariable("shoppingCartItemId") Long shoppingCartItemId,
                                                    HttpSession httpSession) {

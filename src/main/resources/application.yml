@@ -96,7 +96,7 @@ kjt:
   tradeRefundAsyncNotify: http://10.190.176.150:8888/api/pay/tradeRefundAsyncNotify
   transferToAccountAsyncNotify: http://10.190.176.150:8888/api/pay/transferToAccountAsyncNotify
   ensureTradeAsyncNotify: http://ylwbtb.hoptest.haier.net/api/pay/ensureTradeAsyncNotify
-  ensureTradeReturnUrl: http://ylwbtb.hoptest.haier.net
+  ensureTradeReturnUrl: http://ylwbtb.hoptest.haier.net/outer/pay/payFinish
   recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
   verifyFlag: 0
   productCode: 10311

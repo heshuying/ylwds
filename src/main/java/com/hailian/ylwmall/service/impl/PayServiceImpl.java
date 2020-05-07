@@ -166,6 +166,63 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
     }
 
+    public RequestBase ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request){
+        // 生成支付订单号
+        String ip = GetCilentIP.getIpAddr(request);
+        NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
+        List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
+        // 删除历史未支付记录
+        TbOrderPay orderPay = new TbOrderPay();
+        orderPay.setOrderId(Long.parseLong(reqBean.getOrderId()));
+        orderPay.setIsDeleted(1);
+        orderPay.setUpdateTime(new Date());
+        orderPayDao.update(orderPay, new UpdateWrapper<TbOrderPay>().eq("order_id", reqBean.getOrderId()));
+        // 新增支付记录
+        String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+        // 保存支付表
+        orderPay = new TbOrderPay();
+        orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
+        orderPay.setOrderId(orderInfo.getId());
+        orderPay.setOutTradeNo(outTradeNo);
+        orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
+        orderPay.setPayTime(new Date());
+        orderPayDao.insert(orderPay);
+
+        // 交易信息
+        TradeInfo tradeInfo = new TradeInfo();
+        tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
+        tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
+        tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
+        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
+        tradeInfo.setQuantity("1");//数量
+        tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
+        tradeInfo.setPayeeIdentityType("1");
+        tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
+        tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
+
+        // 业务信息
+        EnsureTradeBean tradeBizContent = new EnsureTradeBean();
+        tradeBizContent.setPayerIdentityType("1");
+        tradeBizContent.setPayerPlatformType("1");
+        tradeBizContent.setPayerIdentity("anonymous");
+        tradeBizContent.setPayerIp(ip);
+        tradeBizContent.setBizProductCode(ProductCodeEnum.ENSURE_TRADE_20702.getCode());
+        tradeBizContent.setCashierType("WEB");
+        tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
+        tradeBizContent.setTradeInfo(tradeInfo);
+        // 支付方式设置
+        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), orderInfo.getRealPrice());
+        // 终端信息设置
+        Map<String,String> terminalInfo = new HashMap<>();
+        terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
+        terminalInfo.put("ip",ip);
+        tradeBizContent.setTerminalInfo(terminalInfo);
+        tradeBizContent.setReturnUrl(kjtConfig.getEnsureTradeReturnUrl()); // 同步返回地址
+
+        return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
+    }
+
     /**
      * 协议支付
      * @param reqBean
@@ -343,6 +400,21 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         }
         return ResultGenerator.genSuccessResult();
     }
+
+    public Result ensureTradeAsyncNotify(String orderId){
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", orderId)
+                .eq("is_deleted", "0"));
+        if(orderPay == null){
+            return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+
+        orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
+        orderPay.setUpdateTime(new Date());
+        orderPayDao.updateById(orderPay);
+        return ResultGenerator.genSuccessResult();
+    }
+
     /**
      * 商户验签
      * @param verifyData

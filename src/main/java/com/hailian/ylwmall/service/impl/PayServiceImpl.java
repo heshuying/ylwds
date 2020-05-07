@@ -268,7 +268,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
         tradeInfo.setPayeeIdentityType("1");
         tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
-        tradeInfo.setNotifyUrl(kjtConfig.getInstantTradeAsyncNotify());//服务器异步通知地址
+        tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
 
         // 业务信息
         EnsureTradeBean tradeBizContent = new EnsureTradeBean();
@@ -287,6 +287,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
         terminalInfo.put("ip",ip);
         tradeBizContent.setTerminalInfo(terminalInfo);
+        tradeBizContent.setReturnUrl(kjtConfig.getEnsureTradeReturnUrl()); // 同步返回地址
 
         RequestBase requestBase = genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
         ResponseParameter result = callKjt(requestBase);
@@ -297,7 +298,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
-            return ResultGenerator.genFailResult(result.getMsg());
+            return ResultGenerator.genFailResult(StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg());
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 支付成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
@@ -325,6 +326,9 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
     }
 
+    /**
+     * 交易达成
+     */
     @Override
     public Result tradeSettle(String orderId, Long userId){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
@@ -349,7 +353,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
-            return ResultGenerator.genFailResult(result.getMsg());
+            return ResultGenerator.genFailResult(StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg() );
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
@@ -363,6 +367,9 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return ResultGenerator.genFailResult("交易达成未成功");
     }
 
+    /**
+     * 协议支付确认
+     */
     @Override
     public Result agreementPayConfirm(Long userId, String orderId, String phoneCheckCode){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
@@ -385,7 +392,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
-            return ResultGenerator.genFailResult(result.getMsg());
+            return ResultGenerator.genFailResult(StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg() );
         }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 成功
             JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());

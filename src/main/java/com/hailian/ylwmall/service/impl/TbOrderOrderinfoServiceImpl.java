@@ -140,6 +140,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             Long orderId= SystemUtil.buildOrderNo(supplier);
             order.setId( orderId);
             order.setCreateTime(new Date());
+            order.setUpdateTime(new Date());
             order.setCustomerId(userId);
             order.setSupplierId(supplier);
             order.setDeliveryId(dto.getDeliveryId());

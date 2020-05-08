@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
+import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.util.KJTPayUtil;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -147,9 +150,16 @@ public class PayController {
 
     @ResponseBody
     @RequestMapping("/ensureTradeAsyncNotify")
-    public String ensureTradeAsyncNotify(@RequestBody Map<String, Object> params, HttpServletRequest request) {
-        log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(params));
-        log.info("notify_type: {}", params.get("notify_type"));
+    public String ensureTradeAsyncNotify(EnsureTradeCallBackDto callBackDto, HttpServletRequest request) {
+        log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(callBackDto));
+        log.info("method: " + request.getMethod());
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()){
+            log.info("参数名：" + parameterNames.nextElement());
+        }
+//        log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(params));
+//        log.info("notify_type: {}", params.get("notify_type"));
+        Map<String,Object> params = new HashMap<>();
         payService.ensureTradeAsyncNotify(params);
         return KJTConstants.NOTIFY_RET_SUCCESS;
     }

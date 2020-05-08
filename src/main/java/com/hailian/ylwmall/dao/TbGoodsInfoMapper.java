@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface NewBeeMallGoodsMapper extends BaseMapper<TbGoodsInfo> {
+public interface TbGoodsInfoMapper extends BaseMapper<TbGoodsInfo> {
     int deleteByPrimaryKey(Long goodsId);
 
 //    int insert(NewBeeMallGoods record);

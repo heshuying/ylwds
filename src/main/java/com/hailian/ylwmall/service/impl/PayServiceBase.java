@@ -55,6 +55,8 @@ public class PayServiceBase {
     TbPaySenlogDao paySenlogDao;
     @Autowired
     TbPayRevlogDao payRevlogDao;
+    @Autowired
+    TbGoodsInfoMapper goodsMapper;
 
     Gson gson = new Gson();
 

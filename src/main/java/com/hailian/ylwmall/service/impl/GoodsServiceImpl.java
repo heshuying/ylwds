@@ -2,7 +2,7 @@ package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.common.B2BMallException;
-import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
+import com.hailian.ylwmall.dao.TbGoodsInfoMapper;
 import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.common.ServiceResultEnum;
@@ -25,10 +25,10 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class GoodsServiceImpl extends ServiceImpl<NewBeeMallGoodsMapper, TbGoodsInfo> implements GoodsService {
+public class GoodsServiceImpl extends ServiceImpl<TbGoodsInfoMapper, TbGoodsInfo> implements GoodsService {
 
     @Autowired
-    private NewBeeMallGoodsMapper goodsMapper;
+    private TbGoodsInfoMapper goodsMapper;
     @Autowired
     private TbUserDao tbUserDao;
 

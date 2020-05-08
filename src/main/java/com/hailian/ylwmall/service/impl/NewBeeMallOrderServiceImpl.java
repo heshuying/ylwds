@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.controller.vo.OrderInfoVo;
-import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
+import com.hailian.ylwmall.dao.TbGoodsInfoMapper;
 import com.hailian.ylwmall.dao.NewBeeMallOrderItemMapper;
 import com.hailian.ylwmall.dao.NewBeeMallOrderMapper;
 import com.hailian.ylwmall.dao.NewBeeMallShoppingCartItemMapper;
@@ -53,7 +53,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Autowired
     private NewBeeMallShoppingCartItemMapper newBeeMallShoppingCartItemMapper;
     @Autowired
-    private NewBeeMallGoodsMapper newBeeMallGoodsMapper;
+    private TbGoodsInfoMapper newBeeMallGoodsMapper;
 
 
 

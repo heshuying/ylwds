@@ -2,7 +2,7 @@ package com.hailian.ylwmall.service.impl;
 
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dao.IndexConfigMapper;
-import com.hailian.ylwmall.dao.NewBeeMallGoodsMapper;
+import com.hailian.ylwmall.dao.TbGoodsInfoMapper;
 import com.hailian.ylwmall.entity.IndexConfig;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.util.BeanUtil;
@@ -25,7 +25,7 @@ public class NewBeeMallIndexConfigServiceImpl implements NewBeeMallIndexConfigSe
     private IndexConfigMapper indexConfigMapper;
 
     @Autowired
-    private NewBeeMallGoodsMapper goodsMapper;
+    private TbGoodsInfoMapper goodsMapper;
 
     @Override
     public PageResult getConfigsPage(PageQueryUtil pageUtil) {

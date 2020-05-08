@@ -1,5 +1,6 @@
 package com.hailian.ylwmall.controller.api;
 
+import com.alibaba.fastjson.JSON;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
@@ -64,7 +65,7 @@ public class PayController {
             return "error/error";
         }
         reqBean.setPayType("3");
-        RequestBase requestBase = payService.ensureTrade(reqBean, request);
+        RequestBase requestBase = payService.ensureTradePurse(reqBean, request);
         Map<String,String> req = KJTPayUtil.objToMap(requestBase);
         request.setAttribute("map", req);
         return "mall/send";
@@ -125,8 +126,9 @@ public class PayController {
     @ResponseBody
     @RequestMapping("/ensureTradeAsyncNotify")
     public String ensureTradeAsyncNotify(@RequestBody Map<String, Object> params, HttpServletRequest request) {
-        log.info("ensureTradeAsyncNotify收到异步回调");
+        log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(params));
         log.info("notify_type: {}", params.get("notify_type"));
+        payService.ensureTradeAsyncNotify(params);
         return KJTConstants.NOTIFY_RET_SUCCESS;
     }
 

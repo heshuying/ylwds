@@ -170,7 +170,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             order.setCutDown(BigDecimal.ZERO);
             order.setBuyingPrice(supplierFee);
             order.setRealPrice(supplierFee.add(plateFee).add(expressFee));
-            order.setTotalPrice(originFee);
+            order.setTotalPrice(supplierFee.add(plateFee).add(expressFee));
             order.setGrossProfit(plateFee);
             order.setDeliveryFee(expressFee);
             orders.add(order);

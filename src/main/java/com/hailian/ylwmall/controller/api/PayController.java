@@ -102,6 +102,9 @@ public class PayController {
         if(user == null){
             return ResultGenerator.genFailResult("用户未登录");
         }
+        if(StringUtils.isBlank(orderId)){
+            return ResultGenerator.genFailResult("请求参数错误");
+        }
 
         Result result = payService.tradeSettle(orderId, user.getUserId());
         return result;
@@ -120,6 +123,25 @@ public class PayController {
         }
 
         Result result = payService.agreementPayConfirm(user.getUserId(), orderId, phoneCheckCode);
+        return result;
+    }
+
+    /**
+     * 退款/ 担保撤销网关接口
+     */
+    @ResponseBody
+    @ApiOperation(value = "退款/ 担保撤销网关接口")
+    @GetMapping("/tradeRefund/{orderId}")
+    public Result tradeRefund(@PathVariable String orderId, HttpServletRequest request) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
+        if(user == null){
+            return ResultGenerator.genFailResult("用户未登录");
+        }
+        if(StringUtils.isBlank(orderId)){
+            return ResultGenerator.genFailResult("请求参数错误");
+        }
+
+        Result result = payService.tradeRefund(orderId, user.getUserId());
         return result;
     }
 

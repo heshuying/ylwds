@@ -9,7 +9,8 @@ public enum PayStatusEnum {
     PAY_ING(0, "支付中"),
     PAY_WAIT(1, "待付款"),
     PAY_WAIT_CONFIRM(2, "待达成"),
-    PAY_SUCCESS(3, "支付成功");
+    PAY_SUCCESS(3, "支付成功"),
+    PAY_REFUNDED(4, "已退款");
 
     private int payStatus;
 

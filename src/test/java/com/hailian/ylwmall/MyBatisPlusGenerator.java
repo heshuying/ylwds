@@ -62,7 +62,7 @@ public class MyBatisPlusGenerator {
         strategy.setEntityLombokModel(true);
         strategy.setRestControllerStyle(true);
 
-        strategy.setInclude(new String[]{"tb_pay_senlog","tb_pay_revlog"}); // 排除生成的表，与setInclude二选一配置
+        strategy.setInclude(new String[]{"tb_pay_refund"}); // 排除生成的表，与setInclude二选一配置
         mpg.setStrategy(strategy);
 
         // 包配置

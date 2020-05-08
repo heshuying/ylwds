@@ -21,6 +21,11 @@ public interface PayService {
 
     Result agreementPayConfirm(Long userId, String orderId, String phoneCheckCode);
 
+    Result tradeRefund(String orderId, Long userId);
+
     @Transactional
     Result ensureTradeAsyncNotify(Map<String, Object> params);
+
+    @Transactional
+    Result tradeRefundAsyncNotify(Map<String, Object> params);
 }

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -86,6 +87,8 @@ public class TbOrderPay extends Model<TbOrderPay> {
     private String needSmsconfirm;
     // 删除标识字段(0-未删除 1-已删除)
     private int isDeleted;
+    // 支付金额
+    private BigDecimal payMoney;
 
     @Override
     protected Serializable pkVal() {

@@ -149,14 +149,11 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             //供应商总价
             BigDecimal supplierFee=BigDecimal.ZERO;
             BigDecimal expressFee=BigDecimal.ZERO;
-            BigDecimal originFee=BigDecimal.ZERO;
             BigDecimal plateFee=BigDecimal.ZERO;
             for(ShoppingGoodsDto shoppingGoodsDto:currentSupplierGoods){
                 supplierFee=supplierFee.add(shoppingGoodsDto.getSellingPrice().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
                 expressFee=expressFee.add(shoppingGoodsDto.getTransitMoney().multiply(new BigDecimal(
-                        String.valueOf(shoppingGoodsDto.getGoodsCount()))));
-                originFee=originFee.add(shoppingGoodsDto.getOriginalPrice().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
                 plateFee=plateFee.add(shoppingGoodsDto.getProfit().multiply(new BigDecimal(
                         String.valueOf(shoppingGoodsDto.getGoodsCount()))));
@@ -170,7 +167,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             order.setCutDown(BigDecimal.ZERO);
             order.setBuyingPrice(supplierFee);
             order.setRealPrice(supplierFee.add(plateFee).add(expressFee));
-            order.setTotalPrice(originFee);
+            order.setTotalPrice(supplierFee.add(plateFee).add(expressFee));
             order.setGrossProfit(plateFee);
             order.setDeliveryFee(expressFee);
             orders.add(order);

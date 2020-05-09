@@ -53,15 +53,9 @@ public class FileOperController {
     @ApiOperation(value = "上传文件")
     @PostMapping("/uploadFile")
     public Result uploadFile(@RequestParam("file") MultipartFile file){
-        String fileName = fileService.storeFile(file);
+        String filePath = saveFile(file);
 
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
-                .path(fileName)
-                .toUriString();
-
-        return ResultGenerator.genSuccessResult(new UploadFileResponse(fileName, fileDownloadUri,
-                file.getContentType(), file.getSize())) ;
+        return ResultGenerator.genSuccessResult(filePath) ;
     }
 
     @ApiOperation(value = "上传多文件")

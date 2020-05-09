@@ -1,5 +1,6 @@
 package com.hailian.ylwmall.service;
 
+import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.util.Result;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
@@ -23,8 +24,10 @@ public interface PayService {
 
     Result tradeRefund(String orderId, Long userId);
 
+    Result tradeQuery(String orderId);
+
     @Transactional
-    Result ensureTradeAsyncNotify(Map<String, Object> params);
+    Boolean ensureTradeAsyncNotify(EnsureTradeCallBackDto reqBean);
 
     @Transactional
     Result tradeRefundAsyncNotify(Map<String, Object> params);

@@ -8,12 +8,14 @@ public class KJTConstants {
     public static final String SIGN_TYPE_RSA = "RSA";
     public static final String SIGN_TYPE_MD5 = "MD5";
     public static final String NOTIFY_RET_SUCCESS = "success";
+    public static final String NOTIFY_RET_FAIL = "fail";
 
     /**服务名*/
     public static final String SERVICE_ENSURE_TRADE = "ensure_trade"; // 担保交易
     public static final String SERVICE_TRADE_SETTLE = "trade_settle"; // 交易达成
     public static final String SERVICE_AGREEMENT_PAY_CONFIRM = "agreement_pay_confirm"; // 协议支付/ 直接支付-支付确认
     public static final String SERVICE_TRADE_REFUND = "trade_refund"; // 退款/ 担保撤销网关接口
+    public static final String SERVICE_TRADE_QUERY = "trade_query"; // 交易查询
 
     public static class PayerIdentityType {//快捷通会员标识类型
         public static final String PAYER_IDENTITY_TYPE_1 = "1";//快捷通会员id

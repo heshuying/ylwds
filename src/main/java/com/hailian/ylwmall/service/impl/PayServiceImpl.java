@@ -14,12 +14,14 @@ import com.hailian.ylwmall.common.pay.ProductCodeEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
+import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbOrderPay;
 import com.hailian.ylwmall.entity.TbPayRefund;
 import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.entity.order.OrderInfo;
+import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.util.*;
 import com.kjtpay.gateway.common.domain.VerifyResult;
@@ -535,15 +537,60 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     }
 
     @Override
-    @Transactional
-    public Result ensureTradeAsyncNotify(Map<String, Object> params){
-        // 更新支付状态
-        log.info("接收到支付回调：{}", JSON.toJSONString(params));
+    public Result tradeQuery(String orderId){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
-                .eq("out_trade_no", params.get("outer_trade_no"))
+                .eq("order_id", orderId)
                 .eq("is_deleted", "0"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("out_trade_no", orderPay.getOutTradeNo());
+        RequestBase requestBase = genRequestBase(gson.toJson(reqMap), orderPay.getOutTradeNo(), KJTConstants.SERVICE_TRADE_QUERY);
+        ResponseParameter result = callKjt(requestBase);
+        if(result == null){
+            return ResultGenerator.genFailResult("交易查询接口请求失败");
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付失败
+            String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
+            log.error("交易查询接口请求失败: {}", failMsg);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 成功
+            log.info("交易查询接口请求成功：{}", gson.toJson(result));
+            JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+            // 签约成功保存token_id
+            return ResultGenerator.genSuccessResult(jsonObject);
+        }
+        return ResultGenerator.genFailResult("交易查询接口请求失败");
+    }
+
+    @Override
+    @Transactional
+    public Boolean ensureTradeAsyncNotify(EnsureTradeCallBackDto reqBean){
+        log.info("接收到支付回调：{}", JSON.toJSONString(reqBean));
+        VerifyResult verifyResult;
+        if("RSA".equals(reqBean.getSign_type())){
+            //RSA验签
+            Map signMap = KJTPayUtil.objToMap(reqBean);
+            log.info("signMap: {}", signMap);
+            verifyResult = securityService.verify(signMap, reqBean.getSign(), KJTConstants.DEFAULT_CHARSET);
+        }else {
+            throw new BusinessException("不支持的加密类型：" + reqBean.getSign_type());
+        }
+
+        if(!verifyResult.isSuccess()){
+            log.error("验签失败");
+//            throw new BusinessException("验签失败");
+        }
+
+        // 更新支付状态
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("out_trade_no", reqBean.getOuter_trade_no())
+                .eq("is_deleted", "0"));
+        if(orderPay == null){
+            throw new BusinessException("为检索到支付记录");
         }
 
         orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
@@ -567,7 +614,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         }).collect(Collectors.toList());
         goodsMapper.updateStockNum(list);
 
-        return ResultGenerator.genSuccessResult();
+        return true;
     }
 
     @Override

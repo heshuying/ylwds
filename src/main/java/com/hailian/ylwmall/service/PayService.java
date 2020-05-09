@@ -13,7 +13,7 @@ public interface PayService {
 
     RequestBase ensureTrade(EnsureTradeReq reqBean, HttpServletRequest request);
 
-    RequestBase ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request);
+    Result ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request);
 
     Result ensureTradeAgreement(EnsureTradeReq reqBean, HttpServletRequest request);
 

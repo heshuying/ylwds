@@ -56,22 +56,22 @@ public class PayController {
     /**
      * 担保支付(聚合钱包)
      */
+    @ResponseBody
     @ApiOperation(value = "担保支付(聚合钱包)")
     @GetMapping("/ensureTradePurse")
-    public String ensureTradePurse(@ModelAttribute EnsureTradeReq reqBean, HttpServletRequest request) {
+    public Result ensureTradePurse(@ModelAttribute EnsureTradeReq reqBean, HttpServletRequest request) {
         // 设置登录人
         NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
         if(user == null){
-            return "error/error";
+            return ResultGenerator.genFailResult("用户未登录");
         }
         if(StringUtils.isBlank(reqBean.getOrderId())){
-            return "error/error";
+            return ResultGenerator.genFailResult("请求参数错误");
         }
+
         reqBean.setPayType("3");
-        RequestBase requestBase = payService.ensureTradePurse(reqBean, request);
-        Map<String,String> req = KJTPayUtil.objToMap(requestBase);
-        request.setAttribute("map", req);
-        return "mall/send";
+        Result result = payService.ensureTradePurse(reqBean, request);
+        return result;
     }
 
     /**
@@ -149,7 +149,8 @@ public class PayController {
     }
 
     @ResponseBody
-    @RequestMapping("/ensureTradeAsyncNotify")
+    @ApiOperation(value = "支付异步通知接口")
+    @PostMapping("/ensureTradeAsyncNotify")
     public String ensureTradeAsyncNotify(EnsureTradeCallBackDto callBackDto, HttpServletRequest request) {
         log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(callBackDto));
         log.info("method: " + request.getMethod());

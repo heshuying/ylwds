@@ -23,7 +23,6 @@ import com.hailian.ylwmall.entity.order.CutDownPriceParam;
 import com.hailian.ylwmall.entity.order.DeliverGoodsParam;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.exception.BusinessException;
-import com.hailian.ylwmall.service.KjtService;
 import com.hailian.ylwmall.service.NewBeeMallOrderService;
 import com.hailian.ylwmall.util.PageQueryUtil;
 import com.hailian.ylwmall.util.PageResult;
@@ -65,9 +64,6 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
 
     @Autowired
     private TbUserDao userMapper;
-
-    @Autowired
-    private KjtService kjtService;
 
     @Override
     public PageResult getMyOrdersForSupplier(PageQueryUtil pageUtil) {

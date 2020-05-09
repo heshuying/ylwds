@@ -38,7 +38,7 @@ import java.util.UUID;
 
 @Api("文件操作")
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class FileOperController {
     private static final Logger logger = LoggerFactory.getLogger(FileOperController.class);
 

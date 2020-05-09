@@ -93,7 +93,7 @@ kjt:
   recv: https://zgateway.kjtpay.com/recv.do
   instantTradeAsyncNotify: http://10.190.176.150:8888/api/pay/instantTradeAsyncNotify
   transferToCardAsyncNotify: http://10.190.176.150:8888/api/pay/transferToCardAsyncNotify
-  tradeRefundAsyncNotify: http://10.190.176.150:8888/api/pay/tradeRefundAsyncNotify
+  tradeRefundAsyncNotify: http://ylwbtb.hoptest.haier.net/api/pay/tradeRefundAsyncNotify
   transferToAccountAsyncNotify: http://10.190.176.150:8888/api/pay/transferToAccountAsyncNotify
   ensureTradeAsyncNotify: http://ylwbtb.hoptest.haier.net/api/pay/ensureTradeAsyncNotify
   ensureTradeReturnUrl: http://ylwbtb.hoptest.haier.net/outer/pay/payFinish

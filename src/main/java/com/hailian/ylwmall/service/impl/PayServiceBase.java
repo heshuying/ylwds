@@ -57,6 +57,8 @@ public class PayServiceBase {
     TbPayRevlogDao payRevlogDao;
     @Autowired
     TbGoodsInfoMapper goodsMapper;
+    @Autowired
+    TbPayRefundDao payRefundDao;
 
     Gson gson = new Gson();
 
@@ -164,7 +166,7 @@ public class PayServiceBase {
             return tradeBean;
         }else if("3".equals(reqBean.getPayType())){
             Map<String,String> payMethod = new HashMap<>();
-            payMethod.put("pay_product_code", "83");
+            payMethod.put("pay_product_code", "82");
             payMethod.put("amount", price.toString());
             payMethod.put("token_valid_minutes", "10");
             tradeBean.setPayMethod(payMethod);

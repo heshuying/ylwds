@@ -71,7 +71,7 @@
   </update>
 
   <select id="selectByOrderId" resultType="com.hailian.ylwmall.controller.vo.OrderGoodInfoVo" parameterType="java.lang.Long">
-    select o.* ,g.original_price as unitPrice, g.goods_name as goodName from tb_order_goodinfo o
+    select o.* ,g.price as unitPrice, g.goods_name as goodName from tb_order_goodinfo o
     left join tb_goods_info g on o.good_id = g.goods_id
     where order_id = #{orderId}
   </select>

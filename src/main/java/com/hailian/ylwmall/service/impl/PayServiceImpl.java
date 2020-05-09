@@ -178,7 +178,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
      * 聚合钱包支付
      */
     @Override
-    public RequestBase ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request){
+    public Result ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
         NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
@@ -233,7 +233,38 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeBizContent.setTerminalInfo(terminalInfo);
         tradeBizContent.setReturnUrl(kjtConfig.getEnsureTradeReturnUrl()); // 同步返回地址
 
-        return genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
+        RequestBase requestBase = genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
+        ResponseParameter result = callKjt(requestBase);
+        if(result == null){
+            String failMsg = "聚合钱包支付失败，快捷通返回null";
+            log.error(failMsg);
+            orderPay.setFailMsg(failMsg);
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付失败
+            String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
+            log.error("聚合钱包支付失败: {}", failMsg);
+            orderPay.setFailCode(result.getCode());
+            orderPay.setFailMsg(result.getMsg());
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付成功
+            log.info("聚合钱包返回成功：{}", gson.toJson(result));
+            JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+
+            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
+            orderPay.setTradeNo(jsonObject.getString("trade_no"));
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genSuccessResult(jsonObject);
+        }
+        return ResultGenerator.genFailResult("支付未成功");
     }
 
     /**

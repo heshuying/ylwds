@@ -19,6 +19,8 @@ public class B2BWebMvcConfigurer implements WebMvcConfigurer {
     private B2BMallLoginInterceptor newBeeMallLoginInterceptor;
     @Autowired
     private B2BMallCartNumberInterceptor newBeeMallCartNumberInterceptor;
+    @Autowired
+    private FileProperties fileProperties;
 
     public void addInterceptors(InterceptorRegistry registry) {
         // 添加一个拦截器，拦截以/admin为前缀的url路径（后台登陆拦截）
@@ -52,8 +54,13 @@ public class B2BWebMvcConfigurer implements WebMvcConfigurer {
                 .addPathPatterns("/payPage");
     }
 
+    /**
+     * 静态资源的配置 - 使得可以从磁盘中读取图片
+     */
+    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-       // registry.addResourceHandler("/upload/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
-        //registry.addResourceHandler("/goods-img/**").addResourceLocations("file:" + Constants.FILE_UPLOAD_DIC);
+
+        registry.addResourceHandler(fileProperties.getStaticAccessPath())
+                .addResourceLocations("file:" + fileProperties.getUploadDir() + "/");
     }
 }

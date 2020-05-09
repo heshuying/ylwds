@@ -19,4 +19,6 @@ public interface TbOrderOrderinfoService extends IService<TbOrderOrderinfo> {
     Result confirmOrder(Long userId, OrderFormDto dto);
     Result getOrderInfo(Long orderNo);
     Result doOrder(Long userId, OrderSubmitDto dto);
+
+    Result getOrders(Long userId);
 }

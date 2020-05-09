@@ -181,4 +181,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
 
         return ResultGenerator.genSuccessResult(orderIds);
     }
+
+    @Override
+    public Result getOrders(Long userId) {
+        return null;
+    }
 }

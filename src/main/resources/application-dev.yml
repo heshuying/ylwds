@@ -1,0 +1,81 @@
+server:
+  port: 8080
+
+spring:
+  thymeleaf:
+    cache: false
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://10.138.26.200:3909/YLW_mall_db?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowMultiQueries=true
+      username: sorcl_wz
+      password: s23Ec1dSuk
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #Oracle需要打开注释
+      #validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        #login-username: admin
+        #login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+
+
+logging:
+  config: classpath:log/log-config-dev.xml
+
+kjt:
+  payeeidentity: 200001750781
+  privatekey: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAI7Uc6Jrx1tQdC6JKaJstTXr/huBB8TZk5Jbg6kPsxj/ehwyCgOEReHlD86tmQPmL7F+FjG5QVGd+lMCyqZEluT5m3juiA3vcaVucNrR4itJN3hW6rof0u1sD7OZwl3LeBYFgcDwVJ5uu+WK/rp2bxUfzXvH9TcPznsu6vXGMm/1AgMBAAECgYBKLNUcraJrrr2XiU4g9xmotjVSLVFOjrwPzwzyGKAnRE4zJF2E9AWiyeXKrOcBWmK8Z8G48v+UFlnxEEsTzB0cZcqoOVZ1oIFBACSqdRSqeHwcs9yN5EXjuqIHuTHJXb8tdOJsd0/5Unc9j0wYQnx3J11214YpUMNTcNNLvGqNxQJBAOBRxH2L6GF4Q1O/vxWK0d9NdFJuD/w+JVYMzLSacInZAUeadZRHNbpLqnCHV+56FOOpOcpDafDT86lXUcPnng8CQQCjAHGUzjZOPIZ9uYFqYGx8z8sy9DNpJpbQq77kqci/6eXEvdjrXANgi4TwhzLibBYxI+rxW+XBSpqBXddqCVW7AkEAklPkiD0+zm5EBRq8zJGszCzbZ3YSiWoEsvhQhLOGG/XqBsp0TtCQ9MCtIxC2xILwo33di9qj/gxVEy850ECD8wJAJ6ud+QdO9C+K0+Jn+snI3X99BsOkF31KyzJhXSltMDfusbk6p91W/RI3oopk+fIwXHlPXrps6mQLwlxiZu4qrQJBALjJBfaMs7mkOJ7OKsU4dis0IVSpGwXfDPyb8OnzubsX3f9NvbqLBe8plwtydxcpMaUBQgO9ndHxd356Uns7xDU=
+  kjtpublickey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7phOZ9PHIivfzC6xzqJuF7935YG+j5LYnHnkex0I+Lw3oYOIKIESIrDMMbyNiBeezm3zh6Um+LzgGaaCzP0aV4bTFsS6RCveXFqG+dwHXE8e+YoxS4BTrjDzcZqDnbwNLsZz7wuSm6fSjV4YDL5zc2Ho1eV6OAzcITEfcBGxizaUmzP8s5bXqccWdPBOGVcoLOsvUugmNvmrhr1UL54LH0boZ5CAuOvCDaocBn/Fo7FNcomWnlG24Dynni/iGVTIS3DGU6fEY97JuSodZ4tCtnSnqzwksWaxy+7e+pv4ObFHSxAiTq3tVIaSFY5hJ9Dz3+Dm+RdF4LnyvZVIP3fcrQIDAQAB
+  recv: https://zgateway.kjtpay.com/recv.do
+  instantTradeAsyncNotify: http://10.190.176.150:8888/api/pay/instantTradeAsyncNotify
+  transferToCardAsyncNotify: http://10.190.176.150:8888/api/pay/transferToCardAsyncNotify
+  tradeRefundAsyncNotify: http://ylwbtb.hoptest.haier.net/api/pay/tradeRefundAsyncNotify
+  transferToAccountAsyncNotify: http://10.190.176.150:8888/api/pay/transferToAccountAsyncNotify
+  ensureTradeAsyncNotify: http://ylwbtb.hoptest.haier.net/api/pay/ensureTradeAsyncNotify
+  ensureTradeReturnUrl: http://ylwbtb.hoptest.haier.net/outer/pay/payFinish
+  recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
+  verifyFlag: 0
+  productCode: 10311
+  timeoutExpress: 2h
+
+oss:
+  #baseUrl: http://almsc.hoptest.haier.net:8899/api/hfs/v4
+  baseUrl: http://almsc.hoptest.haier.net:8899/api/oss/v1
+  appName: passtest
+  appKey: OTc3YmQyNjM3NjYwNGE1MWJhZDVjZjI2ODJmZTlhZGE=
+  appSecret: YjU4MjM0MWZjNmI2YzNkZWVkNzQwNDAzM2E2OTUwZjA=
+
+#swagger 启用
+swagger:
+  enable: true
+  basePackage: com.hailian.ylwmall.controller.api
+  info:
+    title: 衣联网B2B电商API文档
+    description: 衣联网B2B电商API文档
+    version: 1.0
+    serviceUrl: ylwbtb.hoptest.haier.net
+
+file:
+  uploadDir: D://files//
+  uriPath: upload/
+  staticAccessPath: /upload/** #静态资源对外暴露的访问路径

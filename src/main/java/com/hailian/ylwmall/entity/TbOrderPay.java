@@ -82,6 +82,7 @@ public class TbOrderPay extends Model<TbOrderPay> {
     private String failCode;
 
     private Date updateTime;
+    private Date createTime;
 
     // 协议支付时是否需要短信确认
     private String needSmsconfirm;

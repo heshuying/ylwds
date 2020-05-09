@@ -70,6 +70,7 @@ public class TbShoppingCartServiceImpl extends ServiceImpl<TbShoppingCartDao, Tb
             BeanUtils.copyProperties(dto,exits);
             exits.setCreateTime(new Date());
             exits.setGoodsCount(dto.getGoodsNum());
+            exits.setUserId(userId);
             baseMapper.insert(exits);
         }else{
             //更新数量

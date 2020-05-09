@@ -1,4 +1,4 @@
-package com.hailian.ylwmall.controller.api;
+package com.hailian.ylwmall.controller.mall;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -38,7 +38,6 @@ import java.util.Random;
 @Api(value = "文件上传下载接口", tags = {"文件上传下载接口"})
 @Slf4j
 @Controller
-@RequestMapping("/api")
 public class UploadController {
 
     @ApiOperation(value = "文件上传")

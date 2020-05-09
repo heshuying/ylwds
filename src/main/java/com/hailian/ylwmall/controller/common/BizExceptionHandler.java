@@ -38,8 +38,6 @@ public class BizExceptionHandler {
             modelAndView.addObject("message", e.getMessage());
             modelAndView.addObject("url", req.getRequestURL());
             modelAndView.addObject("stackTrace", e.getStackTrace());
-            modelAndView.addObject("author", "十三");
-            modelAndView.addObject("ltd", "新峰商城");
             modelAndView.setViewName("error/error");
             return modelAndView;
         }

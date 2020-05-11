@@ -4,13 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.controller.vo.OrderInfoVo;
-import com.hailian.ylwmall.dao.TbGoodsInfoMapper;
-import com.hailian.ylwmall.dao.NewBeeMallOrderItemMapper;
-import com.hailian.ylwmall.dao.NewBeeMallOrderMapper;
-import com.hailian.ylwmall.dao.NewBeeMallShoppingCartItemMapper;
-import com.hailian.ylwmall.dao.OrderGoodInfoMapper;
-import com.hailian.ylwmall.dao.OrderInfoMapper;
-import com.hailian.ylwmall.dao.TbUserDao;
+import com.hailian.ylwmall.dao.*;
+import com.hailian.ylwmall.entity.TbUserAddr;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -54,7 +49,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     private NewBeeMallShoppingCartItemMapper newBeeMallShoppingCartItemMapper;
     @Autowired
     private TbGoodsInfoMapper newBeeMallGoodsMapper;
-
+    @Autowired
+    private TbUserAddrDao userAddrDao;
 
 
     @Autowired
@@ -77,6 +73,11 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         for(OrderInfo info : orderInfos){
             String s = JSONObject.toJSONString(info);
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            //拼装收获地址
+            if(info.getDeliveryId() != null){
+                TbUserAddr tbUserAddr = userAddrDao.selectById(info.getDeliveryId());
+                vo.setDeliveryAddress(tbUserAddr.getAcceptor()+tbUserAddr.getPhone()+";"+tbUserAddr.getProvince()+tbUserAddr.getCity()+tbUserAddr.getArea()+tbUserAddr.getDetail());
+            }
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
             vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());

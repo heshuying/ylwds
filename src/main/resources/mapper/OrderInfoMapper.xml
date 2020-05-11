@@ -15,13 +15,14 @@
     <result column="cut_down" property="cutDown" jdbcType="DECIMAL" />
     <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
     <result column="gross_profit" property="grossProfit" jdbcType="DECIMAL" />
+    <result column="delivery_id" property="deliveryId" jdbcType="BIGINT" />
     <result column="buying_price" property="buyingPrice" jdbcType="DECIMAL" />
     <result column="real_price" property="realPrice" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, status, update_time, create_time, delivery_address, express_company, express_id, 
     user_remark, customer_id, supplier_id, cut_down, total_price, gross_profit, buying_price, 
-    real_price
+    real_price,delivery_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 

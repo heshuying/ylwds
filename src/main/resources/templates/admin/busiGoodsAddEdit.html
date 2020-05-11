@@ -73,14 +73,26 @@
         height: 20px;
         margin-right: 10px;
     }
+    .first-photo {
+        width: 100px;
+        height: 110px;
+        margin-left: 10px
+    }
     .first-photo-item {
-        height: 100px;
+        height: 110px;
         display: flex;
         align-items: center;
         justify-content: center;
         background-color: #ccc;
         color: #fff;
         font-size: 40px;
+    }
+    .first-photo-item > div {
+        cursor: pointer;
+    }
+    .first-photo-item img {
+        width: 100px;
+        height: 110px;
     }
     .operator-btn-area {
         line-height: 50px;
@@ -109,9 +121,39 @@
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
     }
-
     input[type="number"] {
         -moz-appearance: textfield;
+    }
+    .upload-line {
+        line-height: 50px;
+        background-color: #F5F6F8;
+        font-size: 14px;
+        padding-left: 20px;
+    }
+    .upload-line:hover {
+        color: #477FFF;
+    }
+    .detail-content {
+        padding: 20px;
+        width: 100%;
+        min-height: 200px;
+        border: #F5F6F8 1px solid;
+    }
+    .detail-content-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .detail-content-item > img {
+        width: 90%;
+        margin-bottom: 10px;
+    }
+    .detail-content-item p {
+        width: 10%;
+        text-align: center;
+    }
+    .detail-content-item p img {
+        cursor: pointer;
     }
 </style>
 <body class="hold-transition sidebar-mini">
@@ -266,26 +308,22 @@
                         商品首图
                         <span class="red-span">*</span>
                     </el-col>
-                    <el-col :span="3">
+                    <div class="first-photo" v-for="(item,index) in goodsPhotoListShow" :key="index">
                         <div class="first-photo-item">
-                            +
+                            <el-upload
+                                    class="icon-select"
+                                    action="/api/file/uploadFile"
+                                    :limit="5"
+                                    :show-file-list="false"
+                                    :on-success="function(response, file, fileList){handleSingleSuccess(response, file, fileList,index)}"
+                            >
+                                <div v-if="item==''">+</div>
+                                <div v-else>
+                                    <img :src="item"/>
+                                </div>
+                            </el-upload>
                         </div>
-                    </el-col>
-                    <el-col :span="3">
-                        <div class="first-photo-item">
-                            +
-                        </div>
-                    </el-col>
-                    <el-col :span="3">
-                        <div class="first-photo-item">
-                            +
-                        </div>
-                    </el-col>
-                    <el-col :span="3">
-                        <div class="first-photo-item">
-                            +
-                        </div>
-                    </el-col>
+                    </div>
                 </el-row>
                 <el-row :gutter="20" class="row-line">
                     <el-col :span="15" :offset="6" class="intro-content">
@@ -298,8 +336,29 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <!--<el-input type="textarea" rows="8" v-model="goodsDetailContent"></el-input>-->
-                        <textarea id="editor" style="width: 100%; height: 350px;" v-model="goodsDetailContent"></textarea>
+                        <div class="upload-line">
+                            <el-upload
+                                class="icon-select"
+                                action="/api/file/uploadMultipleFiles"
+                                multiple
+                                :limit="5"
+                                :show-file-list="false"
+                                :on-success="handleSuccess"
+                            >
+                                <span>
+                                    <i class="el-icon-upload"></i>
+                                    选择图片
+                                </span>
+                            </el-upload>
+                        </div>
+                        <div class="detail-content">
+                            <div v-for="(item,index) in detailPhotoListShow" :key="item.index" class="detail-content-item">
+                                <img :src="item"/>
+                                <p>
+                                    <img th:src="@{/admin/image/del.png}" alt="" @click="delDetailPhoto(index)"/>
+                                </p>
+                            </div>
+                        </div>
                     </el-col>
                 </el-row>
                 <div class="operator-btn-area">
@@ -313,9 +372,9 @@
 </div>
 <!-- jQuery -->
 <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
-<script th:src="@{/admin/plugins/kindeditor-4.1.10/kindeditor-all.js}"></script>
-<script th:src="@{/admin/plugins/kindeditor-4.1.10/lang/zh_CN.js}"></script>
-<script th:src="@{/admin/dist/js/public.js}"></script>
+<!--<script th:src="@{/admin/plugins/kindeditor-4.1.10/kindeditor-all.js}"></script>-->
+<!--<script th:src="@{/admin/plugins/kindeditor-4.1.10/lang/zh_CN.js}"></script>-->
+<!--<script th:src="@{/admin/dist/js/public.js}"></script>-->
 <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
 <!-- 引入组件库 -->
 <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
@@ -324,6 +383,7 @@
         el: '#app',
         data() {
             return {
+                baseUrl: 'http://localhost:8080/',
                 goodsId: '',
                 specsList:[],  // 规格列表
                 tagList: [],   // 标签列表
@@ -341,11 +401,15 @@
                 secondCateValue: '',
                 thridCategory: [],
                 thridCateValue: '',
-                editor: ''
+                // editor: '',
+                detailPhotoList: [], // 图文详情中地址列表
+                detailPhotoListShow: [], // 图文详情中完整地址列表
+                goodsPhotoList: ['','','',''],
+                goodsPhotoListShow: ['','','','']
             };
         },
         mounted() {
-            this.initEditor();
+            // this.initEditor();
             this.firstCategory = [[${firstLevelCategories}]] || '';
             this.secondCategory = [[${secondLevelCategories}]] || '';
             this.thridCategory = [[${thirdLevelCategories}]] || '';
@@ -362,7 +426,6 @@
                 this.sellingPrice = returnGoods.sellingPrice;
                 this.transitMoney = returnGoods.transitMoney;
                 this.stockNum = returnGoods.stockNum;
-                this.editor.html(returnGoods.goodsDetailContent);
                 if (returnGoods.tag) {
                     this.tagList = returnGoods.tag.split(',');
                 }
@@ -373,24 +436,27 @@
                 for (var i in specsTmp) {
                     this.specsList.push({specsValue: specsTmp[i]});
                 }
+                if (returnGoods.goodsDetailContent) {
+                    this.detailPhotoList = returnGoods.goodsDetailContent.split(',');
+                }
+                for (var j in this.detailPhotoList) {
+                    var tempPhotoUrl = this.baseUrl + this.detailPhotoList[j];
+                    this.detailPhotoListShow.push(tempPhotoUrl);
+                }
+                var tempGoodPhotoList = [];
+                if (returnGoods.goodsCarousel) {
+                    tempGoodPhotoList = returnGoods.goodsCarousel.split(',');
+                }
+                this.goodsPhotoList = [];
+                this.goodsPhotoListShow = [];
+                for (var k in tempGoodPhotoList) {
+                    this.goodsPhotoList.push(tempGoodPhotoList[k]);
+                    var tempGoodsPhotoUrl = this.baseUrl + tempGoodPhotoList[k];
+                    this.goodsPhotoListShow.push(tempGoodsPhotoUrl);
+                }
             }
         },
         methods: {
-            // 初始化富文本
-            initEditor() {
-                this.editor = KindEditor.create('textarea[id="editor"]', {
-                    items: ['multiimage', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'code', 'cut', 'copy', 'paste',
-                        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
-                        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
-                        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
-                        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
-                        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'multiimage',
-                        'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
-                        'anchor', 'link', 'unlink'],
-                    uploadJson: '/admin/upload/file',
-                    filePostName: 'file'
-                });
-            },
             // 删除某个规格
             delSpecs(index) {
                 this.specsList.splice(index, 1);
@@ -398,6 +464,39 @@
             // 增加规格
             addSpecs() {
                 this.specsList.push({specsValue: ''});
+            },
+            // 上传文件成功
+            handleSuccess(res) {
+                if (res.resultCode == "200") {
+                    this.detailPhotoList.push(res.data);
+                    var wholeUrl = this.baseUrl + res.data;
+                    this.detailPhotoListShow.push(wholeUrl);
+                } else {
+                    this.$message.error("上传失败，" + res.msg);
+                }
+            },
+            // 商品首图单张上传
+            handleSingleSuccess(res,file,fileList,index) {
+                if (res.resultCode == "200") {
+                    this.$set(this.goodsPhotoList,index, res.data);
+                    var wholeUrl = this.baseUrl + res.data;
+                    this.$set(this.goodsPhotoListShow,index, wholeUrl);
+                } else {
+                    this.$message.error("上传失败，" + res.msg);
+                }
+            },
+            delDetailPhoto(index) {
+                var _this = this;
+                this.$confirm('确定删除该图片吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(function() {
+                    _this.detailPhotoList.splice(index, 1);
+                    _this.detailPhotoListShow.splice(index, 1);
+                    console.log(_this.detailPhotoList);
+                    console.log(_this.detailPhotoListShow);
+                }).catch(function() {});
             },
             // 操作tag
             handleTagChange(val) {
@@ -438,7 +537,6 @@
             // 申请上架或暂存仓库
             saveService(type) {
                 var _this = this;
-                console.log(this.editor.html());
                 if(!this.validateInput()) {
                     this.$message.error('请填写完整信息后重试');
                     return;
@@ -460,6 +558,23 @@
                         postGooodsAttribute = postGooodsAttribute + ',' + this.specsList[j].specsValue;
                     }
                 }
+                var detailPhotoStr = '';
+                for(var k in this.detailPhotoList) {
+                    if(detailPhotoStr === '') {
+                        detailPhotoStr = this.detailPhotoList[k];
+                    } else {
+                        detailPhotoStr = detailPhotoStr + ',' + this.detailPhotoList[k];
+                    }
+                }
+                var firstPhotoStr = this.goodsPhotoList[0];
+                var otherPhotoStr = '';
+                for(var x in this.goodsPhotoList) {
+                    if(otherPhotoStr === '') {
+                        otherPhotoStr = this.goodsPhotoList[x];
+                    } else {
+                        otherPhotoStr = otherPhotoStr + ',' + this.goodsPhotoList[x];
+                    }
+                }
                 var data = {
 //                    goodsId: this.goodsId,
                     goodsCategoryId: this.thridCateValue,
@@ -471,8 +586,10 @@
                     stockNum: this.stockNum,
                     tag: postTag,
                     goodsAttribute: postGooodsAttribute,
-                    goodsDetailContent: this.editor.html(),
-                    goodsSellStatus: type
+                    goodsDetailContent: detailPhotoStr,
+                    goodsSellStatus: type,
+                    goodsCoverImg: firstPhotoStr,
+                    goodsCarousel: otherPhotoStr
                 }
                 if(this.goodsId) {
                     data.goodsId = this.goodsId;

@@ -236,12 +236,6 @@
         and create_time &lt; #{endTime}
       </if>
     </where>
-    <if test="descOrAsc!=null and descOrAsc!=''">
-      order by create_time ${descOrAsc}
-    </if>
-    <if test="start!=null and limit!=null">
-      limit #{start},#{limit}
-    </if>
   </select>
 
   <select id="countForPlatform" resultType="java.lang.Integer"  parameterType="com.hailian.ylwmall.util.PageQueryUtil" >
@@ -262,13 +256,6 @@
         and create_time &lt; #{endTime}
       </if>
     </where>
-    <if test="descOrAsc!=null and descOrAsc!=''">
-      order by create_time ${descOrAsc}
-    </if>
-
-    <if test="start!=null and limit!=null">
-      limit #{start},#{limit}
-    </if>
   </select>
 
   <select id="selectByPageForSupplier" parameterType="com.hailian.ylwmall.util.PageQueryUtil" resultMap="BaseResultMap">

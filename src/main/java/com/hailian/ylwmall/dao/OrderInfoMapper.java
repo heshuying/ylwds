@@ -19,10 +19,10 @@ public interface OrderInfoMapper {
 
     int updateByPrimaryKey(OrderInfo record);
 
-    int countForSupplier(PageQueryUtil pageUtil);
+    Integer countForSupplier(PageQueryUtil pageUtil);
 
 
-    int countForPlatform(PageQueryUtil pageUtil);
+    Integer countForPlatform(PageQueryUtil pageUtil);
     List<OrderInfo> selectByPageForSupplier(PageQueryUtil queryUtil);
 
     List<OrderInfo> selectByPageForPlatform(PageQueryUtil queryUtil);

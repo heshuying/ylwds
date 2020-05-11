@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -68,7 +69,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Override
     public PageResult getMyOrdersForSupplier(PageQueryUtil pageUtil) {
         //获取总条数
-        int total = orderInfoMapper.countForSupplier(pageUtil);
+        Integer total = orderInfoMapper.countForSupplier(pageUtil);
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForSupplier(pageUtil);
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
@@ -140,16 +141,21 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
 
     @Override
     public void cutDownPrice(CutDownPriceParam params) {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(params.getOrderId());
+        BigDecimal totalPrice = orderInfo.getTotalPrice();
+        BigDecimal buyingPrice = orderInfo.getBuyingPrice();
+        if(totalPrice.subtract(buyingPrice).compareTo(params.getCutdownNumber()) == -1){
+            throw new BusinessException("减免金额不能超过利润额");
+        }
         OrderInfo info = new OrderInfo();
         info.setId(params.getOrderId());
         info.setCutDown(params.getCutdownNumber());
+
         int i = orderInfoMapper.updateByPrimaryKeySelective(info);
         int i1 = orderInfoMapper.cutDownPrice(params);
         if(i == 0 || i1 == 0){
             throw new RuntimeException();
         }
-
-
     }
 
     @Override

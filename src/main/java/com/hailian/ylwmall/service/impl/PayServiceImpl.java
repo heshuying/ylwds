@@ -5,12 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.gson.Gson;
+import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.OrderStatusEnum;
-import com.hailian.ylwmall.common.pay.KJTConstants;
-import com.hailian.ylwmall.common.pay.PayRefundStatusEnum;
-import com.hailian.ylwmall.common.pay.PayStatusEnum;
-import com.hailian.ylwmall.common.pay.ProductCodeEnum;
+import com.hailian.ylwmall.common.pay.*;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
@@ -65,24 +63,33 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
         List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
-        // 删除历史未支付记录
-        TbOrderPay orderPay = new TbOrderPay();
-        orderPay.setOrderId(Long.parseLong(reqBean.getOrderId()));
-        orderPay.setIsDeleted(1);
-        orderPay.setUpdateTime(new Date());
-        orderPayDao.update(orderPay, new UpdateWrapper<TbOrderPay>().eq("order_id", reqBean.getOrderId()));
-        // 新增支付记录
-        String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
-        // 保存支付表
-        orderPay = new TbOrderPay();
-        orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
-        orderPay.setOrderId(orderInfo.getId());
-        orderPay.setOutTradeNo(outTradeNo);
-        orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setCreateTime(new Date());
-        orderPay.setUpdateTime(new Date());
-        orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
-        orderPayDao.insert(orderPay);
+        // 有一种方式支付成功就不再执行
+        List<TbOrderPay> paySuccessList = orderPayDao.selectList(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", reqBean.getOrderId())
+                .eq("is_deleted", "0")
+                .gt("pay_status", PayStatusEnum.PAY_WAIT.getPayStatus()));
+        if(!paySuccessList.isEmpty()){
+            throw new BusinessException("已支付过，请不要重复提交");
+        }
+
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", reqBean.getOrderId())
+                .eq("is_deleted", "0")
+                .eq("pay_type", reqBean.getPayType()));
+        if(orderPay == null){
+            // 新增支付记录
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            // 保存支付表
+            orderPay = new TbOrderPay();
+            orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
+            orderPay.setOrderId(orderInfo.getId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
+            orderPay.setCreateTime(new Date());
+            orderPay.setUpdateTime(new Date());
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPayDao.insert(orderPay);
+        }
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
@@ -129,24 +136,33 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
         List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
-        // 删除历史未支付记录
-        TbOrderPay orderPay = new TbOrderPay();
-        orderPay.setOrderId(Long.parseLong(reqBean.getOrderId()));
-        orderPay.setIsDeleted(1);
-        orderPay.setUpdateTime(new Date());
-        orderPayDao.update(orderPay, new UpdateWrapper<TbOrderPay>().eq("order_id", reqBean.getOrderId()));
-        // 新增支付记录
-        String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
-        // 保存支付表
-        orderPay = new TbOrderPay();
-        orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
-        orderPay.setOrderId(orderInfo.getId());
-        orderPay.setOutTradeNo(outTradeNo);
-        orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setCreateTime(new Date());
-        orderPay.setUpdateTime(new Date());
-        orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
-        orderPayDao.insert(orderPay);
+        // 有一种方式支付成功就不再执行
+        List<TbOrderPay> paySuccessList = orderPayDao.selectList(new QueryWrapper<TbOrderPay>()
+                        .eq("order_id", reqBean.getOrderId())
+                        .eq("is_deleted", "0")
+                        .gt("pay_status", PayStatusEnum.PAY_WAIT.getPayStatus()));
+        if(!paySuccessList.isEmpty()){
+            return ResultGenerator.genFailResult("已支付过，请不要重复提交");
+        }
+
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", reqBean.getOrderId())
+                .eq("is_deleted", "0")
+                .eq("pay_type", reqBean.getPayType()));
+        if(orderPay == null){
+            // 新增支付记录
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            // 保存支付表
+            orderPay = new TbOrderPay();
+            orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
+            orderPay.setOrderId(orderInfo.getId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
+            orderPay.setCreateTime(new Date());
+            orderPay.setUpdateTime(new Date());
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPayDao.insert(orderPay);
+        }
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
@@ -224,24 +240,33 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         NewBeeMallUserVO user = (NewBeeMallUserVO) request.getSession().getAttribute(Constants.MALL_USER_SESSION_KEY);
         OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(Long.parseLong(reqBean.getOrderId()));
         List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderInfo.getId());
-        // 删除历史未支付记录
-        TbOrderPay orderPay = new TbOrderPay();
-        orderPay.setOrderId(Long.parseLong(reqBean.getOrderId()));
-        orderPay.setIsDeleted(1);
-        orderPay.setUpdateTime(new Date());
-        orderPayDao.update(orderPay, new UpdateWrapper<TbOrderPay>().eq("order_id", reqBean.getOrderId()));
-        // 新增支付记录
-        String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
-        // 保存支付表
-        orderPay = new TbOrderPay();
-        orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
-        orderPay.setOrderId(orderInfo.getId());
-        orderPay.setOutTradeNo(outTradeNo);
-        orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setCreateTime(new Date());
-        orderPay.setUpdateTime(new Date());
-        orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
-        orderPayDao.insert(orderPay);
+        // 有一种方式支付成功就不再执行
+        List<TbOrderPay> paySuccessList = orderPayDao.selectList(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", reqBean.getOrderId())
+                .eq("is_deleted", "0")
+                .gt("pay_status", PayStatusEnum.PAY_WAIT.getPayStatus()));
+        if(!paySuccessList.isEmpty()){
+            return ResultGenerator.genFailResult("已支付过，请不要重复提交");
+        }
+
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", reqBean.getOrderId())
+                .eq("is_deleted", "0")
+                .eq("pay_type", reqBean.getPayType()));
+        if(orderPay == null){
+            // 新增支付记录
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            // 保存支付表
+            orderPay = new TbOrderPay();
+            orderPay.setPayType(Integer.parseInt(reqBean.getPayType()));
+            orderPay.setOrderId(orderInfo.getId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
+            orderPay.setCreateTime(new Date());
+            orderPay.setUpdateTime(new Date());
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPayDao.insert(orderPay);
+        }
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();

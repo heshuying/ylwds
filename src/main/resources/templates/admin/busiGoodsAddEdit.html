@@ -298,7 +298,8 @@
                         <span class="red-span">*</span>
                     </el-col>
                     <el-col :span="15">
-                        <el-input type="textarea" rows="8" v-model="goodsDetailContent"></el-input>
+                        <!--<el-input type="textarea" rows="8" v-model="goodsDetailContent"></el-input>-->
+                        <textarea id="editor" style="width: 100%; height: 350px;" v-model="goodsDetailContent"></textarea>
                     </el-col>
                 </el-row>
                 <div class="operator-btn-area">
@@ -312,6 +313,9 @@
 </div>
 <!-- jQuery -->
 <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/kindeditor-4.1.10/kindeditor-all.js}"></script>
+<script th:src="@{/admin/plugins/kindeditor-4.1.10/lang/zh_CN.js}"></script>
+<script th:src="@{/admin/dist/js/public.js}"></script>
 <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
 <!-- 引入组件库 -->
 <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
@@ -337,9 +341,11 @@
                 secondCateValue: '',
                 thridCategory: [],
                 thridCateValue: '',
+                editor: ''
             };
         },
         mounted() {
+            this.initEditor();
             this.firstCategory = [[${firstLevelCategories}]] || '';
             this.secondCategory = [[${secondLevelCategories}]] || '';
             this.thridCategory = [[${thirdLevelCategories}]] || '';
@@ -356,20 +362,35 @@
                 this.sellingPrice = returnGoods.sellingPrice;
                 this.transitMoney = returnGoods.transitMoney;
                 this.stockNum = returnGoods.stockNum;
-                this.goodsDetailContent = returnGoods.goodsDetailContent;
-                if(returnGoods.tag) {
+                this.editor.html(returnGoods.goodsDetailContent);
+                if (returnGoods.tag) {
                     this.tagList = returnGoods.tag.split(',');
                 }
                 var specsTmp = [];
-                if(returnGoods.goodsAttribute) {
+                if (returnGoods.goodsAttribute) {
                     specsTmp = returnGoods.goodsAttribute.split(',');
                 }
-                for(var i in specsTmp) {
+                for (var i in specsTmp) {
                     this.specsList.push({specsValue: specsTmp[i]});
                 }
             }
         },
         methods: {
+            // 初始化富文本
+            initEditor() {
+                this.editor = KindEditor.create('textarea[id="editor"]', {
+                    items: ['multiimage', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'code', 'cut', 'copy', 'paste',
+                        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+                        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
+                        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+                        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'multiimage',
+                        'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
+                        'anchor', 'link', 'unlink'],
+                    uploadJson: '/admin/upload/file',
+                    filePostName: 'file'
+                });
+            },
             // 删除某个规格
             delSpecs(index) {
                 this.specsList.splice(index, 1);
@@ -417,6 +438,7 @@
             // 申请上架或暂存仓库
             saveService(type) {
                 var _this = this;
+                console.log(this.editor.html());
                 if(!this.validateInput()) {
                     this.$message.error('请填写完整信息后重试');
                     return;
@@ -449,7 +471,7 @@
                     stockNum: this.stockNum,
                     tag: postTag,
                     goodsAttribute: postGooodsAttribute,
-                    goodsDetailContent: this.goodsDetailContent,
+                    goodsDetailContent: this.editor.html(),
                     goodsSellStatus: type
                 }
                 if(this.goodsId) {
@@ -477,7 +499,7 @@
             // 验证必输字段
             validateInput() {
                 if(this.thridCateValue === '' ||  this.goodsName === '' || this.originalPrice === '' || this.sellingPrice === '' ||
-                        this.stockNum === '' || this.goodsDetailContent === '') {
+                        this.stockNum === '') {
                     return false;
                 }
                 return true;

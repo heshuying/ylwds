@@ -14,12 +14,14 @@ import com.hailian.ylwmall.common.pay.ProductCodeEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
+import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbOrderPay;
 import com.hailian.ylwmall.entity.TbPayRefund;
 import com.hailian.ylwmall.entity.TbUserPay;
 import com.hailian.ylwmall.entity.order.OrderInfo;
+import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.util.*;
 import com.kjtpay.gateway.common.domain.VerifyResult;
@@ -52,70 +54,11 @@ import java.util.stream.Collectors;
 @Service
 public class PayServiceImpl extends PayServiceBase implements PayService {
 
-    /*public RequestBase ensureTradeOld(String outTradeNo){
-        // 交易信息
-        TradeInfo tradeInfo = new TradeInfo();
-        tradeInfo.setOutTradeNo(outTradeNo);//平台（商户）单号
-        tradeInfo.setSubject("苹果");//商品名称
-        tradeInfo.setPrice(ArithmeticUtil.strRound("0.19",2));//单价，精确到两位小数 5000.00
-        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound("0.19",2));
-        tradeInfo.setQuantity("1");//数量
-        tradeInfo.setTotalAmount(ArithmeticUtil.strRound("0.19",2));//交易金额
-        tradeInfo.setPayeeIdentityType("1");
-        tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
-        tradeInfo.setNotifyUrl(kjtConfig.getInstantTradeAsyncNotify());//服务器异步通知地址
-        System.out.println("tradeInfo: " + gson.toJson(tradeInfo));
-
-        // 业务信息
-        EnsureTradeBizContent tradeBizContent = new EnsureTradeBizContent();
-        tradeBizContent.setPayerIdentityType(KjtConstants.PayerIdentityType.PAYER_IDENTITY_TYPE_1);
-        tradeBizContent.setPayerPlatformType(KjtConstants.InstantTrade.BizContent.PAYER_PLATFORM_TYPE);
-        tradeBizContent.setPayerIdentity(KjtConstants.InstantTrade.BizContent.PAYER_IDENTITY_ID);
-        tradeBizContent.setPayerIp("223.80.102.178");//买家公网ip
-        tradeBizContent.setBizProductCode("20702");
-        tradeBizContent.setCashierType("WEB");
-        tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
-        tradeBizContent.setTradeInfo(gson.toJson(tradeInfo));
-        // 支付方式设置
-        String payMethodTempt;
-//        JSONObject payMethodJson = new JSONObject();//支付方式
-//        payMethodJson.put("pay_product_code","65");
-//        payMethodJson.put("amount",ArithmeticUtil.strRound(totalAmount,2));
-//        payMethodJson.put("target_organization","WECHAT");
-//        payMethodTempt = payMethodJson.toJSONString();
-        tradeBizContent.setPayMethod("");
-        // 终端信息设置
-        Map<String,String> terminal_info = new HashMap<>();
-        terminal_info.put("terminal_type","01");//手机
-        terminal_info.put("ip","223.80.102.178");
-        tradeBizContent.setTerminalInfo(gson.toJson(terminal_info));
-        String bizContent = gson.toJson(tradeBizContent);
-        // 嵌套json处理
-        log.info("bizContent转换前：{}", bizContent);
-        JSONObject bizReq = null;
-        bizReq = KJTPayUtil.convertParm(KJTConstants.SERVICE_ENSURE_TRADE, bizContent);
-        // 私钥加密
-        log.info(">biz_content加密前:"+bizReq);
-        String bizContentEncryptStr = securityService.encrypt(bizReq.toJSONString(), ReqValue.DEFAULT_CHARSET); //业务数据加密
-        log.info("biz_content加密后:"+bizContentEncryptStr);
-
-        // 最终请求构建及签名
-        RequestBase requestBase = genRequestBase(bizContentEncryptStr, kjtConfig.getPayeeidentity(),outTradeNo);
-        String signData = new Gson().toJson(requestBase);
-        Map<String,String> req = JSON.parseObject(signData, HashMap.class);
-        System.out.println("3.1-->商户签名前："+signData);
-        String signDataStr = securityService.sign(req, ReqValue.DEFAULT_CHARSET);
-        requestBase.setSign(signDataStr);
-
-        String result = new Gson().toJson(requestBase);
-        log.info("ensure_trade签名后数据："+result);
-        return requestBase;
-    }*/
-
     /**
      * 担保支付
      */
     @Override
+    @Transactional
     public RequestBase ensureTrade(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
@@ -136,7 +79,8 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         orderPay.setOrderId(orderInfo.getId());
         orderPay.setOutTradeNo(outTradeNo);
         orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setPayTime(new Date());
+        orderPay.setCreateTime(new Date());
+        orderPay.setUpdateTime(new Date());
         orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
         orderPayDao.insert(orderPay);
 
@@ -178,6 +122,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
      * 聚合钱包支付
      */
     @Override
+    @Transactional
     public Result ensureTradePurse(EnsureTradeReq reqBean, HttpServletRequest request){
         // 生成支付订单号
         String ip = GetCilentIP.getIpAddr(request);
@@ -198,7 +143,8 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         orderPay.setOrderId(orderInfo.getId());
         orderPay.setOutTradeNo(outTradeNo);
         orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setPayTime(new Date());
+        orderPay.setCreateTime(new Date());
+        orderPay.setUpdateTime(new Date());
         orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
         orderPayDao.insert(orderPay);
 
@@ -292,7 +238,8 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         orderPay.setOrderId(orderInfo.getId());
         orderPay.setOutTradeNo(outTradeNo);
         orderPay.setPayStatus(PayStatusEnum.PAY_ING.getPayStatus());
-        orderPay.setPayTime(new Date());
+        orderPay.setCreateTime(new Date());
+        orderPay.setUpdateTime(new Date());
         orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
         orderPayDao.insert(orderPay);
 
@@ -329,7 +276,15 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
         RequestBase requestBase = genRequestBase(gson.toJson(tradeBizContent), orderPay.getOutTradeNo(), KJTConstants.SERVICE_ENSURE_TRADE);
         ResponseParameter result = callKjt(requestBase);
-        if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+        if(result == null){
+            String failMsg = "协议支付失败，快捷通返回null";
+            log.error(failMsg);
+            orderPay.setFailMsg(failMsg);
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 支付失败
             String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
             log.error("协议支付失败: {}", failMsg);
@@ -352,13 +307,19 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
                 userPay.setUpdateTime(new Date());
                 userPayDao.updateById(userPay);
             }
-            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
+
+            String smsNeed = jsonObject.getString("status");
+            if("M".equalsIgnoreCase(smsNeed)){
+                orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
+            }else if("S".equalsIgnoreCase(smsNeed)){
+                orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
+            }
             if(StringUtils.isNotBlank(jsonObject.getString("pay_token"))){
                 orderPay.setTokenId(jsonObject.getString("token_id"));
                 orderPay.setPayToken(jsonObject.getString("pay_token"));
             }
             orderPay.setTradeNo(jsonObject.getString("trade_no"));
-            orderPay.setNeedSmsconfirm(jsonObject.getString("status"));
+            orderPay.setNeedSmsconfirm(smsNeed);
             orderPay.setUpdateTime(new Date());
             orderPayDao.updateById(orderPay);
             return ResultGenerator.genSuccessResult(jsonObject);
@@ -387,7 +348,16 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
         RequestBase requestBase = genRequestBase(gson.toJson(bizContent), outTradeNo, KJTConstants.SERVICE_TRADE_SETTLE);
         ResponseParameter result = callKjt(requestBase);
-        if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+        if(result == null){
+            // 失败
+            String failMsg = "达成失败，快捷通返回null";
+            log.error(failMsg);
+            orderPay.setFailMsg(result.getMsg());
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 失败
             String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
             log.error("交易达成失败: {}", failMsg);
@@ -429,7 +399,16 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
         RequestBase requestBase = genRequestBase(gson.toJson(bizContent), outTradeNo, KJTConstants.SERVICE_AGREEMENT_PAY_CONFIRM);
         ResponseParameter result = callKjt(requestBase);
-        if(result == null || !ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+        if(result == null){
+            // 支付失败
+            String failMsg = "协议支付确认失败，快捷通返回null";
+            log.error(failMsg);
+            orderPay.setFailMsg(failMsg);
+            orderPay.setPayStatus(PayStatusEnum.PAY_FAIL.getPayStatus());
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
             // 支付失败
             String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
             log.error("协议支付确认失败: {}", failMsg);
@@ -461,9 +440,6 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
     /**
      * 退款/ 担保撤销网关接口
-     * @param orderId
-     * @param userId
-     * @return
      */
     @Override
     @Transactional
@@ -534,42 +510,110 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return ResultGenerator.genFailResult("退款失败");
     }
 
+    /**
+     * 交易查询
+     */
     @Override
-    @Transactional
-    public Result ensureTradeAsyncNotify(Map<String, Object> params){
-        // 更新支付状态
-        log.info("接收到支付回调：{}", JSON.toJSONString(params));
+    public Result tradeQuery(String orderId){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
-                .eq("out_trade_no", params.get("outer_trade_no"))
+                .eq("order_id", orderId)
                 .eq("is_deleted", "0"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
         }
 
-        orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("out_trade_no", orderPay.getOutTradeNo());
+        RequestBase requestBase = genRequestBase(gson.toJson(reqMap), orderPay.getOutTradeNo(), KJTConstants.SERVICE_TRADE_QUERY);
+        ResponseParameter result = callKjt(requestBase);
+        if(result == null){
+            return ResultGenerator.genFailResult("交易查询接口请求失败");
+        }else if(!ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 支付失败
+            String failMsg = StringUtils.isNotBlank(result.getSubMsg()) ? result.getSubMsg() : result.getMsg();
+            log.error("交易查询接口请求失败: {}", failMsg);
+            return ResultGenerator.genFailResult(failMsg);
+        }else if(ReturnInfoEnum.SUCCESS.getCode().equals(result.getCode())){
+            // 成功
+            log.info("交易查询接口请求成功：{}", gson.toJson(result));
+            JSONObject jsonObject = JSONObject.parseObject((String)result.getBizContent());
+            // 签约成功保存token_id
+            return ResultGenerator.genSuccessResult(jsonObject);
+        }
+        return ResultGenerator.genFailResult("交易查询接口请求失败");
+    }
+
+    /**
+     * 支付状态变更异步通知
+     */
+    @Override
+    @Transactional
+    public Boolean ensureTradeAsyncNotify(EnsureTradeCallBackDto reqBean){
+        log.info("接收到支付回调：{}", JSON.toJSONString(reqBean));
+        log.info("支付状态：{}", reqBean.getTrade_status());
+        /*VerifyResult verifyResult;
+        if("RSA".equals(reqBean.getSignType())){
+            //RSA验签
+            Map signMap = KJTPayUtil.objToMap(reqBean);
+            log.info("signMap: {}", signMap);
+            verifyResult = securityService.verify(signMap, reqBean.getSign(), KJTConstants.DEFAULT_CHARSET);
+        }else {
+            throw new BusinessException("不支持的加密类型：" + reqBean.getSignType());
+        }
+
+        if(!verifyResult.isSuccess()){
+            log.error("验签失败");
+//            throw new BusinessException("验签失败");
+        }*/
+
+        insertRevLog(reqBean.getOuter_trade_no(), "ensureTradeAsyncNotify", JSON.toJSONString(reqBean), JSON.toJSONString(reqBean));
+        // 更新支付状态
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("out_trade_no", reqBean.getOuter_trade_no())
+                .eq("is_deleted", "0"));
+        if(orderPay == null){
+            throw new BusinessException("未检索到支付记录");
+        }
+
+        if("WAIT_BUYER_PAY".equalsIgnoreCase(reqBean.getTrade_status())){
+            // 等待买家付款
+            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT.getPayStatus());
+        }else if("PAY_FINISHED".equalsIgnoreCase(reqBean.getTrade_status())){
+            // 买家已付款
+            // 更新订单状态为待发货
+            OrderInfo info = new OrderInfo();
+            info.setId(orderPay.getOrderId());
+            info.setUpdateTime(new Date());
+            info.setStatus(OrderStatusEnum.OREDER_PRE_OUT.getOrderStatus());
+            orderInfoMapper.updateByPrimaryKeySelective(info);
+
+            // 更新库存
+            List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderPay.getOrderId());
+            List<StockNumDTO> list = orderGoodInfoVos.stream().map(m -> {
+                StockNumDTO stockNumDTO = new StockNumDTO();
+                stockNumDTO.setGoodsId(m.getGoodId());
+                stockNumDTO.setGoodsCount(m.getNumber());
+                return stockNumDTO;
+            }).collect(Collectors.toList());
+            goodsMapper.updateStockNum(list);
+
+            orderPay.setPayTime(new Date());
+            orderPay.setPayStatus(PayStatusEnum.PAY_WAIT_CONFIRM.getPayStatus());
+        }else if("TRADE_SUCCESS".equalsIgnoreCase(reqBean.getTrade_status())){
+            // 交易支付成功
+            orderPay.setPayconfirmTime(new Date());
+            orderPay.setPayStatus(PayStatusEnum.PAY_SUCCESS.getPayStatus());
+        }
+        orderPay.setTradeNo(reqBean.getInner_trade_no());
         orderPay.setUpdateTime(new Date());
         orderPayDao.updateById(orderPay);
 
-        // 更新订单状态为待发货
-        OrderInfo info = new OrderInfo();
-        info.setId(orderPay.getOrderId());
-        info.setUpdateTime(new Date());
-        info.setStatus(OrderStatusEnum.OREDER_PRE_OUT.getOrderStatus());
-        orderInfoMapper.updateByPrimaryKeySelective(info);
-
-        // 更新库存
-        List<OrderGoodInfoVo> orderGoodInfoVos = orderGoodInfoMapper.selectByOrderId(orderPay.getOrderId());
-        List<StockNumDTO> list = orderGoodInfoVos.stream().map(m -> {
-            StockNumDTO stockNumDTO = new StockNumDTO();
-            stockNumDTO.setGoodsId(m.getGoodId());
-            stockNumDTO.setGoodsCount(m.getNumber());
-            return stockNumDTO;
-        }).collect(Collectors.toList());
-        goodsMapper.updateStockNum(list);
-
-        return ResultGenerator.genSuccessResult();
+        return true;
     }
 
+    /**
+     * 退款异步通知
+     */
     @Override
     @Transactional
     public Result tradeRefundAsyncNotify(Map<String, Object> params){
@@ -579,7 +623,6 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         if(payRefund == null){
             return ResultGenerator.genFailResult("未检索到退款记录");
         }
-
 
         return ResultGenerator.genSuccessResult();
     }

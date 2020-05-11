@@ -148,20 +148,40 @@ public class PayController {
         return result;
     }
 
+    /**
+     * 交易查询接口
+     */
+    @ResponseBody
+    @ApiOperation(value = "交易查询接口")
+    @GetMapping("/tradeQuery/{orderId}")
+    public Result tradeQuery(@PathVariable String orderId, HttpServletRequest request) {
+        if(StringUtils.isBlank(orderId)){
+            return ResultGenerator.genFailResult("请求参数错误");
+        }
+
+        Result result = payService.tradeQuery(orderId);
+        return result;
+    }
+
     @ResponseBody
     @ApiOperation(value = "支付异步通知接口")
     @PostMapping("/ensureTradeAsyncNotify")
     public String ensureTradeAsyncNotify(EnsureTradeCallBackDto callBackDto, HttpServletRequest request) {
         log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(callBackDto));
-        log.info("method: " + request.getMethod());
         Enumeration<String> parameterNames = request.getParameterNames();
         while (parameterNames.hasMoreElements()){
             log.info("参数名：" + parameterNames.nextElement());
         }
-//        log.info("ensureTradeAsyncNotify收到异步回调: {}", JSON.toJSONString(params));
-//        log.info("notify_type: {}", params.get("notify_type"));
-        Map<String,Object> params = new HashMap<>();
-        payService.ensureTradeAsyncNotify(params);
+        if(callBackDto == null){
+            return KJTConstants.NOTIFY_RET_FAIL;
+        }
+
+        try {
+            payService.ensureTradeAsyncNotify(callBackDto);
+        } catch (Exception e) {
+            log.error("支付回调处理失败", e);
+            return KJTConstants.NOTIFY_RET_FAIL;
+        }
         return KJTConstants.NOTIFY_RET_SUCCESS;
     }
 

@@ -177,6 +177,11 @@ public class PayServiceBase {
 
     }
 
+    /**
+     * 快捷通接口调用
+     * @param requestBase
+     * @return
+     */
     public ResponseParameter callKjt(RequestBase requestBase){
         // 请求快捷通接口
         net.sf.json.JSONObject jsonObjectFinal = KJTPayUtil.getJsonObjectFinal(requestBase);

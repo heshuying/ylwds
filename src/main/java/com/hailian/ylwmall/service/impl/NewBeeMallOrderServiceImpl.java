@@ -76,7 +76,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             //拼装收获地址
             if(info.getDeliveryId() != null){
                 TbUserAddr tbUserAddr = userAddrDao.selectById(info.getDeliveryId());
-                vo.setDeliveryAddress(tbUserAddr.getAcceptor()+tbUserAddr.getPhone()+";"+tbUserAddr.getProvince()+tbUserAddr.getCity()+tbUserAddr.getArea()+tbUserAddr.getDetail());
+                vo.setDeliveryAddress(tbUserAddr.getAcceptor()+tbUserAddr.getPhone()+"/"+tbUserAddr.getProvince()+tbUserAddr.getCity()+tbUserAddr.getArea()+tbUserAddr.getDetail());
             }
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));

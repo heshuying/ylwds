@@ -360,3 +360,9 @@ CREATE TABLE `tb_user_profile` (
   PRIMARY KEY (`profile_id`) USING BTREE,
   KEY `idx_profile_user` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+INSERT INTO `tb_user` VALUES ('1', 'admin', 'admin', 'e10adc3949ba59abbe56e057f20f883e', '', '平台用户', '', '03', '1', '', '2020-04-16 11:38:35');
+
+INSERT INTO `tb_module` VALUES ('1', '轮播大图', '轮播大图', '100', '0', '2020-04-23 14:19:49', '1', '2020-04-23 14:19:49', '1', 'Banner');
+INSERT INTO `tb_module` VALUES ('2', '日用百货', '生活必需品', '0', '0', '2020-04-24 14:25:04', '0', '2020-04-24 14:25:04', '0', 'Module');
+INSERT INTO `tb_module` VALUES ('3', '冰洗专区', '生活必需品', '1', '0', '2020-04-26 16:11:11', '0', '2020-04-26 16:11:11', '0', 'Module');

@@ -16,9 +16,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://10.138.26.200:3909/YLW_mall_db?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowMultiQueries=true
-      username: sorcl_wz
-      password: s23Ec1dSuk
+      url: jdbc:mysql://localhost:3306/ylw_mall_db?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowMultiQueries=true
+      username: root
+      password: Root@20202
       initial-size: 10
       max-active: 100
       min-idle: 10
@@ -46,7 +46,7 @@ spring:
           config:
             multi-statement-allow: true
 logging:
-  config: classpath:log/log-config-dev.xml
+  config: classpath:log/log-config-prod.xml
 
 kjt:
   payeeidentity: 200001750781

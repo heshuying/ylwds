@@ -269,3 +269,5 @@ alter table tb_order_goodinfo add goods_attr varchar(80) not null default '' com
 alter table tb_order_orderinfo add delivery_id bigint(20) not null default 0 comment '发货地址ID';
 alter table tb_order_orderinfo add pay_type varchar(20) not null default '' comment '支付方式';
 alter table tb_order_orderinfo add delivery_fee decimal(5,2) NOT NULL DEFAULT 0 comment '运费';
+
+INSERT INTO `tb_user` VALUES ('1', 'admin', 'admin', 'e10adc3949ba59abbe56e057f20f883e', '', '平台用户', '', '03', '1', '', '2020-04-16 11:38:35');

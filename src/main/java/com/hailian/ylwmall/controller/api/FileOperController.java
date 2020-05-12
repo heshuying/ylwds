@@ -80,7 +80,7 @@ public class FileOperController {
     }
 
     @ApiOperation(value = "下载文件")
-    @GetMapping("/downloadFile/{fileName:.+}")
+    @GetMapping("/downloadFile/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = fileService.loadFileAsResource(fileName);

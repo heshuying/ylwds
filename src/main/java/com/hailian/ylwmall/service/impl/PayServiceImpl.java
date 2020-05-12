@@ -539,10 +539,11 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
      * 交易查询
      */
     @Override
-    public Result tradeQuery(String orderId){
+    public Result tradeQuery(String orderId, String payType){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
-                .eq("is_deleted", "0"));
+                .eq("is_deleted", "0")
+                .eq("pay_type", payType));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
         }

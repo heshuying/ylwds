@@ -87,3 +87,9 @@ file:
   uploadDir: D://files//
   uriPath: upload/
   staticAccessPath: /upload/** #静态资源对外暴露的访问路径
+
+# 快递100
+kd100:
+  url: http://poll.kuaidi100.com/poll/query.do
+  customer: 6256F91AC42AB34B172D50E07D139A1A
+  key: SSwDHrAK6313

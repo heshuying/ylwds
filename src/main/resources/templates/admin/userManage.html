@@ -244,7 +244,7 @@
                                 <div class="dialog-content-label">营业执照</div>
                                 <div class="dialog-content-input">
                                     <el-input readonly v-model="regisInfoAll.compLegalNo">
-                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                        <i slot="suffix" class="check-append" @click="downloadCustom(regisInfoAll.compLegalUrl)">点击查看附件</i>
                                     </el-input>
                                 </div>
                             </div>
@@ -311,8 +311,8 @@
                             <div class="dialog-content-line">
                                 <div class="dialog-content-label">供应商承诺书</div>
                                 <div class="dialog-content-input">
-                                    <el-input readonly v-model="regisInfoAll.promiseUri">
-                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                    <el-input readonly>
+                                        <i slot="suffix" class="check-append" @click="downloadCustom(regisInfoAll.promiseUri)">点击查看附件</i>
                                     </el-input>
                                 </div>
                             </div>
@@ -418,7 +418,7 @@
                                 <div class="dialog-content-label">营业执照附件</div>
                                 <div class="dialog-content-input">
                                     <el-input readonly v-model="regisInfoAll.compLegalNo">
-                                        <i slot="suffix" class="check-append" @click="downloadCustom">点击查看附件</i>
+                                        <i slot="suffix" class="check-append" @click="downloadCustom(regisInfoAll.compLegalUrl)">点击查看附件</i>
                                     </el-input>
                                 </div>
                             </div>
@@ -480,8 +480,13 @@
                 this.queryTableData();
             },
             // 会员营业执照下载
-            downloadCustom() {
-                console.log('custom download');
+            downloadCustom(url) {
+                if(url) {
+                    var wholeUrl = 'http://localhost:8080/' + url;
+                    window.open(wholeUrl);
+                } else {
+                    this.$message.error('无可用链接，查看失败');
+                }
             },
             // 查询表格数据
             queryTableData() {

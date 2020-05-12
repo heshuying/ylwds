@@ -168,7 +168,7 @@ public class PayServiceBase {
             Map<String,String> payMethod = new HashMap<>();
             payMethod.put("pay_product_code", "83");
             payMethod.put("amount", price.toString());
-            payMethod.put("token_valid_minutes", "10");
+            payMethod.put("token_valid_minutes", "120"); // 2小时
             tradeBean.setPayMethod(payMethod);
             return tradeBean;
         }

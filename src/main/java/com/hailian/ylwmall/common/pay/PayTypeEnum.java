@@ -1,18 +1,14 @@
-package com.hailian.ylwmall.common;
+package com.hailian.ylwmall.common.pay;
 
 /**
- * @author 13
- * @qq交流群 796794009
- * @email 2449207463@qq.com
- * @link https://github.com/newbee-ltd
- * @apiNote 订单状态:0.无 1.支付宝 2.微信支付
+ * 支付方式
+ * @author 19033323
  */
 public enum PayTypeEnum {
 
-    DEFAULT(-1, "ERROR"),
-    NOT_PAY(0, "无"),
-    ALI_PAY(1, "支付宝"),
-    WEIXIN_PAY(2, "微信支付");
+    BANK(1, "银联支付"),
+    AGREEMENT(2, "协议支付"),
+    PURSE(3, "扫码支付");
 
     private int payType;
 
@@ -29,7 +25,7 @@ public enum PayTypeEnum {
                 return payTypeEnum;
             }
         }
-        return DEFAULT;
+        return BANK;
     }
 
     public int getPayType() {

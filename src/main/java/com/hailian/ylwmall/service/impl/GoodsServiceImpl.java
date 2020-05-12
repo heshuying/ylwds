@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +45,9 @@ public class GoodsServiceImpl extends ServiceImpl<TbGoodsInfoMapper, TbGoodsInfo
     public String saveNewBeeMallGoods(TbGoodsInfo goods) {
         goods.setCreateTime(new Date());
         goods.setUpdateTime(new Date());
-
+        if(goods.getProfit() == null || BigDecimal.ZERO.compareTo(goods.getProfit()) == 0){
+            goods.setPrice(goods.getSellingPrice());
+        }
         if (goodsMapper.insertSelective(goods) > 0) {
             return ServiceResultEnum.SUCCESS.getResult();
         }

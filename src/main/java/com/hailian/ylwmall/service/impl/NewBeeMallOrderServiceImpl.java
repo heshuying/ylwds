@@ -4,13 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.controller.vo.OrderInfoVo;
-import com.hailian.ylwmall.dao.TbGoodsInfoMapper;
-import com.hailian.ylwmall.dao.NewBeeMallOrderItemMapper;
-import com.hailian.ylwmall.dao.NewBeeMallOrderMapper;
-import com.hailian.ylwmall.dao.NewBeeMallShoppingCartItemMapper;
-import com.hailian.ylwmall.dao.OrderGoodInfoMapper;
-import com.hailian.ylwmall.dao.OrderInfoMapper;
-import com.hailian.ylwmall.dao.TbUserDao;
+import com.hailian.ylwmall.dao.*;
+import com.hailian.ylwmall.entity.TbUserAddr;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -37,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -53,7 +49,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     private NewBeeMallShoppingCartItemMapper newBeeMallShoppingCartItemMapper;
     @Autowired
     private TbGoodsInfoMapper newBeeMallGoodsMapper;
-
+    @Autowired
+    private TbUserAddrDao userAddrDao;
 
 
     @Autowired
@@ -68,7 +65,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
     @Override
     public PageResult getMyOrdersForSupplier(PageQueryUtil pageUtil) {
         //获取总条数
-        int total = orderInfoMapper.countForSupplier(pageUtil);
+        Integer total = orderInfoMapper.countForSupplier(pageUtil);
         //查询每页的数据
         List<OrderInfo> orderInfos = orderInfoMapper.selectByPageForSupplier(pageUtil);
         List<OrderInfoVo> orderListVOS = new ArrayList<>();
@@ -76,6 +73,11 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         for(OrderInfo info : orderInfos){
             String s = JSONObject.toJSONString(info);
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
+            //拼装收获地址
+            if(info.getDeliveryId() != null){
+                TbUserAddr tbUserAddr = userAddrDao.selectById(info.getDeliveryId());
+                vo.setDeliveryAddress(tbUserAddr.getAcceptor()+tbUserAddr.getPhone()+"/"+tbUserAddr.getProvince()+tbUserAddr.getCity()+tbUserAddr.getArea()+tbUserAddr.getDetail());
+            }
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
             vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
@@ -140,16 +142,21 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
 
     @Override
     public void cutDownPrice(CutDownPriceParam params) {
+        OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(params.getOrderId());
+        BigDecimal totalPrice = orderInfo.getTotalPrice();
+        BigDecimal buyingPrice = orderInfo.getBuyingPrice();
+        if(totalPrice.subtract(buyingPrice).compareTo(params.getCutdownNumber()) == -1){
+            throw new BusinessException("减免金额不能超过利润额");
+        }
         OrderInfo info = new OrderInfo();
         info.setId(params.getOrderId());
         info.setCutDown(params.getCutdownNumber());
+
         int i = orderInfoMapper.updateByPrimaryKeySelective(info);
         int i1 = orderInfoMapper.cutDownPrice(params);
         if(i == 0 || i1 == 0){
             throw new RuntimeException();
         }
-
-
     }
 
     @Override

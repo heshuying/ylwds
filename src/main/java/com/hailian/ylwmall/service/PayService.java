@@ -24,7 +24,7 @@ public interface PayService {
 
     Result tradeRefund(String orderId, Long userId);
 
-    Result tradeQuery(String orderId);
+    Result tradeQuery(String orderId, String payType);
 
     @Transactional
     Boolean ensureTradeAsyncNotify(EnsureTradeCallBackDto reqBean);

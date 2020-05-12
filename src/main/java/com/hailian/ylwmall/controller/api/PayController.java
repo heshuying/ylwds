@@ -153,13 +153,14 @@ public class PayController {
      */
     @ResponseBody
     @ApiOperation(value = "交易查询接口")
-    @GetMapping("/tradeQuery/{orderId}")
-    public Result tradeQuery(@PathVariable String orderId, HttpServletRequest request) {
+    @GetMapping("/tradeQuery/{orderId}/{payType}")
+    public Result tradeQuery(@PathVariable String orderId, @PathVariable String payType, HttpServletRequest request) {
+        log.info("tradeQuery请求参数orderId：{}, payType:{}", orderId, payType);
         if(StringUtils.isBlank(orderId)){
             return ResultGenerator.genFailResult("请求参数错误");
         }
 
-        Result result = payService.tradeQuery(orderId);
+        Result result = payService.tradeQuery(orderId, payType);
         return result;
     }
 

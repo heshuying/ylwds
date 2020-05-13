@@ -169,7 +169,7 @@
                             prop="id"
                             label="订单编号"
                             align="center"
-                            width="120">
+                            width="130">
                     </el-table-column>
                     <el-table-column
                             label="商品名称"
@@ -196,13 +196,23 @@
                             align="center">
                         <template slot-scope="scope">
                             <div class="plat-deduct-line">
-                                <el-input type="number" v-model="scope.row.cutDown">
+                                <el-input type="number" v-model="scope.row.cutDown" :disabled="scope.row.cutDownDis">
                                     <span slot="prefix" style="margin-left: 2px;">
                                         -¥
                                     </span>
                                 </el-input>
-                                <img th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
-                                <img th:src="@{/admin/image/photo.png}" alt="">
+                                <div>
+                                    <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
+                                    <el-upload
+                                            class="icon-select"
+                                            action="/api/file/uploadFile"
+                                            :limit="5"
+                                            :show-file-list="false"
+                                            :on-success="function(response, file, fileList){handleUploadSuccess(response, file, fileList,scope.row)}"
+                                    >
+                                        <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/photo.png}" alt="">
+                                    </el-upload>
+                                </div>
                             </div>
                             <div style="text-align: left;">
                                 =¥{{scope.row.realPrice || ''}}
@@ -228,7 +238,7 @@
                             prop="userRemark"
                             label="用户备注"
                             align="center"
-                            width="100"
+                            width="50"
                             show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column
@@ -246,7 +256,7 @@
                     <el-table-column
                             label="客户方"
                             align="center"
-                            width="100">
+                            width="120">
                         <template slot-scope="scope">
                             <div class="blue-color">
                                {{scope.row.customerName}}
@@ -256,7 +266,7 @@
                     <el-table-column
                             label="资源方"
                             align="center"
-                            width="100">
+                            width="120">
                         <template slot-scope="scope">
                             <div class="blue-color">
                                 {{scope.row.supplierName}}
@@ -304,6 +314,7 @@
                 orderId: '',
                 tableData: [],
                 multipleSelection: [],
+                canCutList: [], //记录上传照片的订单id
                 sortType: '',
                 total: 0,
                 pagesize: 10,
@@ -347,6 +358,7 @@
                                 result.data.list[i].totalPriceShow = '¥' + totalTemp;
                                 var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
                                 result.data.list[i].grossProfitShow = '¥' + formatGross;
+                                result.data.list[i].cutDownDis = result.data.list[i].status == '待支付'? false : true;
                             }
                             _this.tableData = result.data.list || [];
                         } else {
@@ -358,9 +370,34 @@
                     }
                 });
             },
+            // 减免前上传图片
+            handleUploadSuccess(res,file,fileList,item) {
+                if (res.resultCode == "200") {
+                    this.$message.success('上传成功');
+                    var wholeUrl = this.baseUrl + res.data;
+                    this.canCutList.push({orderId: item.id, img: res.data});
+                } else {
+                    this.$message.error("上传失败，" + res.msg);
+                }
+            },
             // 平台减免服务
             cutDownService(valObj) {
-                if(valObj.cutDown === '') {
+                var imgFlag = false;
+                var cutImg = '';
+                var operateIndex = -1;
+                for(var i in this.canCutList) {
+                    if(this.canCutList[i].orderId === valObj.id) {
+                        operateIndex = i;
+                        imgFlag = true;
+                        cutImg = this.canCutList[i].img;
+                        break;
+                    }
+                }
+                if(!imgFlag) {
+                    this.$message.error('请先上传签名图片');
+                    return;
+                }
+                if(valObj.cutDown === '' || valObj.cutDown == '0') {
                     this.$message.error('前先输入减免金额');
                     return;
                 }
@@ -368,7 +405,8 @@
                 var postObj = {
 //                    userId:[[${session.loginUserId}]],
                     orderId: valObj.id,
-                    cutdownNumber: parseFloat(valObj.cutDown)
+                    cutdownNumber: parseFloat(valObj.cutDown),
+                    cutdownImg: cutImg
                 }
                 $.ajax({
                     type: "post",
@@ -377,6 +415,7 @@
                     data: JSON.stringify(postObj),
                     success: function (result) {
                         if (result.resultCode == 200) {
+                            _this.canCutList.splice(operateIndex, 1);
                             _this.$message.success('操作成功');
                             _this.queryTableData();
                         } else {

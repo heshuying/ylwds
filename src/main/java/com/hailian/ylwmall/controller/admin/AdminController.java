@@ -97,7 +97,7 @@ public class AdminController {
 
         if("04".equals(adminUser.getUserType())
                 && adminUser.getUserStatus()==3){
-            return "redirect:http://localhost:8002/outer/registerbus/busCompany?userId=" + adminUser.getUserId();
+            return "redirect:http://106.53.192.56/outer/#/registerbus/busCompany?userId=" + adminUser.getUserId();
         }
         //session过期时间设置为7200秒 即两小时
         //session.setMaxInactiveInterval(60 * 60 * 2);

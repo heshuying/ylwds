@@ -1,25 +1,32 @@
 package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.BuyRespDto;
+import com.hailian.ylwmall.dto.MyOrderRespDto;
 import com.hailian.ylwmall.dto.OrderDetailDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderRespDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
+import com.hailian.ylwmall.dto.UserListDto;
 import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.entity.TbOrderGoodinfo;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.hailian.ylwmall.dao.TbOrderOrderinfoDao;
+import com.hailian.ylwmall.entity.TbUser;
 import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.service.TbShoppingCartService;
+import com.hailian.ylwmall.service.TbUserService;
+import com.hailian.ylwmall.util.Query;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import com.hailian.ylwmall.util.SystemUtil;
@@ -32,6 +39,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +58,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     private TbOrderGoodinfoService orderGoodsService;
     @Autowired
     private TbShoppingCartService shoppingCartService;
+    @Autowired
+    private TbUserService userService;
+
     @Override
     public Result confirmOrder(Long userId, OrderFormDto dto) {
         if(dto==null||dto.getGoods()==null){
@@ -183,7 +194,68 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
     }
 
     @Override
-    public Result getOrders(Long userId) {
-        return null;
+    public Result getOrders(Map<String, Object> params) {
+        IPage<TbOrderOrderinfo> orders=baseMapper.selectPage(
+                new Query<TbOrderOrderinfo>().getPage(params),
+                new QueryWrapper<TbOrderOrderinfo>().eq("customer_id",params.get("userId"))
+                .eq(params.containsKey("status"),"status",params.get("status"))
+        );
+        IPage<MyOrderRespDto> pages=new Page<>();
+        List<MyOrderRespDto> myOrders=new ArrayList<>();
+
+        pages.setCurrent(orders.getCurrent());
+        pages.setTotal(orders.getTotal());
+        pages.setPages(orders.getPages());
+        pages.setSize(orders.getSize());
+        List<TbOrderOrderinfo> list=orders.getRecords();
+        if(list!=null&&list.size()>0){
+            List<Long> orderIds=list.stream().map(m->m.getId()).collect(Collectors.toList());
+            List<TbOrderGoodinfo> orderGoods=orderGoodsService.list(
+                    new QueryWrapper<TbOrderGoodinfo>().in("order_id",orderIds)
+            );
+            List<TbGoodsInfo> goodsInfos=goodsService.list(
+                    new QueryWrapper<TbGoodsInfo>().in("goods_id",
+                            orderGoods.stream().map(m->m.getGoodId()).collect(Collectors.toList()))
+            );
+            List<Long> supplierIds=list.stream().map(m->m.getSupplierId())
+                    .distinct().collect(Collectors.toList());
+            List<TbUser> users=userService.list(
+                    new QueryWrapper<TbUser>()
+                            .in("user_id",supplierIds)
+            );
+            for (TbOrderOrderinfo current :list
+                 ) {
+                MyOrderRespDto myOrder=new MyOrderRespDto();
+                BeanUtils.copyProperties(current,myOrder);
+                TbUser currSupplier=users.stream().filter(m->current.getSupplierId()
+                        .compareTo(m.getUserId())==0).findAny().get();
+                myOrder.setSupplierName(currSupplier.getLoginName());
+                List<TbOrderGoodinfo> currOrderGoods=orderGoods.stream().filter(
+                       m-> current.getId().compareTo(m.getOrderId())==0
+                ).collect(Collectors.toList());
+                List<ShoppingGoodsDto> myOrderGoods=new ArrayList<>();
+                for (TbOrderGoodinfo orderGood:currOrderGoods
+                     ) {
+                    ShoppingGoodsDto good=new ShoppingGoodsDto();
+                    good.setGoodsCount(orderGood.getNumber());
+                    good.setGoodsAttr(orderGood.getGoodsAttr());
+                    TbGoodsInfo goodsInfo=goodsInfos.stream().filter(
+                            m->m.getGoodsId().compareTo(orderGood.getGoodId())==0
+                    ).findAny().orElse(null);
+                    if(goodsInfo!=null){
+                        BeanUtils.copyProperties(goodsInfo, good);
+                        good.setSupplierId(goodsInfo.getCreateUser());
+                    }
+                    myOrderGoods.add(good);
+                }
+                myOrder.setList(myOrderGoods);
+                myOrders.add(myOrder);
+
+            }
+            pages.setRecords(myOrders);
+        }else{
+            pages.setRecords(myOrders);
+        }
+        return ResultGenerator.genSuccessResult(pages);
     }
 }

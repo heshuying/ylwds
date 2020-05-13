@@ -70,7 +70,7 @@ public class MyController {
     @ResponseBody
     public Result orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        params.put("customerId", user.getUserId());
+        params.put("userId", user.getUserId());
         if (StringUtils.isEmpty(params.get("page"))) {
             params.put("page", 1);
         }

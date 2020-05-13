@@ -114,7 +114,7 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
     private String payType;
 
     private String cutdownImg;
-    
+
     @Override
     protected Serializable pkVal() {
         return this.id;

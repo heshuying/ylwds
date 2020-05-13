@@ -7,6 +7,8 @@ import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.Result;
 
+import java.util.Map;
+
 /**
  * <p>
  * 订单表（主） 服务类
@@ -20,5 +22,5 @@ public interface TbOrderOrderinfoService extends IService<TbOrderOrderinfo> {
     Result getOrderInfo(Long orderNo);
     Result doOrder(Long userId, OrderSubmitDto dto);
 
-    Result getOrders(Long userId);
+    Result getOrders(Map<String, Object> params);
 }

@@ -407,7 +407,8 @@
                     beginTime = this.orderDate[0];
                     endTime = this.orderDate[1];
                 }
-                window.location.href = '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime + '&endTime=' + endTime;
+                var url = '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime + '&endTime=' + endTime;
+                window.open(url, '_self');
 //                var _this = this;
 //                $.ajax({
 //                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +

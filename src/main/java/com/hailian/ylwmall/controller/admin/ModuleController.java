@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -44,12 +45,18 @@ public class ModuleController {
      * @return
      */
     @PostMapping("/save")
-    public Result save(@RequestBody ModuleReq reqBean){
+    public Result save(@RequestBody ModuleReq reqBean, HttpServletRequest request){
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
         if(reqBean == null || StringUtils.isEmpty(reqBean.getModName())){
             return ResultGenerator.genFailResult("参数异常！");
         }
 
         TbModule module = CommonUtil.convertBean(reqBean, TbModule.class);
+        module.setCreateUser(userId.intValue());
+        module.setUpdateUser(userId.intValue());
         module.setUpdateTime(new Date());
         module.setModKey(Const.Mod_Module_Key);
         if(moduleService.saveOrUpdate(module)){
@@ -84,7 +91,11 @@ public class ModuleController {
      * @return
      */
     @PostMapping("/saveModelDetail")
-    public Result saveModelDetail(@RequestBody ModuleDetailReq reqBean){
+    public Result saveModelDetail(@RequestBody ModuleDetailReq reqBean, HttpServletRequest request){
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
         if(reqBean == null
                 || StringUtils.isEmpty(reqBean.getIsHead())
                 || StringUtils.isEmpty(reqBean.getModId())){
@@ -98,6 +109,8 @@ public class ModuleController {
         }
 
         TbModuleDetail module = CommonUtil.convertBean(reqBean, TbModuleDetail.class);
+        module.setCreateUser(userId.intValue());
+        module.setUpdateUser(userId.intValue());
         module.setUpdateTime(new Date());
         if(moduleDetailService.saveOrUpdate(module)){
             return ResultGenerator.genSuccessResult();

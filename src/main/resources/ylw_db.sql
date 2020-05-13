@@ -368,3 +368,22 @@ INSERT INTO `tb_module` VALUES ('2', '日用百货', '生活必需品', '0', '0'
 INSERT INTO `tb_module` VALUES ('3', '冰洗专区', '生活必需品', '1', '0', '2020-04-26 16:11:11', '0', '2020-04-26 16:11:11', '0', 'Module');
 
 alter table tb_order_orderinfo add cutdown_img varchar(100) not null default '' comment '减价图片';
+-- 评价表
+CREATE TABLE `tb_goods_comment` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `goods_id` bigint(20) DEFAULT NULL COMMENT '商品id',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
+  `order_id` bigint(20) DEFAULT NULL COMMENT '订单id',
+  `user_name` varchar(100) DEFAULT NULL COMMENT '用户名',
+  `content` varchar(1000) DEFAULT NULL COMMENT '评价内容',
+  `score` int(11) DEFAULT '5' COMMENT '评分：1 2 3 4 5',
+  `goods_attribute` varchar(200) DEFAULT NULL COMMENT '规格',
+  `pic_url` varchar(500) DEFAULT NULL COMMENT '图片地址,逗号分隔',
+  `is_auto` int(11) DEFAULT '0' COMMENT '是否自动评价：0是 1否',
+  `is_anonymous` int(11) DEFAULT '0' COMMENT '是否匿名：0是 1否',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+

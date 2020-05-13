@@ -603,8 +603,8 @@
                     success: function (result) {
                         if (result.resultCode == 200) {
                             _this.$message.success('操作成功');
-                            // window.location.href = "/admin/goods";
-                            window.open("/admin/goods", '_self');
+                            window.location.href = "/admin/goods";
+                            // window.open("/admin/goods", '_self');
                         } else {
                             _this.$message.error(result.message);
                         };

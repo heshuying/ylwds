@@ -12,4 +12,5 @@ public class CutDownPriceParam {
     private BigDecimal cutdownNumber;
 
     private Integer userId;
+    private String cutdownImg;
 }

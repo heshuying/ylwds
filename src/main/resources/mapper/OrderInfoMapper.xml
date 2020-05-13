@@ -343,7 +343,10 @@
   </select>
 
   <update id="cutDownPrice" parameterType="com.hailian.ylwmall.entity.order.CutDownPriceParam">
-    update tb_order_orderinfo set gross_profit = (total_price-cut_down-buying_price) ,real_price = (total_price-cut_down) where id = #{orderId}
+    update tb_order_orderinfo set gross_profit = (total_price-cut_down-buying_price) ,
+    real_price = (total_price-cut_down) ,
+    cutdown_img=#{cutdownImg}
+    where id = #{orderId}
   </update>
 
 </mapper>

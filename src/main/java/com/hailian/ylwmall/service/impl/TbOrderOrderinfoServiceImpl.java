@@ -30,6 +30,8 @@ import com.hailian.ylwmall.util.Query;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import com.hailian.ylwmall.util.SystemUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.jboss.netty.util.internal.StringUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -195,10 +197,19 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
 
     @Override
     public Result getOrders(Map<String, Object> params) {
+        String orderNo="", status="";
+        if(params.containsKey("orderNo")){
+            orderNo=String.valueOf(params.get("orderNo"));
+        }
+        if(params.containsKey("status")){
+            status=String.valueOf(params.get("status"));
+        }
+
         IPage<TbOrderOrderinfo> orders=baseMapper.selectPage(
                 new Query<TbOrderOrderinfo>().getPage(params),
                 new QueryWrapper<TbOrderOrderinfo>().eq("customer_id",params.get("userId"))
-                .eq(params.containsKey("status"),"status",params.get("status"))
+                .eq(StringUtils.isNoneBlank(status),"status", Integer.valueOf(status))
+                .eq(StringUtils.isNoneBlank(orderNo), "id", Long.parseLong(orderNo))
         );
         IPage<MyOrderRespDto> pages=new Page<>();
         List<MyOrderRespDto> myOrders=new ArrayList<>();

@@ -74,7 +74,9 @@ public class MyController {
         if (StringUtils.isEmpty(params.get("page"))) {
             params.put("page", "1");
         }
-        params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
+        if(StringUtils.isEmpty(params.get("limit"))) {
+            params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
+        }
         return orderinfoService.getOrders(params);
     }
 

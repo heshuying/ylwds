@@ -268,6 +268,8 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                     if(goodsInfo!=null){
                         BeanUtils.copyProperties(goodsInfo, good);
                         good.setSupplierId(goodsInfo.getCreateUser());
+                        good.setTotal(good.getPrice().multiply(new BigDecimal(
+                                String.valueOf(good.getGoodsCount()))));
                     }
                     myOrderGoods.add(good);
                 }

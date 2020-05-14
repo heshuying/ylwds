@@ -59,27 +59,7 @@ public class MyController {
     private TbOrderOrderinfoService orderinfoService;
     @Autowired
     private HttpSession httpSession;
-    /**
-     * 我的订单列表
-     * @param params
-     * @param request
-     * @param httpSession
-     * @return
-     */
-    @ApiOperation(value = "我的订单列表")
-    @GetMapping("/orders")
-    @ResponseBody
-    public Result orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
-        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        params.put("userId", user.getUserId());
-        if (StringUtils.isEmpty(params.get("page"))) {
-            params.put("page", "1");
-        }
-        if(StringUtils.isEmpty(params.get("limit"))) {
-            params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
-        }
-        return orderinfoService.getOrders(params);
-    }
+
 
     /**
      * 我的收获地址
@@ -219,5 +199,27 @@ public class MyController {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
 
         return orderinfoService.updateOrderStatus(user.getUserId(), dto);
+    }
+
+    /**
+     * 我的订单列表
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @ApiOperation(value = "我的订单列表")
+    @GetMapping("/orders")
+    @ResponseBody
+    public Result orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        params.put("userId", user.getUserId());
+        if (StringUtils.isEmpty(params.get("page"))) {
+            params.put("page", "1");
+        }
+        if(StringUtils.isEmpty(params.get("limit"))) {
+            params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
+        }
+        return orderinfoService.getOrders(params);
     }
 }

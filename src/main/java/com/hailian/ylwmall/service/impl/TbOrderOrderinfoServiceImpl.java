@@ -26,6 +26,8 @@ import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.service.TbShoppingCartService;
 import com.hailian.ylwmall.service.TbUserService;
+import com.hailian.ylwmall.util.Const;
+import com.hailian.ylwmall.util.DateTimeUtil;
 import com.hailian.ylwmall.util.Query;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
@@ -244,6 +246,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                  ) {
                 MyOrderRespDto myOrder=new MyOrderRespDto();
                 BeanUtils.copyProperties(current,myOrder);
+                myOrder.setCreateDate(DateTimeUtil.format(current.getCreateTime()));
+                Const.OrderStatus orderStatus=Const.OrderStatus.getByKey(current.getStatus());
+                myOrder.setStatusDesc(orderStatus.getCustomerDesc());
                 TbUser currSupplier=users.stream().filter(m->current.getSupplierId()
                         .compareTo(m.getUserId())==0).findAny().get();
                 myOrder.setSupplierName(currSupplier.getLoginName());

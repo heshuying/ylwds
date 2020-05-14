@@ -26,11 +26,13 @@ public class MyOrderRespDto {
      */
     private Integer status;
 
+    private String statusDesc;
+
 
     /**
      * 下单时间
      */
-    private Date createTime;
+    private String createDate;
 
     /**
      * 收货地址

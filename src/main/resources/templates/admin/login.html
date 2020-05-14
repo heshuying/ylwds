@@ -138,8 +138,7 @@
                             还没有账号?
                         </div>
                         <div>
-                            <a class="login-reg-btn" th:href="@{'http://106.53.192.56/outer/#/registerbus/busIndex'}">注册</a>
-                            <!--<a class="login-reg-btn" th:href="@{'http://ylwbtb.hoptest.haier.net/outer/registerbus/busIndex'}">注册</a>-->
+                            <a id="regBtn" class="login-reg-btn" >注册</a>
                         </div>
                     </div>
                 </form>
@@ -161,4 +160,16 @@
 <!--<script th:src="@{/admin/dist/js/plugins/particles.js}"></script>-->
 <!--<script th:src="@{/admin/dist/js/plugins/login-bg-particles.js}"></script>-->
 </body>
+<script th:inline="javascript">
+    var storage=window.localStorage;
+    // 本地
+//    var url = "http://localhost:8002/";
+//    var urlWithPort = "http://localhost:8080/";
+    // 服务器
+    var url = "http://106.53.192.56/";
+    var urlWithPort = "http://106.53.192.56:8080/";
+    storage.setItem("baseUrl",urlWithPort);
+    var regUrl = url + "outer/#/registerbus/busIndex";
+    $('#regBtn').attr('href',regUrl);
+</script>
 </html>

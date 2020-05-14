@@ -380,7 +380,7 @@
         el: '#app',
         data() {
             return {
-                baseUrl: 'http://106.53.192.56:8080/',
+                baseUrl: "",
                 goodsId: '',
                 specsList:[],  // 规格列表
                 tagList: [],   // 标签列表
@@ -406,7 +406,7 @@
             };
         },
         mounted() {
-            // this.initEditor();
+            this.baseUrl = window.localStorage.getItem("baseUrl");
             this.firstCategory = [[${firstLevelCategories}]] || '';
             this.secondCategory = [[${secondLevelCategories}]] || '';
             this.thridCategory = [[${thirdLevelCategories}]] || '';
@@ -491,8 +491,6 @@
                 }).then(function() {
                     _this.detailPhotoList.splice(index, 1);
                     _this.detailPhotoListShow.splice(index, 1);
-                    console.log(_this.detailPhotoList);
-                    console.log(_this.detailPhotoListShow);
                 }).catch(function() {});
             },
             // 操作tag
@@ -557,7 +555,9 @@
                 }
                 var detailPhotoStr = '';
                 for(var k in this.detailPhotoList) {
-                    if(detailPhotoStr === '') {
+                    if(this.detailPhotoList.length === 1) {
+                        detailPhotoStr = this.detailPhotoList[0][0];
+                    } else if(detailPhotoStr === '') {
                         detailPhotoStr = this.detailPhotoList[k];
                     } else {
                         detailPhotoStr = detailPhotoStr + ',' + this.detailPhotoList[k];

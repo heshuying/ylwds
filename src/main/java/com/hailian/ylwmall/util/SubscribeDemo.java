@@ -18,11 +18,11 @@ public class SubscribeDemo {
 
 	public static void main(String[] args) {
 		String key = "SSwDHrAK6313";					//企业授权key
-		String company = "yunda";			//快递公司编码
-		String number = "3950055201640";	//快递单号
+		String company = "jd";			//快递公司编码
+		String number = "JD0016164893471";	//快递单号
 		String from = "";					//出发地城市
 		String to = "";						//目的地城市
-		String callbackurl = "http://ylwbtb.hoptest.haier.net/api/kd100/query";			//回调地址
+		String callbackurl = "http://ylwbtb.hoptest.haier.net/api/kd100/callBack";			//回调地址
 		String salt = "";					//加密串
 		int resultv2 = 1;					//行政区域解析
 		int autoCom = 0;					//单号智能识别

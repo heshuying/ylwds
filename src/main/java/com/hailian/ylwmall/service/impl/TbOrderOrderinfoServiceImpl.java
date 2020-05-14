@@ -197,19 +197,25 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
 
     @Override
     public Result getOrders(Map<String, Object> params) {
+        QueryWrapper<TbOrderOrderinfo> wrapper=new QueryWrapper<>();
+        wrapper.eq("customer_id",params.get("userId"));
         String orderNo="", status="";
         if(params.containsKey("orderNo")){
             orderNo=String.valueOf(params.get("orderNo"));
+            if(StringUtils.isNotBlank(orderNo)){
+                wrapper.eq("id",Long.parseLong(orderNo));
+            }
         }
         if(params.containsKey("status")){
             status=String.valueOf(params.get("status"));
+            if(StringUtils.isNotBlank(status)){
+                wrapper.eq("status",Integer.valueOf(status));
+            }
         }
 
         IPage<TbOrderOrderinfo> orders=baseMapper.selectPage(
                 new Query<TbOrderOrderinfo>().getPage(params),
-                new QueryWrapper<TbOrderOrderinfo>().eq("customer_id",params.get("userId"))
-                .eq(StringUtils.isNoneBlank(status),"status", Integer.valueOf(status))
-                .eq(StringUtils.isNoneBlank(orderNo), "id", Long.parseLong(orderNo))
+                wrapper
         );
         IPage<MyOrderRespDto> pages=new Page<>();
         List<MyOrderRespDto> myOrders=new ArrayList<>();

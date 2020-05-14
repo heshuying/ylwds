@@ -58,7 +58,7 @@ kjt:
   tradeRefundAsyncNotify: http://106.53.192.56:8080/api/pay/tradeRefundAsyncNotify
   transferToAccountAsyncNotify: http://10.190.176.150:8888/api/pay/transferToAccountAsyncNotify
   ensureTradeAsyncNotify: http://106.53.192.56:8080/api/pay/ensureTradeAsyncNotify
-  ensureTradeReturnUrl: http://106.53.192.56:8080/outer/pay/payFinish
+  ensureTradeReturnUrl: http://106.53.192.56/outer/pay/payFinish
   recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
   verifyFlag: 0
   productCode: 10311

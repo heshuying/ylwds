@@ -72,12 +72,12 @@ public class MyController {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         params.put("userId", user.getUserId());
         if (StringUtils.isEmpty(params.get("page"))) {
-            params.put("page", 1);
+            params.put("page", "1");
         }
-        params.put("limit", Constants.ORDER_SEARCH_PAGE_LIMIT);
+        params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
         //封装我的订单数据
         PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(orderService.getMyOrdersForSupplier(pageUtil));
+        return ResultGenerator.genSuccessResult(orderinfoService.getOrders(params));
     }
 
     /**

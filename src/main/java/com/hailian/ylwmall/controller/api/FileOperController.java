@@ -80,10 +80,12 @@ public class FileOperController {
     }
 
     @ApiOperation(value = "下载文件")
-    @GetMapping("/downloadFile/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+    @GetMapping("/downloadFile")
+    public ResponseEntity<Resource> downloadFile(@RequestParam  Long fileId,
+                                                 @RequestParam String fileType,
+                                                 HttpServletRequest request) {
         // Load file as Resource
-        Resource resource = fileService.loadFileAsResource(fileName);
+        Resource resource = fileService.loadFileAsResource("");
 
         // Try to determine file's content type
         String contentType = null;

@@ -75,9 +75,7 @@ public class MyController {
             params.put("page", "1");
         }
         params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
-        //封装我的订单数据
-        PageQueryUtil pageUtil = new PageQueryUtil(params);
-        return ResultGenerator.genSuccessResult(orderinfoService.getOrders(params));
+        return orderinfoService.getOrders(params);
     }
 
     /**

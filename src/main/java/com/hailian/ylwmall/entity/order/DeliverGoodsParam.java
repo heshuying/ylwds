@@ -11,4 +11,8 @@ public class DeliverGoodsParam {
     private String expressCompany;
 
     private String expressNumber;
+    /**
+     * 快递公司编码
+     */
+    private String expressCode;
 }

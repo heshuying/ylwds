@@ -6,6 +6,7 @@ import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.controller.vo.OrderInfoVo;
 import com.hailian.ylwmall.dao.*;
 import com.hailian.ylwmall.entity.TbUserAddr;
+import com.hailian.ylwmall.util.Const;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -80,7 +81,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             }
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            vo.setStatus(Const.OrderStatus.getByKey(info.getStatus()).getSupplierDesc());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
@@ -114,7 +115,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(OrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(info.getStatus()).getName());
+            vo.setStatus(Const.OrderStatus.getByKey(info.getStatus()).getPlateDesc());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
@@ -136,6 +137,7 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         info.setExpressCompany(params.getExpressCompany());
         info.setExpressId(params.getExpressNumber());
         info.setUpdateTime(new Date());
+        info.setExpressCode(params.getExpressCode());
         info.setStatus(3);
         orderInfoMapper.updateByPrimaryKeySelective(info);
     }

@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
+import com.hailian.ylwmall.dao.TbOrderGoodinfoDao;
 import com.hailian.ylwmall.dto.CommentReq;
 import com.hailian.ylwmall.entity.TbGoodsComment;
+import com.hailian.ylwmall.entity.TbOrderGoodinfo;
 import com.hailian.ylwmall.service.TbGoodsCommentService;
+import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.util.CommonUtil;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
@@ -28,6 +31,8 @@ public class CommentController {
 
     @Autowired
     TbGoodsCommentService commentService;
+    @Autowired
+    TbOrderGoodinfoService orderGoodinfoService;
 
     /**
      * 添加评价
@@ -47,6 +52,7 @@ public class CommentController {
         }
 
         List<TbGoodsComment> list = commentService.list(new QueryWrapper<TbGoodsComment>()
+                .eq("order_id", reqBean.getOrderId())
                 .eq("goods_id", reqBean.getGoodsId()).eq("user_id", user.getUserId()));
         if(list != null && !list.isEmpty()){
             return ResultGenerator.genFailResult("您已评价过");
@@ -59,10 +65,14 @@ public class CommentController {
         comment.setIsAuto(1);
         comment.setCreateTime(new Date());
         comment.setUpdateTime(new Date());
-        if(commentService.saveOrUpdate(comment)){
-            return ResultGenerator.genSuccessResult();
-        }
-        return ResultGenerator.genFailResult("评价保存失败");
+        commentService.saveOrUpdate(comment);
+
+        TbOrderGoodinfo orderGoodInfo = new TbOrderGoodinfo();
+        orderGoodInfo.setHasComment(true);
+        orderGoodinfoService.update(orderGoodInfo, new QueryWrapper<TbOrderGoodinfo>()
+                .eq("order_id", reqBean.getOrderId()).eq("good_id", reqBean.getGoodsId()));
+
+        return ResultGenerator.genSuccessResult();
     }
 
     /**

@@ -357,13 +357,13 @@
                 tableData: [],
                 sortType: '',
                 expressComArr: [
-                    {label:'顺丰',value: '顺丰'},
-                    {label:'中通',value: '中通'},
-                    {label:'申通',value: '申通'},
-                    {label:'圆通',value: '圆通'},
-                    {label:'韵达',value: '韵达'},
-                    {label:'优速',value: '优速'},
-                    {label:'全峰',value: '全峰'},
+                    {label:'顺丰',value: 'shunfeng'},
+                    {label:'中通',value: 'zhongtong'},
+                    {label:'申通',value: 'shentong'},
+                    {label:'圆通',value: 'yuantong'},
+                    {label:'韵达',value: 'yunda'},
+                    {label:'京东物流',value: 'jd'},
+                    {label:'EMS',value: 'ems'},
                 ],
                 expressCompany: '',
                 expressNumber: '',
@@ -453,10 +453,17 @@
                     this.$message.error('物流公司及物流单号不能为空');
                     return;
                 }
+                var expressName = '';
+                for(var i in this.expressComArr) {
+                    if(this.expressComArr[i].value === this.expressCompany) {
+                        expressName = this.expressComArr[i].label;
+                    }
+                }
                 var postObj = {
 //                    userId:[[${session.loginUserId}]],
                     orderId: this.sendOrderId,
-                    expressCompany: this.expressCompany,
+                    expressCode: this.expressCompany,
+                    expressCompany: expressName,
                     expressNumber: this.expressNumber
                 }
                 $.ajax({

@@ -113,6 +113,10 @@ public class TbOrderOrderinfo extends Model<TbOrderOrderinfo> {
 
     private String payType;
 
+    /**
+     * 快递公司编码
+     */
+    private String expressCode;
     private String cutdownImg;
     private Date confirmDate;
     @Override

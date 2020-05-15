@@ -163,6 +163,9 @@
       <if test="expressCompany != null" >
         express_company = #{expressCompany,jdbcType=VARCHAR},
       </if>
+      <if test="expressCode != null" >
+        express_code = #{expressCode,jdbcType=VARCHAR},
+      </if>
       <if test="expressId != null" >
         express_id = #{expressId,jdbcType=VARCHAR},
       </if>

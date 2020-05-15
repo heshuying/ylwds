@@ -369,6 +369,7 @@ INSERT INTO `tb_module` VALUES ('3', '冰洗专区', '生活必需品', '1', '0'
 
 alter table tb_order_orderinfo add cutdown_img varchar(100) not null default '' comment '减价图片';
 alter table tb_order_orderinfo add confirm_date datetime DEFAULT NULL COMMENT '确认收货时间';
+alter table tb_order_orderinfo add express_code varchar(80) not null default '' comment '快递公司编码';
 
 alter table tb_order_goodinfo add has_comment char(1) not null default '0' comment '是否评价';
 alter table tb_order_goodinfo add refund_num int(4) not null default 0 comment '退货数量';

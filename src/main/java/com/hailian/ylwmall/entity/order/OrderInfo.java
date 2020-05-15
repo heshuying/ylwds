@@ -18,6 +18,11 @@ public class OrderInfo {
 
     private String expressId;
 
+    /**
+     * 快递公司编码
+     */
+    private String expressCode;
+
     private String userRemark;
 
     private Integer customerId;
@@ -162,5 +167,13 @@ public class OrderInfo {
 
     public void setRealPrice(BigDecimal realPrice) {
         this.realPrice = realPrice;
+    }
+
+    public String getExpressCode() {
+        return expressCode;
+    }
+
+    public void setExpressCode(String expressCode) {
+        this.expressCode = expressCode;
     }
 }

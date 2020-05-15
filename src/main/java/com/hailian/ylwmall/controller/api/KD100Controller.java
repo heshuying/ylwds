@@ -2,6 +2,7 @@ package com.hailian.ylwmall.controller.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.hailian.ylwmall.dto.CommentReq;
 import com.hailian.ylwmall.dto.KD100Req;
 import com.hailian.ylwmall.util.MD5Util;
 import com.hailian.ylwmall.util.MD5UtilsKD100;
@@ -13,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -25,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,8 +49,8 @@ public class KD100Controller {
     @ResponseBody
     @ApiOperation(value = "物流轨迹查询")
     @GetMapping("/query")
-    public Result ensureTradeBank(@ModelAttribute KD100Req reqBean, HttpServletRequest request) {
-        log.info("ensureTradeBank请求参数：{}", JSON.toJSONString(reqBean));
+    public Result query(@ModelAttribute KD100Req reqBean, HttpServletRequest request) {
+        log.info("query请求参数：{}", JSON.toJSONString(reqBean));
         if(StringUtils.isBlank(reqBean.getCom()) || StringUtils.isBlank(reqBean.getNum())){
             return ResultGenerator.genFailResult("请求参数错误");
         }
@@ -68,6 +67,27 @@ public class KD100Controller {
 
         return ResultGenerator.genSuccessResult(tradeReq);
 
+    }
+
+    /**
+     * 接收快递100回调
+     * @param reqBean
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/callBack")
+    public Map<String,String> callBack(@RequestBody Map<String, Object> reqBean, HttpServletRequest request){
+        Map<String,String> resultMap = new HashMap<>();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()){
+            log.info("参数名：" + parameterNames.nextElement());
+        }
+        log.info("请求参数：{}", JSON.toJSONString(reqBean));
+
+        resultMap.put("result", "true");
+        resultMap.put("returnCode", "200");
+        resultMap.put("message", "接收成功");
+        return resultMap;
     }
 
     /**

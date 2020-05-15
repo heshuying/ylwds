@@ -48,7 +48,7 @@ public class CommentController {
 
         List<TbGoodsComment> list = commentService.list(new QueryWrapper<TbGoodsComment>()
                 .eq("goods_id", reqBean.getGoodsId()).eq("user_id", user.getUserId()));
-        if(list != null || !list.isEmpty()){
+        if(list != null && !list.isEmpty()){
             return ResultGenerator.genFailResult("您已评价过");
         }
 

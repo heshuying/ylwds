@@ -295,6 +295,9 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             orderOrderinfo.setId(dto.getOrderNo());
             orderOrderinfo.setStatus(dto.getStatus());
             orderOrderinfo.setUpdateTime(new Date());
+            if(Const.OrderStatus.UnSettle.getKey()==dto.getStatus()){
+                orderOrderinfo.setConfirmDate(new Date());
+            }
             baseMapper.updateById(orderOrderinfo);
             return ResultGenerator.genSuccessResult();
         }else{

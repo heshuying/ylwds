@@ -262,6 +262,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                     ShoppingGoodsDto good=new ShoppingGoodsDto();
                     good.setGoodsCount(orderGood.getNumber());
                     good.setGoodsAttr(orderGood.getGoodsAttr());
+                    good.setHasComment(orderGood.getHasComment());
                     TbGoodsInfo goodsInfo=goodsInfos.stream().filter(
                             m->m.getGoodsId().compareTo(orderGood.getGoodId())==0
                     ).findAny().orElse(null);

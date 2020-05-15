@@ -12,6 +12,7 @@ import com.hailian.ylwmall.dto.OrderDetailDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderRespDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
+import com.hailian.ylwmall.dto.OrderUpdateDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsDto;
 import com.hailian.ylwmall.dto.UserListDto;
 import com.hailian.ylwmall.entity.StockNumDTO;
@@ -267,6 +268,8 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                     if(goodsInfo!=null){
                         BeanUtils.copyProperties(goodsInfo, good);
                         good.setSupplierId(goodsInfo.getCreateUser());
+                        good.setTotal(good.getPrice().multiply(new BigDecimal(
+                                String.valueOf(good.getGoodsCount()))));
                     }
                     myOrderGoods.add(good);
                 }
@@ -279,5 +282,23 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
             pages.setRecords(myOrders);
         }
         return ResultGenerator.genSuccessResult(pages);
+    }
+
+    @Override
+    public Result updateOrderStatus(Long userId, OrderUpdateDto dto) {
+        if(dto==null||dto.getOrderNo()==null){
+            return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
+        }
+        if(Const.OrderStatus.Cancle.getKey()==dto.getStatus()
+                ||Const.OrderStatus.UnSettle.getKey()==dto.getStatus()) {
+            TbOrderOrderinfo orderOrderinfo = new TbOrderOrderinfo();
+            orderOrderinfo.setId(dto.getOrderNo());
+            orderOrderinfo.setStatus(dto.getStatus());
+            orderOrderinfo.setUpdateTime(new Date());
+            baseMapper.updateById(orderOrderinfo);
+            return ResultGenerator.genSuccessResult();
+        }else{
+            return ResultGenerator.genFailResult(ServiceResultEnum.ORDER_STATUS_ERROR.getResult());
+        }
     }
 }

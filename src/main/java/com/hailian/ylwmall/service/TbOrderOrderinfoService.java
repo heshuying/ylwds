@@ -3,6 +3,7 @@ package com.hailian.ylwmall.service;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
+import com.hailian.ylwmall.dto.OrderUpdateDto;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.Result;
@@ -23,4 +24,6 @@ public interface TbOrderOrderinfoService extends IService<TbOrderOrderinfo> {
     Result doOrder(Long userId, OrderSubmitDto dto);
 
     Result getOrders(Map<String, Object> params);
+
+    Result updateOrderStatus(Long userId, OrderUpdateDto dto);
 }

@@ -7,6 +7,7 @@ import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.BuyFormDto;
 import com.hailian.ylwmall.dto.OrderFormDto;
 import com.hailian.ylwmall.dto.OrderSubmitDto;
+import com.hailian.ylwmall.dto.OrderUpdateDto;
 import com.hailian.ylwmall.dto.ShoppingGoodsUpdateDto;
 import com.hailian.ylwmall.entity.TbUserAddr;
 import com.hailian.ylwmall.service.NewBeeMallOrderService;
@@ -58,27 +59,7 @@ public class MyController {
     private TbOrderOrderinfoService orderinfoService;
     @Autowired
     private HttpSession httpSession;
-    /**
-     * 我的订单列表
-     * @param params
-     * @param request
-     * @param httpSession
-     * @return
-     */
-    @ApiOperation(value = "我的订单列表")
-    @GetMapping("/orders")
-    @ResponseBody
-    public Result orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
-        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
-        params.put("userId", user.getUserId());
-        if (StringUtils.isEmpty(params.get("page"))) {
-            params.put("page", "1");
-        }
-        if(StringUtils.isEmpty(params.get("limit"))) {
-            params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
-        }
-        return orderinfoService.getOrders(params);
-    }
+
 
     /**
      * 我的收获地址
@@ -209,5 +190,36 @@ public class MyController {
     public Result orderInfo(@PathVariable("orderNo") Long orderNo) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
         return orderinfoService.getOrderInfo(orderNo);
+    }
+
+    @ApiOperation(value = "确认、取消订单")
+    @PostMapping("/order/my/update")
+    @ResponseBody
+    public Result updateOrderStatus(@RequestBody OrderUpdateDto dto) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
+        return orderinfoService.updateOrderStatus(user.getUserId(), dto);
+    }
+
+    /**
+     * 我的订单列表
+     * @param params
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @ApiOperation(value = "我的订单列表")
+    @GetMapping("/orders")
+    @ResponseBody
+    public Result orderListPage(@RequestParam Map<String, Object> params, HttpServletRequest request, HttpSession httpSession) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        params.put("userId", user.getUserId());
+        if (StringUtils.isEmpty(params.get("page"))) {
+            params.put("page", "1");
+        }
+        if(StringUtils.isEmpty(params.get("limit"))) {
+            params.put("limit", String.valueOf(Constants.ORDER_SEARCH_PAGE_LIMIT));
+        }
+        return orderinfoService.getOrders(params);
     }
 }

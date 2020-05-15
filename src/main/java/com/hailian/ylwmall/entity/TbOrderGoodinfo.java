@@ -41,6 +41,10 @@ public class TbOrderGoodinfo extends Model<TbOrderGoodinfo> {
      */
     private String goodsAttr;
 
+    /**
+     * 是否评价
+     */
+    private Boolean hasComment;
 
     @Override
     protected Serializable pkVal() {

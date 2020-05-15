@@ -368,6 +368,11 @@ INSERT INTO `tb_module` VALUES ('2', '日用百货', '生活必需品', '0', '0'
 INSERT INTO `tb_module` VALUES ('3', '冰洗专区', '生活必需品', '1', '0', '2020-04-26 16:11:11', '0', '2020-04-26 16:11:11', '0', 'Module');
 
 alter table tb_order_orderinfo add cutdown_img varchar(100) not null default '' comment '减价图片';
+
+alter table tb_order_goodinfo add has_comment char(1) not null default '0' comment '是否评价';
+alter table tb_order_goodinfo add refund_num int(4) not null default 0 comment '退货数量';
+
+
 -- 评价表
 CREATE TABLE `tb_goods_comment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',

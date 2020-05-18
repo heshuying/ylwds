@@ -297,7 +297,54 @@
                         </div>
                     </div>
                 </el-dialog>
-                <!--退款申请 end-->
+                <!--选择退货地址 end-->
+                <!--待买家退回-->
+                <el-dialog :visible.sync="waitBuyerReturnMoralShow" width="45%" title="待买家退回" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="common-line return-info">
+                            <span class="bold-word">买家申请退货</span>
+                            <span class="light-word">(购买数量200;退货数量2)</span>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">退货原因</div>
+                            <div>不喜欢</div>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">详细原因</div>
+                            <div>用不了这么多</div>
+                        </div>
+                        <div class="common-line btn-area">
+                            <el-button type="primary" disabled>已同意</el-button>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--待买家退回 end-->
+                <!--包裹寄回中查看物流-->
+                <el-dialog :visible.sync="checkExpressMoralShow" width="45%" title="包裹寄回中" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="express-num">
+                            <div class="express-title">
+                                <img th:src="@{/admin/image/express.png}" />
+                                退货中
+                            </div>
+                            <div class="express-no">
+                                中通快递：7312 3356 3354 5789
+                                <span class="copy-btn">复制</span>
+                            </div>
+                        </div>
+                        <div class="express-info">
+                            <el-timeline>
+                                <el-timeline-item
+                                        v-for="(activity, index) in activities"
+                                        :key="index"
+                                        :timestamp="activity.timestamp"
+                                >{{activity.content}}</el-timeline-item>
+                            </el-timeline>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--包裹寄回中查看物流 end-->
             </div>
         </div>
     </div>

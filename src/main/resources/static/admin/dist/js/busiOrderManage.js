@@ -49,7 +49,21 @@
                 addressList: [
                     {addrId: 1,addressAll: '山东省青岛市崂山区海尔路1号海尔工业园', acceptor: '王有钱', phone:'18092429845'},
                     {addrId: 2,addressAll: '山东省青岛市崂山区海尔路1号海尔工业园山东省青岛市崂山区海尔路1号海尔工业园', acceptor: '王有钱', phone:'18092429848'}
-                ]
+                ],
+                // 等待买家退回dialog
+                waitBuyerReturnMoralShow: false,
+                // 包裹寄回中查看物流dialog
+                checkExpressMoralShow: true,
+                activities: [{
+                    content: '活动按期开始',
+                    timestamp: '2018-04-15'
+                }, {
+                    content: '通过审核',
+                    timestamp: '2018-04-13'
+                }, {
+                    content: '创建成功',
+                    timestamp: '2018-04-11'
+                }]
             };
         },
         mounted() {

@@ -222,3 +222,37 @@ body {
     border: 1px solid #DCDFE6;
     padding-left: 15px;
 }
+.return-goods-dia-area .express-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    padding: 20px 0;
+}
+.return-goods-dia-area .express-num .express-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+.return-goods-dia-area .express-num .express-title img {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+}
+.return-goods-dia-area .express-num .express-no {
+    margin: 0 15px;
+}
+.return-goods-dia-area .express-num .copy-btn {
+    color: #477fff;
+    cursor: pointer;
+    margin-left: 20px;
+}
+.return-goods-dia-area .express-info {
+    width: 100%;
+    height: 250px;
+    padding: 15px;
+    background-color: #fafafa;
+    overflow-y: auto;
+}

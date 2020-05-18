@@ -50,6 +50,11 @@ public class MyOrderRespDto {
     private String expressId;
 
     /**
+     * 快递公司编码
+     */
+    private String expressCode;
+
+    /**
      * 下单用户的id
      */
     private Long customerId;

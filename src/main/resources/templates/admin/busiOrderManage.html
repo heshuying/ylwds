@@ -345,6 +345,53 @@
                     </div>
                 </el-dialog>
                 <!--包裹寄回中查看物流 end-->
+                <!--编辑退款-->
+                <el-dialog :visible.sync="editReturnMoneyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="common-line return-info">
+                            <span class="light-word">订单总额180元;退货金额40元</span>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title">卖家操作</div>
+                            <div>
+                                <el-radio v-model="returnMoneyTypeRadio" label="1">全额退款</el-radio>
+                                <el-radio v-model="returnMoneyTypeRadio" label="2">部分退款</el-radio>
+                            </div>
+                        </div>
+                        <div v-if="returnMoneyTypeRadio==='2'">
+                            <div class="common-line">
+                                <div class="common-title">扣除损失</div>
+                                <div>
+                                    <el-input v-model="rejectReason"></el-input>
+                                </div>
+                            </div>
+                            <div class="common-line">
+                                <div class="common-title light-word">实际退款</div>
+                                <div>20元</div>
+                            </div>
+                            <div class="common-line">
+                                <div class="light-word">本商品结算金额</div>
+                                <div style="margin-left: 15px">140元</div>
+                                <div style="margin-left: 10px">
+                                    <el-tooltip class="item" effect="light" content="结算金额=本商品未退货部分的结算金额+损失金额" placement="right">
+                                        <img th:src="@{/admin/image/question.png}" />
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                            <div class="common-line">
+                                <div class="common-title">扣款原因</div>
+                                <div class="input-item">
+                                    <el-input type="textarea" placeholder="请输入详细原因" v-model="rejectReason" rows="4"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="common-line btn-area">
+                            <el-button type="primary" >确定</el-button>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--编辑退款 end-->
             </div>
         </div>
     </div>

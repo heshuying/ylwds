@@ -53,7 +53,7 @@
                 // 等待买家退回dialog
                 waitBuyerReturnMoralShow: false,
                 // 包裹寄回中查看物流dialog
-                checkExpressMoralShow: true,
+                checkExpressMoralShow: false,
                 activities: [{
                     content: '活动按期开始',
                     timestamp: '2018-04-15'
@@ -63,7 +63,10 @@
                 }, {
                     content: '创建成功',
                     timestamp: '2018-04-11'
-                }]
+                }],
+                // 编辑退款dialog
+                editReturnMoneyMoralShow: false,
+                returnMoneyTypeRadio: ""
             };
         },
         mounted() {

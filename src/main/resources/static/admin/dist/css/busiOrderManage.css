@@ -132,6 +132,9 @@ body {
         display: flex;
         align-items: center;
     }
+    .return-goods-dia-area .common-line label {
+        margin-bottom: 0;
+    }
     .return-goods-dia-area .bold-word {
         color: #333;
         font-weight: bold;

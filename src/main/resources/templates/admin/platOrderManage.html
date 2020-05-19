@@ -6,119 +6,8 @@
     <meta charset="UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/platOrderManage.css}">
 </head>
-<style>
-    body {
-        background-color: #FBFBFC;
-    }
-
-    .content-wrapper {
-        background: #fbfbfb;
-    }
-
-    .manage-main-page {
-        padding: 0 30px;
-    }
-
-    .manage-main-page .query-condition-line {
-        display: flex;
-        margin-bottom: 30px;
-    }
-
-    .el-date-editor .el-range-separator {
-        width: 8%;
-    }
-
-    .el-date-editor--daterange.el-input__inner {
-        width: 300px;
-    }
-
-    .query-condition-line label {
-        font-size: 14px;
-        margin-right: 5px;
-        font-weight: normal;
-        display: inline-block;
-        width: 70px;
-        text-align: right;
-    }
-    .query-condition-line > div {
-        margin-right: 30px;
-    }
-    .el-select {
-        width: 250px;
-    }
-    .query-condition-line .el-input, .el-dialog__body .el-input{
-        width: 250px;
-    }
-    .search-btn {
-        margin-left: 15px;
-        width: 100px;
-    }
-    .cell .el-input {
-        width: 80px;
-    }
-
-    .bg-common {
-        padding: 2px 5px;
-        color: #fff;
-    }
-
-    .blue-bg {
-        background-color: #477FFF;
-    }
-    .blue-color {
-        color: #477FFF;
-    }
-    .red-bg {
-        background-color: #FE9544;
-    }
-
-    .green-bg {
-        background-color: #1FC990;
-    }
-
-    .gray-bg {
-        background-color: #999;
-    }
-
-    .tab-line {
-        margin-top: 30px;
-        min-height: 440px;
-    }
-
-    .goods-name-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .plat-deduct-line {
-        display: flex;
-        align-items: center;
-    }
-    .plat-deduct-line img {
-        cursor: pointer;
-        width: 18px;
-        height: 18px;
-        margin-left: 5px;
-    }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-    }
-
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
-    .el-input--prefix .el-input__inner {
-        padding-left: 22px;
-        padding-right: 2px;
-    }
-    .el-input__prefix {
-        line-height: 40px;
-        color: #333;
-    }
-
-</style>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
     <!-- 引入页面头header-fragment -->
@@ -284,6 +173,96 @@
                     </el-pagination>
                 </div>
             </div>
+            <!--退货申请/退货审核-->
+            <el-dialog :visible.sync="applyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
+                <div class="plat-return-goods-dia-area">
+                    <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                    <div class="common-line return-info">
+                        <span class="bold-word">买家申请退货</span>
+                        <span class="light-word">(购买数量200;退货数量2)</span>
+                    </div>
+                    <div class="common-line">
+                        <div class="common-title light-word">退货原因</div>
+                        <div>不喜欢</div>
+                    </div>
+                    <div class="common-line bottom-padding">
+                        <div class="common-title light-word">详细原因</div>
+                        <div>用不了这么多</div>
+                    </div>
+                    <div v-if="!isApply">
+                        <div class="common-line seperate-line">
+                            <div class="common-title bold-word">卖家驳回</div>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">驳回原因</div>
+                            <div>特殊商品，非质量问题不支持退货，望理解</div>
+                        </div>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--退货申请/退货审核 end-->
+            <!--包裹寄回中查看物流-->
+            <el-dialog :visible.sync="checkExpressMoralShow" width="45%" title="包裹寄回中" center :close-on-click-modal="closeBtnShow">
+                <div class="plat-return-goods-dia-area">
+                    <div class="express-num">
+                        <div class="express-title">
+                            <img th:src="@{/admin/image/express.png}" />
+                            退货中
+                        </div>
+                        <div class="express-no">
+                            中通快递：7312 3356 3354 5789
+                            <span class="copy-btn">复制</span>
+                        </div>
+                    </div>
+                    <div class="express-info">
+                        <el-timeline>
+                            <el-timeline-item
+                                    v-for="(activity, index) in activities"
+                                    :key="index"
+                                    :timestamp="activity.timestamp"
+                            >{{activity.content}}</el-timeline-item>
+                        </el-timeline>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--包裹寄回中查看物流 end-->
+            <!--待买家确认退款金额/买家申诉/退款明细-->
+            <el-dialog :visible.sync="mutiMoralShow" width="45%" :title="mutiTitle" center :close-on-click-modal="closeBtnShow">
+                <div class="plat-return-goods-dia-area">
+                    <div class="light-word" style="text-align: center;margin-bottom: 15px">买卖双方协商一致，退款进行中</div>
+                    <div class="bold-word">商家修改退款金额</div>
+                    <div class="light-word bottom-padding">修改原因：丢失一件，另有一件包装破损影响二次销售</div>
+                    <div class="common-line seperate-line">
+                        <div class="mid-width-title light-word">退货商品全额</div>
+                        <div>
+                            180元
+                        </div>
+                    </div>
+                    <div class="common-line">
+                        <div class="mid-width-title light-word">扣款金额</div>
+                        <div>
+                            10元
+                        </div>
+                    </div>
+                    <div class="common-line">
+                        <div class="mid-width-title light-word">实际退款</div>
+                        <div>
+                            170元
+                        </div>
+                    </div>
+                    <div class="common-line">
+                        <div class="mid-width-title light-word">结算金额</div>
+                        <div>
+                            10元+未退货商品结算金额
+                        </div>
+                    </div>
+                    <div class="common-line btn-area big-btn-width">
+                        <el-button type="plain">打回商家重新填写</el-button>
+                        <el-button type="primary">发起退款</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--退货申请/退货审核 end-->
         </div>
     </div>
     <!-- /.content-wrapper -->
@@ -293,139 +272,6 @@
 <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
 <!-- 引入组件库 -->
 <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
-<script th:inline="javascript">
-    new Vue({
-        el: '#app',
-        data() {
-            return {
-                orderStatus: '',
-                orderStatusArr: [
-                    {label:'请选择',value: ''},
-                    {label:'待支付',value: '1'},
-                    {label:'待发货',value: '2'},
-                    {label:'待收货',value: '3'},
-                    {label:'待评价',value: '4'},
-                    {label:'售后中',value: '5'},
-                    {label:'待结算',value: '6'},
-                    {label:'结算中',value: '7'},
-                    {label:'已结算',value: '8'},
-                    {label:'已取消',value: '9'},
-                ],
-                orderId: '',
-                tableData: [],
-                multipleSelection: [],
-                canCutList: [], //记录上传照片的订单id
-                sortType: '',
-                total: 0,
-                pagesize: 10,
-                currentPage: 1
-            };
-        },
-        mounted() {
-            this.queryTableData();
-        },
-        methods: {
-            // 表格数据勾选修改
-            handleTableSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            // 表格上排序方式发生改变
-            sortChange(column) {
-                if (column.order.indexOf('desc') > -1) {
-                    this.sortType = 'desc';
-                } else {
-                    this.sortType = 'asc';
-                }
-                this.queryTableData();
-            },
-            // 换页
-            current_change: function (currentPage) {
-                this.currentPage = currentPage;
-                this.queryTableData();
-            },
-            // 查询表格数据
-            queryTableData() {
-                var _this = this;
-                $.ajax({
-                    url: '/admin/orders/platform?page=' + this.currentPage + '&limit=' + this.pagesize +
-                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&descOrAsc=' + this.sortType,
-                    type: 'GET',
-                    success: function (result) {
-                        if (result.resultCode == 200) {
-                            _this.total = result.data.totalCount || 0;
-                            for (var i in result.data.list) {
-                                var totalTemp = result.data.list[i].totalPrice === null ?  '' : result.data.list[i].totalPrice;
-                                result.data.list[i].totalPriceShow = '¥' + totalTemp;
-                                var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
-                                result.data.list[i].grossProfitShow = '¥' + formatGross;
-                                result.data.list[i].cutDownDis = result.data.list[i].status == '待支付'? false : true;
-                            }
-                            _this.tableData = result.data.list || [];
-                        } else {
-                            _this.$message.error(result.message);
-                        };
-                    },
-                    error: function () {
-                        _this.$message.error('操作失败');
-                    }
-                });
-            },
-            // 减免前上传图片
-            handleUploadSuccess(res,file,fileList,item) {
-                if (res.resultCode == "200") {
-                    this.$message.success('上传成功');
-                    var wholeUrl = this.baseUrl + res.data;
-                    this.canCutList.push({orderId: item.id, img: res.data});
-                } else {
-                    this.$message.error("上传失败，" + res.msg);
-                }
-            },
-            // 平台减免服务
-            cutDownService(valObj) {
-                var imgFlag = false;
-                var cutImg = '';
-                var operateIndex = -1;
-                for(var i in this.canCutList) {
-                    if(this.canCutList[i].orderId === valObj.id) {
-                        operateIndex = i;
-                        imgFlag = true;
-                        cutImg = this.canCutList[i].img;
-                        break;
-                    }
-                }
-                if(!imgFlag) {
-                    this.$message.error('请先上传签名图片');
-                    return;
-                }
-                if(valObj.cutDown === '' || valObj.cutDown == '0') {
-                    this.$message.error('前先输入减免金额');
-                    return;
-                }
-                var _this = this;
-                var postObj = {
-//                    userId:[[${session.loginUserId}]],
-                    orderId: valObj.id,
-                    cutdownNumber: parseFloat(valObj.cutDown),
-                    cutdownImg: cutImg
-                }
-                $.ajax({
-                    type: "post",
-                    url: "/admin/orders/cutDown",
-                    contentType: "application/json",
-                    data: JSON.stringify(postObj),
-                    success: function (result) {
-                        if (result.resultCode == 200) {
-                            _this.canCutList.splice(operateIndex, 1);
-                            _this.$message.success('操作成功');
-                            _this.queryTableData();
-                        } else {
-                            _this.$message.error(result.message);
-                        }
-                    }
-                });
-            }
-        }
-    })
-</script>
+<script th:src="@{/admin/dist/js/platOrderManage.js}"></script>
 </body>
 </html>

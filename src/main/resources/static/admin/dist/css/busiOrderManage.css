@@ -127,6 +127,9 @@ body {
     .return-goods-dia-area {
         padding: 0;
     }
+    .el-dialog--center .el-dialog__body {
+        padding: 0 25px 30px;
+    }
     .return-goods-dia-area .common-line {
         padding-top: 15px;
         display: flex;
@@ -230,7 +233,7 @@ body {
     align-items: center;
     justify-content: center;
     color: #999;
-    padding: 20px 0;
+    padding-bottom: 15px;
 }
 .return-goods-dia-area .express-num .express-title {
     font-size: 18px;

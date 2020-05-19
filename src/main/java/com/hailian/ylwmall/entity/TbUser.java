@@ -82,6 +82,11 @@ public class TbUser extends Model<TbUser> {
      */
     private Date createTime;
 
+    /**
+     * mdm编码
+     */
+    private String mdmCode;
+
 
     @Override
     protected Serializable pkVal() {

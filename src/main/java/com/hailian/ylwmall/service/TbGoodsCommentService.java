@@ -13,4 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface TbGoodsCommentService extends IService<TbGoodsComment> {
 
+    void autoComment();
+
+    Integer getScore(String goodsId);
 }

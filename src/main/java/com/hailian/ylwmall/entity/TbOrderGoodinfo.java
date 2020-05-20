@@ -20,7 +20,10 @@ import lombok.experimental.Accessors;
 public class TbOrderGoodinfo extends Model<TbOrderGoodinfo> {
 
     private static final long serialVersionUID=1L;
-
+    /**
+     * 订单id
+     */
+    private Long id;
     /**
      * 订单id
      */
@@ -45,7 +48,10 @@ public class TbOrderGoodinfo extends Model<TbOrderGoodinfo> {
      * 是否评价
      */
     private Boolean hasComment;
-
+    /**
+     * 是否退货
+     */
+    private Long refundId;
     @Override
     protected Serializable pkVal() {
         return this.orderId;

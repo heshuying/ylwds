@@ -372,8 +372,7 @@ alter table tb_order_orderinfo add confirm_date datetime DEFAULT NULL COMMENT '�
 alter table tb_order_orderinfo add express_code varchar(80) not null default '' comment '快递公司编码';
 
 alter table tb_order_goodinfo add has_comment char(1) not null default '0' comment '是否评价';
-alter table tb_order_goodinfo add refund_num int(4) not null default 0 comment '退货数量';
-
+alter table tb_order_goodinfo add refund_id bigint(20) not null default 0 comment '退货ID';
 
 -- 评价表
 CREATE TABLE `tb_goods_comment` (
@@ -393,4 +392,29 @@ CREATE TABLE `tb_goods_comment` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
+-- 退货表
+CREATE TABLE `tb_order_refund` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `goods_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '商品id',
+  `user_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '用户id',
+  `supplier_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '供应商ID',
+  `order_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '订单id',
+   `order_goods_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '商品订单表Id',
+   `goods_attribute` varchar(200) NOT NULL DEFAULT '' COMMENT '规格',
+  `refund_num` int(4) not null default 0 comment '退货数量',
+  `refund_reason` varchar(80) not null default '' comment '退货原因代码',
+  `refund_reason_desc` varchar(80) not null default '' comment '退货原因描述',
+  `refund_detail` varchar(1000) not null default '' comment '退货详细原因',
+  `reject_reason` varchar(80) not null default '' comment '拒绝原因',
+  `open_comment` varchar(80) not null default '' comment '备注',
+  `refund_amount` decimal(10,2) NOT NULL DEFAULT '0.00' comment '退货金额',
+  `refund_actual_amount` decimal(10,2) NOT NULL DEFAULT '0.00' comment '实际退货金额',
+  `delivery_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '发货地址ID',
+  `express_code` varchar(80) not null default '' comment '快递公司编码',
+  `express_company` varchar(255) DEFAULT NULL COMMENT '快递公司',
+  `express_id` varchar(255) DEFAULT NULL COMMENT '快递单号',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 

@@ -10,6 +10,9 @@ import java.math.BigDecimal;
  */
 @Data
 public class ShoppingGoodsDto {
+    /**
+     * 订单产品ID
+     */
     private Long id;
 
     /**

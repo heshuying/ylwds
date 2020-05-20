@@ -18,4 +18,26 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
+    <select id="getNotCommentList" resultType="com.hailian.ylwmall.entity.TbOrderGoodinfo">
+        SELECT
+          gi.`id`,
+          gi.`order_id` AS orderId,
+          gi.`good_id` AS goodId,
+          gi.`number`,
+          gi.`has_comment` AS hasComment
+        FROM
+          tb_order_orderinfo oi
+          JOIN tb_order_goodinfo gi
+            ON gi.`order_id` = oi.`id`
+        WHERE gi.`has_comment` = '0'
+          AND TO_DAYS(NOW()) - TO_DAYS(oi.`confirm_date`) > 5 ;
+    </select>
+
+    <select id="getScore" resultType="int">
+        SELECT
+          CAST(ifnull(AVG(c.`score`),0) AS SIGNED) AS scoreAvg
+        FROM
+          tb_goods_comment c
+        WHERE c.`goods_id` = #{goodsId};
+    </select>
 </mapper>

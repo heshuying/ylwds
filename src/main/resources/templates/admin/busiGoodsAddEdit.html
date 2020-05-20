@@ -63,7 +63,6 @@
         display: flex;
         align-items: center;
         font-size: 14px;
-        cursor: pointer;
     }
     .specs-margin {
         margin: 25px 0;
@@ -72,6 +71,9 @@
         width: 20px;
         height: 20px;
         margin-right: 10px;
+    }
+    .specs-btn-area span {
+        cursor: pointer;
     }
     .first-photo {
         width: 100px;
@@ -298,9 +300,9 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line specs-margin">
-                    <el-col :span="15" :offset="6" class="specs-btn-area" @click.native="addSpecs">
+                    <el-col :span="15" :offset="6" class="specs-btn-area">
                         <img th:src="@{/admin/image/add-blue.png}" alt="">
-                        <span style="color: #477FFF;">添加规格</span>
+                        <span style="color: #477FFF;" @click="addSpecs">添加规格</span>
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="row-line-with-intro">
@@ -389,7 +391,7 @@
                 goodsIntro: '',
                 originalPrice: '',
                 sellingPrice: '',
-                transitMoney: '',
+                transitMoney: 0,
                 stockNum: '',
                 goodsDetailContent: '',
                 firstCategory: [],
@@ -536,6 +538,29 @@
                     this.$message.error('请填写完整信息后重试');
                     return;
                 }
+                var firstPhotoStr = this.goodsPhotoList[0];
+                var otherPhotoStr = '';
+                var hasBlankImage = false;
+                for(var x in this.goodsPhotoList) {
+                    if(this.goodsPhotoList[x] === '') {
+                        hasBlankImage = true;
+                        break;
+                    }
+                    if(otherPhotoStr === '') {
+                        otherPhotoStr = this.goodsPhotoList[x];
+                    } else {
+                        otherPhotoStr = otherPhotoStr + ',' + this.goodsPhotoList[x];
+                    }
+                }
+                if(hasBlankImage) {
+                    this.$message.error('请维护完整4张商品图片');
+                    return;
+                }
+                console.log(hasBlankImage);
+                if(this.detailPhotoList.length < 1) {
+                    this.$message.error('请先维护图文详情');
+                    return;
+                }
                 var url = '/admin/goods/save';
                 var postTag = '';
                 for(var i in this.tagList) {
@@ -561,15 +586,6 @@
                         detailPhotoStr = this.detailPhotoList[k];
                     } else {
                         detailPhotoStr = detailPhotoStr + ',' + this.detailPhotoList[k];
-                    }
-                }
-                var firstPhotoStr = this.goodsPhotoList[0];
-                var otherPhotoStr = '';
-                for(var x in this.goodsPhotoList) {
-                    if(otherPhotoStr === '') {
-                        otherPhotoStr = this.goodsPhotoList[x];
-                    } else {
-                        otherPhotoStr = otherPhotoStr + ',' + this.goodsPhotoList[x];
                     }
                 }
                 var data = {

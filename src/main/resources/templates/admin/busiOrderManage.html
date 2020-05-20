@@ -6,136 +6,8 @@
     <meta charset="UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/busiOrderManage.css}">
 </head>
-<style>
-    body {
-        background-color: #FBFBFC;
-    }
-
-    .content-wrapper {
-        background: #fbfbfb;
-    }
-
-    .manage-main-page {
-        padding: 0 30px;
-    }
-
-    .manage-main-page .query-condition-line {
-        display: flex;
-        margin-bottom: 30px;
-    }
-
-    .el-date-editor .el-range-separator {
-        width: 8%;
-    }
-
-    .el-date-editor--daterange.el-input__inner {
-        width: 300px;
-    }
-
-    .query-condition-line label {
-        font-size: 14px;
-        margin-right: 5px;
-        font-weight: normal;
-        display: inline-block;
-        width: 70px;
-        text-align: right;
-    }
-
-    .query-condition-line > div:first-child {
-        margin-right: 20px;
-    }
-
-    .el-select {
-        width: 250px;
-    }
-    .query-condition-line .el-input, .el-dialog__body .el-input{
-        width: 250px;
-    }
-    .search-btn {
-        margin-left: 15px;
-        width: 100px;
-    }
-    .cell .el-input {
-        width: 80px;
-    }
-
-    .el-message-box .el-input {
-        width: 100%;
-    }
-
-    .bg-common {
-        padding: 2px 5px;
-        color: #fff;
-    }
-
-    .blue-bg {
-        background-color: #477FFF;
-    }
-
-    .red-bg {
-        background-color: #FE9544;
-    }
-
-    .green-bg {
-        background-color: #1FC990;
-    }
-
-    .gray-bg {
-        background-color: #999;
-    }
-
-    .tab-line {
-        margin-top: 30px;
-        min-height: 440px;
-    }
-
-    .import-operiton-line {
-        color: #477FFF;
-        margin: 15px 0;
-        display: flex;
-        justify-content: flex-end;
-    }
-    .import-word-icon-line {
-        display: flex;
-        margin-right: 15px;
-        align-items: center;
-        cursor: pointer;
-    }
-    .import-word-icon-line img {
-        width: 20px;
-        height: 20px;
-    }
-    .address-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .address-line div {
-        width: 90%;
-    }
-    .address-line img {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        margin-left: 5px;
-    }
-    .dialog-line {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-    .dialog-line > div:first-child {
-        margin-right: 15px;
-    }
-    .dialog-btn-line {
-        display: flex;
-        justify-content: center;
-        margin-top: 25px;
-    }
-
-</style>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
     <!-- 引入页面头header-fragment -->
@@ -300,7 +172,8 @@
                             @current-change="current_change">
                     </el-pagination>
                 </div>
-                <el-dialog :visible.sync="moralShow" width="45%" title="发货">
+                <!--选择物流/填写单号-->
+                <el-dialog :visible.sync="moralShow" width="45%" title="发货" center :close-on-click-modal="closeBtnShow">
                     <div class="dialog-line">
                         <div>物流公司</div>
                         <div>
@@ -324,6 +197,201 @@
                         <el-button type="primary" style="width: 140px;" @click="singleSendGoodsService">确定</el-button>
                     </div>
                 </el-dialog>
+                <!--选择物流/填写单号 end-->
+                <!--退款申请-->
+                <el-dialog :visible.sync="applyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="common-line return-info">
+                            <span class="bold-word">买家申请退货</span>
+                            <span class="light-word">(购买数量200;退货数量2)</span>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">退货原因</div>
+                            <div>不喜欢</div>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">详细原因</div>
+                            <div>用不了这么多</div>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title">卖家操作</div>
+                            <div>
+                                <el-radio v-model="providerOpeateRadio" label="1">驳回</el-radio>
+                                <el-radio v-model="providerOpeateRadio" label="2">同意退货</el-radio>
+                            </div>
+                        </div>
+                        <div v-if="providerOpeateRadio=='1'" class="common-line">
+                            <div class="common-title">驳回原因</div>
+                            <div class="input-item">
+                                <el-input placeholder="请输入,20字以内" v-model="rejectReason" maxlength="20" show-word-limit></el-input>
+                            </div>
+                        </div>
+                        <div class="btn-area">
+                            <el-button type="primary" >确定</el-button>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--退款申请 end-->
+                <!--选择退货地址-->
+                <el-dialog :visible.sync="addressMoralShow" width="52%" title="退货事项" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div v-show="addressStep=='1'">
+                            <div class="address-list">
+                                <el-radio-group v-model="selectedAddress">
+                                    <el-radio :label="item.addrId" v-for="item in addressList" :key="item.index">
+                                        <div style="display: flex;flex-wrap: wrap;margin-right: 20px;">
+                                            {{item.addressAll}}
+                                            <span class="name-span">{{item.acceptor}}</span>
+                                            <span>{{item.phone}}</span>
+                                        </div>
+                                        <div>
+                                            <span v-if="selectedAddress==item.addrId" @click="addressChange('2', item)">修改本地址</span>
+                                        </div>
+                                    </el-radio>
+                                </el-radio-group>
+                            </div>
+                            <div class="add-address">
+                                <span>+</span>
+                                添加收货地址
+                            </div>
+                            <div class="common-line">
+                                <div class="short-title">备注</div>
+                                <div class="input-item">
+                                    <el-input placeholder="请输入备注,20字以内" v-model="addressRemark" maxlength="20" show-word-limit></el-input>
+                                </div>
+                            </div>
+                            <div class="common-line btn-area">
+                                <el-button type="primary" >确定</el-button>
+                            </div>
+                        </div>
+                        <div v-show="addressStep=='2'" class="address-info-area">
+                            <div class="dia-address-line">
+                                <div class="dia-address-item">
+                                    <div class="common-title">收货人</div>
+                                    <div>
+                                        <el-input  v-model="addressRemark"></el-input>
+                                    </div>
+                                </div>
+                                <div class="dia-address-item">
+                                    <div class="common-title">手机号码</div>
+                                    <div>
+                                        <el-input  v-model="addressRemark"></el-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-toggle="distpicker" class="select-area-dia">
+                                <select data-province="---- 选择省 ----"></select>
+                                <select data-city="---- 选择市 ----"></select>
+                                <select data-district="---- 选择区 ----"></select>
+                            </div>
+                            <div class="common-line">
+                                <div class="common-title">详细地址</div>
+                                <div class="input-item">
+                                    <el-input placeholder="如区、道路、门牌号、公司名等" v-model="addressRemark"></el-input>
+                                </div>
+                            </div>
+                            <div class="common-line btn-area">
+                                <el-button type="primary" @click="saveAddress">保存地址</el-button>
+                            </div>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--选择退货地址 end-->
+                <!--待买家退回-->
+                <el-dialog :visible.sync="waitBuyerReturnMoralShow" width="45%" title="待买家退回" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="common-line return-info">
+                            <span class="bold-word">买家申请退货</span>
+                            <span class="light-word">(购买数量200;退货数量2)</span>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">退货原因</div>
+                            <div>不喜欢</div>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title light-word">详细原因</div>
+                            <div>用不了这么多</div>
+                        </div>
+                        <div class="common-line btn-area">
+                            <el-button type="primary" disabled>已同意</el-button>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--待买家退回 end-->
+                <!--包裹寄回中查看物流-->
+                <el-dialog :visible.sync="checkExpressMoralShow" width="45%" title="包裹寄回中" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="express-num">
+                            <div class="express-title">
+                                <img th:src="@{/admin/image/express.png}" />
+                                退货中
+                            </div>
+                            <div class="express-no">
+                                中通快递：7312 3356 3354 5789
+                                <span class="copy-btn">复制</span>
+                            </div>
+                        </div>
+                        <div class="express-info">
+                            <el-timeline>
+                                <el-timeline-item
+                                        v-for="(activity, index) in activities"
+                                        :key="index"
+                                        :timestamp="activity.timestamp"
+                                >{{activity.content}}</el-timeline-item>
+                            </el-timeline>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--包裹寄回中查看物流 end-->
+                <!--编辑退款-->
+                <el-dialog :visible.sync="editReturnMoneyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
+                    <div class="return-goods-dia-area">
+                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="common-line return-info">
+                            <span class="light-word">订单总额180元;退货金额40元</span>
+                        </div>
+                        <div class="common-line">
+                            <div class="common-title">卖家操作</div>
+                            <div>
+                                <el-radio v-model="returnMoneyTypeRadio" label="1">全额退款</el-radio>
+                                <el-radio v-model="returnMoneyTypeRadio" label="2">部分退款</el-radio>
+                            </div>
+                        </div>
+                        <div v-if="returnMoneyTypeRadio==='2'">
+                            <div class="common-line">
+                                <div class="common-title">扣除损失</div>
+                                <div>
+                                    <el-input v-model="rejectReason"></el-input>
+                                </div>
+                            </div>
+                            <div class="common-line">
+                                <div class="common-title light-word">实际退款</div>
+                                <div>20元</div>
+                            </div>
+                            <div class="common-line">
+                                <div class="light-word">本商品结算金额</div>
+                                <div style="margin-left: 15px">140元</div>
+                                <div style="margin-left: 10px">
+                                    <el-tooltip class="item" effect="light" content="结算金额=本商品未退货部分的结算金额+损失金额" placement="right">
+                                        <img th:src="@{/admin/image/question.png}" />
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                            <div class="common-line">
+                                <div class="common-title">扣款原因</div>
+                                <div class="input-item">
+                                    <el-input type="textarea" placeholder="请输入详细原因" v-model="rejectReason" rows="4"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="common-line btn-area">
+                            <el-button type="primary" >确定</el-button>
+                        </div>
+                    </div>
+                </el-dialog>
+                <!--编辑退款 end-->
             </div>
         </div>
     </div>
@@ -334,192 +402,7 @@
 <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
 <!-- 引入组件库 -->
 <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
-<script th:inline="javascript">
-    new Vue({
-        el: '#app',
-        data() {
-            return {
-                orderStatus: '',
-                orderStatusArr: [
-                    {label:'请选择',value: ''},
-                    {label:'待支付',value: '1'},
-                    {label:'待发货',value: '2'},
-                    {label:'待收货',value: '3'},
-                    {label:'待评价',value: '4'},
-                    {label:'售后中',value: '5'},
-                    {label:'待结算',value: '6'},
-                    {label:'结算中',value: '7'},
-                    {label:'已结算',value: '8'},
-                    {label:'已取消',value: '9'},
-                ],
-                orderDate: [],
-                orderId: '',
-                tableData: [],
-                sortType: '',
-                expressComArr: [
-                    {label:'顺丰',value: 'shunfeng'},
-                    {label:'中通',value: 'zhongtong'},
-                    {label:'申通',value: 'shentong'},
-                    {label:'圆通',value: 'yuantong'},
-                    {label:'韵达',value: 'yunda'},
-                    {label:'京东物流',value: 'jd'},
-                    {label:'EMS',value: 'ems'},
-                ],
-                expressCompany: '',
-                expressNumber: '',
-                sendOrderId: '',
-                moralShow: false,
-                total: 0,
-                pagesize: 10,
-                currentPage: 1
-            };
-        },
-        mounted() {
-            this.queryTableData();
-        },
-        methods: {
-            // 复制地址
-            copyAddress(address) {
-                var input = document.createElement('input');
-                document.body.appendChild(input);
-                input.setAttribute('value', address);
-                input.select();
-                if (document.execCommand('copy')) {
-                    document.execCommand('copy');
-                    this.$message.success('地址已复制');
-                }
-                document.body.removeChild(input);
-            },
-            // 表格上排序方式发生改变
-            sortChange(column) {
-                if (column.order.indexOf('desc') > -1) {
-                    this.sortType = 'desc';
-                } else {
-                    this.sortType = 'asc';
-                }
-                this.queryTableData();
-            },
-            // 导出excel
-            exportSheet() {
-                var beginTime =  '';
-                var endTime =  '';
-                if(this.orderDate && this.orderDate.length > 0) {
-                    beginTime = this.orderDate[0];
-                    endTime = this.orderDate[1];
-                }
-                window.location.href = '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime + '&endTime=' + endTime;
-//                var _this = this;
-//                $.ajax({
-//                    url: '/admin/orders/export?id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
-//                    '&endTime=' + endTime,
-//                    type: 'GET',
-//                    contentType: "application/json",
-//                    responseType: "arraybuffer",
-//                    success: function (result) {
-//                        const blob = new Blob([result]);
-//                        const fileName = "订单信息.xls";
-//                        const elink = document.createElement("a");
-//                        elink.download = fileName;
-//                        elink.style.display = "none";
-//                        elink.href = URL.createObjectURL(blob);
-//                        document.body.appendChild(elink);
-//                        elink.click();
-//                        URL.revokeObjectURL(elink.href); // 释放URL 对象
-//                        document.body.removeChild(elink);
-//                    },
-//                    error: function () {
-//                        _this.$message.error('操作失败');
-//                    }
-//                });
-            },
-            // 导入excel
-            handleUploadSuccess(res) {
-                if (res.code == "200") {
-                    this.$message.success("上传成功！");
-                    this.queryTableData();
-                } else {
-                    this.$message.error('上传失败，'+ res.msg);
-                }
-            },
-            // 点击发货
-            singleSendGoods(valObj) {
-                this.moralShow = true;
-                this.sendOrderId = valObj.id;
-            },
-            // 单个发货服务
-            singleSendGoodsService() {
-                var _this = this;
-                if(this.expressCompany === ''|| this.expressNumber === '') {
-                    this.$message.error('物流公司及物流单号不能为空');
-                    return;
-                }
-                var expressName = '';
-                for(var i in this.expressComArr) {
-                    if(this.expressComArr[i].value === this.expressCompany) {
-                        expressName = this.expressComArr[i].label;
-                    }
-                }
-                var postObj = {
-//                    userId:[[${session.loginUserId}]],
-                    orderId: this.sendOrderId,
-                    expressCode: this.expressCompany,
-                    expressCompany: expressName,
-                    expressNumber: this.expressNumber
-                }
-                $.ajax({
-                    type: "post",
-                    url: "/admin/orders/deliverGoods",
-                    contentType: "application/json",
-                    data: JSON.stringify(postObj),
-                    success: function (result) {
-                        if (result.code == 200) {
-                            _this.$message.success('发货成功');
-                            _this.moralShow = false;
-                            _this.queryTableData();
-                        } else {
-                            _this.$message.error(result.message);
-                        }
-                    }
-                });
-            },
-            // 换页
-            current_change: function (currentPage) {
-                this.currentPage = currentPage;
-                this.queryTableData();
-            },
-            // 查询表格数据
-            queryTableData() {
-                var beginTime =  '';
-                var endTime =  '';
-                if(this.orderDate && this.orderDate.length > 0) {
-                    beginTime = this.orderDate[0];
-                    endTime = this.orderDate[1];
-                }
-                var _this = this;
-                $.ajax({
-                    url: '/admin/orders/supplier?page=' + this.currentPage + '&limit=' + this.pagesize +
-                    '&id=' + this.orderId + '&status=' + this.orderStatus + '&beginTime=' + beginTime +
-                    '&endTime=' + endTime + '&descOrAsc=' + this.sortType,
-                    type: 'GET',
-                    success: function (result) {
-                        if (result.resultCode == 200) {
-                            _this.total = result.data.totalCount || 0;
-                            for (var i in result.data.list) {
-                                result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
-                            }
-                            _this.tableData = result.data.list || [];
-                        } else {
-                            _this.$message.error(result.message);
-                        }
-                        ;
-                    },
-                    error: function () {
-                        _this.$message.error('操作失败');
-                    }
-                });
-            }
-        }
-    })
-</script>
+<script th:src="@{/admin/plugins/v-distpicker/distpicker.js}"></script>
+<script th:src="@{/admin/dist/js/busiOrderManage.js}"></script>
 </body>
 </html>

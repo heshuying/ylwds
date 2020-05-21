@@ -2,6 +2,8 @@ package com.hailian.ylwmall.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * Created by 19012964 on 2020/5/20.
  */
@@ -19,6 +21,11 @@ public class RefundApplyDto {
      * 退货数量
      */
     private Integer refundNum;
+
+    /**
+     * 退货金额
+     */
+    private BigDecimal refundAmount;
 
     /**
      * 退货原因代码

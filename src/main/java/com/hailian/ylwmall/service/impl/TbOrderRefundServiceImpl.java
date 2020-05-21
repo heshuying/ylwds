@@ -62,7 +62,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         //检查是否已发起过，如果已发起，删除历史记录
         TbOrderRefund exists=baseMapper.selectOne(new QueryWrapper<TbOrderRefund>()
         .eq("order_id", dto.getOrderId()));
-        if(exists!=null){
+        if(exists!=null&&exists.getId()!=null){
             baseMapper.deleteById(exists.getId());
         }
 

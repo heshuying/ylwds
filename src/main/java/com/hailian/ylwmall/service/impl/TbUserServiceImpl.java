@@ -21,6 +21,7 @@ import com.hailian.ylwmall.dao.TbUserDao;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.util.MD5Util;
 import com.hailian.ylwmall.util.ResultGenerator;
+import com.hailian.ylwmall.wsdl.buyer.CreatePlCust2MDM_CreatePlCust2MDMPt_Client;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +107,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         profileService.update(tbUserProfile, new QueryWrapper<TbUserProfile>()
                 .eq("user_id",dto.getUserId()));
         //更新状态
-        TbUser user=new TbUser();
+        TbUser user = baseMapper.selectById(dto.getUserId());
         user.setUserId(dto.getUserId());
         user.setUserStatus(Const.UserStatus.Uncheck.getKey());
         if(StringUtils.isNoneBlank(dto.getRegCellphone())){
@@ -134,6 +135,14 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             userAddrService.updateById(tbUserAddr);
         }
 
+        if("02".equals(user.getUserType())){
+            // 采购调用mdm
+            String mdmCode = CreatePlCust2MDM_CreatePlCust2MDMPt_Client.callMdm(dto);
+            user.setMdmCode(mdmCode);
+            baseMapper.updateById(user);
+        }else if("04".equals(user.getUserType())){
+
+        }
 
         return ResultGenerator.genSuccessResult();
     }

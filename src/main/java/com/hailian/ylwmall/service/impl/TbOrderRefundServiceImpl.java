@@ -17,7 +17,7 @@ import com.hailian.ylwmall.service.TbUserAddrService;
 import com.hailian.ylwmall.util.Const;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +53,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }
         TbOrderRefund orderRefund=new TbOrderRefund();
-        try {
-            BeanUtils.copyProperties(dto, orderRefund);
+        BeanUtils.copyProperties(dto, orderRefund);
             orderRefund.setUserId(userId);
             orderRefund.setCreateTime(new Date());
             orderRefund.setUpdateTime(new Date());
@@ -72,9 +71,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             tbOrderOrderinfo.setUpdateTime(new Date());
             orderinfoService.updateById(tbOrderOrderinfo);
             return ResultGenerator.genSuccessResult();
-        }catch (Exception ex){
-            return ResultGenerator.genFailResult(ex.getMessage());
-        }
+
     }
 
     @Override
@@ -84,10 +81,13 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         TbOrderRefund tbOrderRefund=baseMapper.selectById(orderGoodinfo.getRefundId());
         tbOrderRefund.setStatus(tbOrderOrderinfo.getStatus());
         tbOrderRefund.setStatusDesc(Const.OrderStatus.getByKey(tbOrderOrderinfo.getStatus()).getCustomerDesc());
+        if(tbOrderRefund.getDeliveryId()>0){
+            //拼接地址
+            TbUserAddr userAddr=userAddrService.getById(tbOrderRefund.getDeliveryId());
+            tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
+                    userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
+        }
 
-        TbUserAddr userAddr=userAddrService.getById(tbOrderRefund.getDeliveryId());
-        tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
-        userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
         return ResultGenerator.genSuccessResult(tbOrderRefund);
     }
 
@@ -95,8 +95,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     @Override
     public Result refundDelivery(RefundDeliveryDto dto) {
         TbOrderRefund tbOrderRefund=new TbOrderRefund();
-        try {
-            BeanUtils.copyProperties(dto,tbOrderRefund);
+        BeanUtils.copyProperties(dto,tbOrderRefund);
             tbOrderRefund.setId(dto.getRefundId());
             baseMapper.updateById(tbOrderRefund);
 
@@ -107,9 +106,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             tbOrderOrderinfo.setUpdateTime(new Date());
             orderinfoService.updateById(tbOrderOrderinfo);
             return ResultGenerator.genSuccessResult();
-        }catch (Exception ex){
-            return ResultGenerator.genFailResult(ex.getMessage());
-        }
+
 
 
     }

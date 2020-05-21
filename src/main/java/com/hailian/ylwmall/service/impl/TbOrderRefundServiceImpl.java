@@ -164,6 +164,14 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             //同意退货
             updateDto.setDeliveryId(dto.getDeveryId());
             updateDto.setOpenComment(dto.getComment());
+        }else if(Const.OrderStatus.Refund_ConfirmMoney.getKey()==dto.getStatus()){
+            //部分退款
+            updateDto.setRefundActualAmount(updateDto.getRefundAmount()
+                    .subtract(dto.getContdownAmount()));
+
+        }else if(Const.OrderStatus.Refund_Edit.getKey()==dto.getStatus()){
+            //全额退款
+            updateDto.setRefundActualAmount(updateDto.getRefundAmount());
         }
         baseMapper.updateById(updateDto);
         //更新订单状态

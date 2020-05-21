@@ -56,36 +56,46 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     @Transactional
     @Override
     public Result refundApply(Long userId, RefundApplyDto dto) {
-        if(dto==null||userId==null){
+        if (dto == null || userId == null) {
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }
-        TbOrderRefund orderRefund=new TbOrderRefund();
+        TbOrderGoodinfo orderGoods = orderGoodinfoService.getById(dto.getOrderGoodsId());
+        TbOrderRefund orderRefund = new TbOrderRefund();
         BeanUtils.copyProperties(dto, orderRefund);
-            orderRefund.setUserId(userId);
-            orderRefund.setCreateTime(new Date());
-            orderRefund.setUpdateTime(new Date());
-            baseMapper.insert(orderRefund);
+        orderRefund.setUserId(userId);
+        orderRefund.setGoodsId(orderGoods.getGoodId());
+        orderRefund.setGoodsAttribute(orderGoods.getGoodsAttr());
+        orderRefund.setCreateTime(new Date());
+        orderRefund.setUpdateTime(new Date());
+        baseMapper.insert(orderRefund);
 
-            TbOrderGoodinfo orderGoodinfo = new TbOrderGoodinfo();
-            orderGoodinfo.setId(dto.getOrderGoodsId());
-            orderGoodinfo.setRefundId(orderRefund.getId());
-            orderGoodinfoService.updateById(orderGoodinfo);
+        TbOrderGoodinfo orderGoodinfo = new TbOrderGoodinfo();
+        orderGoodinfo.setId(dto.getOrderGoodsId());
+        orderGoodinfo.setRefundId(orderRefund.getId());
+        orderGoodinfoService.updateById(orderGoodinfo);
 
-            //更新订单状态
-            TbOrderOrderinfo tbOrderOrderinfo=new TbOrderOrderinfo();
-            tbOrderOrderinfo.setId(dto.getOrderId());
-            tbOrderOrderinfo.setStatus(Const.OrderStatus.Refund_Confirm.getKey());
-            tbOrderOrderinfo.setUpdateTime(new Date());
-            orderinfoService.updateById(tbOrderOrderinfo);
-            return ResultGenerator.genSuccessResult();
+        //更新订单状态
+        TbOrderOrderinfo tbOrderOrderinfo = new TbOrderOrderinfo();
+        tbOrderOrderinfo.setId(dto.getOrderId());
+        tbOrderOrderinfo.setStatus(Const.OrderStatus.Refund_Confirm.getKey());
+        tbOrderOrderinfo.setUpdateTime(new Date());
+        orderinfoService.updateById(tbOrderOrderinfo);
+        return ResultGenerator.genSuccessResult();
 
     }
 
+
     @Override
-    public Result refundInfo(Long orderGoodsId) {
-        TbOrderGoodinfo orderGoodinfo = orderGoodinfoService.getById(orderGoodsId);
-        TbOrderOrderinfo tbOrderOrderinfo=orderinfoService.getById(orderGoodinfo.getOrderId());
-        TbOrderRefund tbOrderRefund=baseMapper.selectById(orderGoodinfo.getRefundId());
+    public Result refundInfo(Long orderNo) {
+        TbOrderRefund tbOrderRefund=baseMapper.selectOne(new QueryWrapper<TbOrderRefund>()
+                .eq("order_id", orderNo));
+        TbGoodsInfo goodsInfo=goodsService.getById(tbOrderRefund.getGoodsId());
+        tbOrderRefund.setGoodsName(goodsInfo==null?"":goodsInfo.getGoodsName());
+        TbOrderGoodinfo orderGoods=orderGoodinfoService.getOne(new QueryWrapper<TbOrderGoodinfo>()
+                .eq("refund_id", tbOrderRefund.getId()));
+        tbOrderRefund.setBuyNum(orderGoods==null?0:orderGoods.getNumber());
+        TbOrderOrderinfo tbOrderOrderinfo=orderinfoService.getById(orderNo);
+        tbOrderRefund.setOrderAmount(tbOrderOrderinfo==null?BigDecimal.ZERO:tbOrderOrderinfo.getRealPrice());
         tbOrderRefund.setStatus(tbOrderOrderinfo.getStatus());
         tbOrderRefund.setStatusDesc(Const.OrderStatus.getByKey(tbOrderOrderinfo.getStatus()).getCustomerDesc());
         if(tbOrderRefund.getDeliveryId()>0){
@@ -94,7 +104,6 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
                     userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
         }
-
         return ResultGenerator.genSuccessResult(tbOrderRefund);
     }
 

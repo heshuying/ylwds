@@ -27,10 +27,11 @@ public interface TbOrderRefundService extends IService<TbOrderRefund> {
 
     /**
      * 退货详情
-     * @param orderGoodsId
+     * @param orderNo
      * @return
      */
-    Result refundInfo(Long orderGoodsId);
+    Result refundInfo(Long orderNo);
+
 
     /**
      * 退货发货

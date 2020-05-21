@@ -68,16 +68,16 @@ public class RefundController {
 
     /**
      * 退货单信息查询
-     * @param orderGoodsId
+     * @param orderId
      * @return
      */
     @ApiOperation(value = "退货单信息查询")
     @GetMapping("/refundInfo")
     @ResponseBody
-    public Result refundInfo(@RequestParam Long orderGoodsId) {
+    public Result refundInfo(@RequestParam Long orderId) {
         NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
 
-        return orderRefundService.refundInfo(orderGoodsId);
+        return orderRefundService.refundInfo(orderId);
     }
 
     /**

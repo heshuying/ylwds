@@ -38,6 +38,8 @@ public class TbOrderRefund extends Model<TbOrderRefund> {
      * 商品id
      */
     private Long goodsId;
+    @TableField(exist = false)
+    private String goodsName;
 
     /**
      * 用户id
@@ -68,7 +70,10 @@ public class TbOrderRefund extends Model<TbOrderRefund> {
      * 退货数量
      */
     private Integer refundNum;
-
+    @TableField(exist = false)
+    private Integer buyNum;
+    @TableField(exist = false)
+    private BigDecimal orderAmount;
     /**
      * 退货原因代码
      */

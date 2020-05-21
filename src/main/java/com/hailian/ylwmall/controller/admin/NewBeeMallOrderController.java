@@ -5,6 +5,7 @@ import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.RefundCheckDto;
 import com.hailian.ylwmall.dto.RefundStatusDto;
+import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.hailian.ylwmall.entity.TbUserAddr;
 import com.hailian.ylwmall.entity.order.CommonResult;
 import com.hailian.ylwmall.entity.order.CutDownPriceParam;
@@ -380,4 +381,10 @@ public class NewBeeMallOrderController {
         return orderRefundService.checkRefund(Long.valueOf(userId), dto);
     }
 
+    @GetMapping("/refund/info")
+    @ResponseBody
+    public Result refundInfo(@RequestParam Long orderId, HttpSession httpSession) {
+        String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+        return orderRefundService.refundInfo(orderId);
+    }
 }

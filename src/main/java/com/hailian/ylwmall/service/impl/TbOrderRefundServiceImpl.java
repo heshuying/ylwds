@@ -81,10 +81,13 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         TbOrderRefund tbOrderRefund=baseMapper.selectById(orderGoodinfo.getRefundId());
         tbOrderRefund.setStatus(tbOrderOrderinfo.getStatus());
         tbOrderRefund.setStatusDesc(Const.OrderStatus.getByKey(tbOrderOrderinfo.getStatus()).getCustomerDesc());
+        if(tbOrderRefund.getDeliveryId()>0){
+            //拼接地址
+            TbUserAddr userAddr=userAddrService.getById(tbOrderRefund.getDeliveryId());
+            tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
+                    userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
+        }
 
-        TbUserAddr userAddr=userAddrService.getById(tbOrderRefund.getDeliveryId());
-        tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
-        userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
         return ResultGenerator.genSuccessResult(tbOrderRefund);
     }
 

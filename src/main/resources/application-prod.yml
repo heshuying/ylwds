@@ -55,7 +55,7 @@ kjt:
   recv: https://zgateway.kjtpay.com/recv.do
   tradeRefundAsyncNotify: http://106.53.192.56:8080/api/pay/tradeRefundAsyncNotify
   ensureTradeAsyncNotify: http://106.53.192.56:8080/api/pay/ensureTradeAsyncNotify
-  ensureTradeReturnUrl: http://106.53.192.56/outer/pay/payFinish
+  ensureTradeReturnUrl: http://106.53.192.56/outer/#/pay/payFinish
   recvOrder: https://zmgs.kjtpay.com/mgs/recvOrder.htm
   verifyFlag: 0
   productCode: 10311
@@ -88,3 +88,9 @@ kd100:
   url: http://poll.kuaidi100.com/poll/query.do
   customer: 6256F91AC42AB34B172D50E07D139A1A
   key: SSwDHrAK6313
+
+mdm:
+  customer:
+    wsdl: http://10.135.16.46:8001/soa-infra/services/interface/CreatePlCust2MDM/createplcust2mdm_client_ep?WSDL
+  supplier:
+    wsdl: http://10.135.16.46:8001/soa-infra/services/interface/OuterSysVendorToMDM_NEW/outersysvendortomdm_new_client_ep?WSDL

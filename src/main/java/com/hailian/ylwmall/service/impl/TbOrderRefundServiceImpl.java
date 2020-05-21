@@ -59,6 +59,13 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         if (dto == null || userId == null) {
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }
+        //检查是否已发起过，如果已发起，删除历史记录
+        TbOrderRefund exists=baseMapper.selectOne(new QueryWrapper<TbOrderRefund>()
+        .eq("order_id", dto.getOrderId()));
+        if(exists!=null){
+            baseMapper.deleteById(exists.getId());
+        }
+
         TbOrderGoodinfo orderGoods = orderGoodinfoService.getById(dto.getOrderGoodsId());
         TbOrderRefund orderRefund = new TbOrderRefund();
         BeanUtils.copyProperties(dto, orderRefund);

@@ -1,7 +1,9 @@
 package com.hailian.ylwmall.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.RefundApplyDto;
+import com.hailian.ylwmall.dto.RefundCheckDto;
 import com.hailian.ylwmall.dto.RefundDeliveryDto;
 import com.hailian.ylwmall.dto.RefundStatusDto;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
@@ -137,5 +139,31 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         TbGoodsInfo goodsInfo=goodsService.getById(orderGoodinfo.getGoodId());
         BigDecimal refundAmount=goodsInfo.getPrice().multiply(new BigDecimal(refundNum));
         return ResultGenerator.genSuccessResult(refundAmount);
+    }
+
+    @Override
+    public Result checkRefund(Long userId, RefundCheckDto dto) {
+
+        TbOrderRefund tbOrderRefund=baseMapper.selectOne(new QueryWrapper<TbOrderRefund>()
+        .eq("order_id", dto.getOrderId()));
+        TbOrderRefund updateDto=new TbOrderRefund();
+        updateDto.setId(tbOrderRefund.getId());
+        if(Const.OrderStatus.Refund_Reject.getKey()==dto.getStatus()) {
+            //驳回
+            updateDto.setRejectReason(dto.getRejectReason());
+        }else if(Const.OrderStatus.Refund_Delivery.getKey()==dto.getStatus()){
+            //同意退货
+            updateDto.setDeliveryId(dto.getDeveryId());
+            updateDto.setOpenComment(dto.getComment());
+        }
+        baseMapper.updateById(updateDto);
+        //更新订单状态
+        TbOrderOrderinfo tbOrderOrderinfo=new TbOrderOrderinfo();
+        tbOrderOrderinfo.setId(tbOrderRefund.getOrderId());
+        tbOrderOrderinfo.setStatus(dto.getStatus());
+        tbOrderOrderinfo.setUpdateTime(new Date());
+        orderinfoService.updateById(tbOrderOrderinfo);
+
+        return ResultGenerator.genSuccessResult();
     }
 }

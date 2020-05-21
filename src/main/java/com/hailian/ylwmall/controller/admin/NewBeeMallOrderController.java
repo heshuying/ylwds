@@ -1,15 +1,25 @@
 package com.hailian.ylwmall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hailian.ylwmall.common.Constants;
+import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
+import com.hailian.ylwmall.dto.RefundCheckDto;
+import com.hailian.ylwmall.dto.RefundStatusDto;
+import com.hailian.ylwmall.entity.TbUserAddr;
 import com.hailian.ylwmall.entity.order.CommonResult;
 import com.hailian.ylwmall.entity.order.CutDownPriceParam;
 import com.hailian.ylwmall.entity.order.DeliverGoodsParam;
 import com.hailian.ylwmall.service.NewBeeMallOrderService;
+import com.hailian.ylwmall.service.TbOrderRefundService;
+import com.hailian.ylwmall.service.TbUserAddrService;
 import com.hailian.ylwmall.util.PageQueryUtil;
 import com.hailian.ylwmall.util.PageResult;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.util.ResultGenerator;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +41,10 @@ public class NewBeeMallOrderController {
 
     @Resource
     private NewBeeMallOrderService newBeeMallOrderService;
-
+    @Autowired
+    private TbUserAddrService userAddrService;
+    @Autowired
+    private TbOrderRefundService orderRefundService;
     /**
      *
      * @param params
@@ -305,6 +319,65 @@ public class NewBeeMallOrderController {
             e.printStackTrace();
             return ResultGenerator.genFailResult("减免失败");
         }
+    }
+
+    /**
+     * 编辑我的收获地址
+     * @param userAddr
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @PostMapping("/delivery/update")
+    @ResponseBody
+    public Result updateDelivery(@RequestBody TbUserAddr userAddr, HttpServletRequest request, HttpSession httpSession) {
+        String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+        userAddrService.updateById(userAddr);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    /**
+     * 我的收获地址
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @GetMapping("/delivery")
+    @ResponseBody
+    public Result delivery(HttpServletRequest request, HttpSession httpSession) {
+        String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+        List<TbUserAddr> userAddrList=userAddrService.list(
+                new QueryWrapper<TbUserAddr>()
+                        .eq("user_id",userId)
+                        .eq("status",0)
+        );
+        return ResultGenerator.genSuccessResult(userAddrList);
+    }
+
+    /**
+     * 新增我的收获地址
+     * @param userAddr
+     * @param request
+     * @param httpSession
+     * @return
+     */
+    @PostMapping("/delivery/add")
+    @ResponseBody
+    public Result addDelivery(@RequestBody TbUserAddr userAddr, HttpServletRequest request, HttpSession httpSession) {
+        String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+        userAddr.setUserId(Long.valueOf(userId));
+        userAddr.setCreateTime(new Date());
+        userAddr.setStatus(0);
+        userAddr.setIsDefault(false);
+        userAddrService.save(userAddr);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @PostMapping("/refund/check")
+    @ResponseBody
+    public Result updateRefundStatus(@RequestBody RefundCheckDto dto, HttpSession httpSession) {
+        String userId = String.valueOf(httpSession.getAttribute("loginUserId"));
+        return orderRefundService.checkRefund(Long.valueOf(userId), dto);
     }
 
 }

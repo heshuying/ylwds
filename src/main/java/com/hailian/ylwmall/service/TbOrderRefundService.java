@@ -1,6 +1,7 @@
 package com.hailian.ylwmall.service;
 
 import com.hailian.ylwmall.dto.RefundApplyDto;
+import com.hailian.ylwmall.dto.RefundCheckDto;
 import com.hailian.ylwmall.dto.RefundDeliveryDto;
 import com.hailian.ylwmall.dto.RefundStatusDto;
 import com.hailian.ylwmall.entity.TbOrderRefund;
@@ -51,4 +52,11 @@ public interface TbOrderRefundService extends IService<TbOrderRefund> {
      * @return
      */
     Result calRefundAmount(Long orderGoodsId, Integer refundNum);
+
+    /**
+     * 更新退货状态
+     * @param dto
+     * @return
+     */
+    Result checkRefund(Long userId, RefundCheckDto dto);
 }

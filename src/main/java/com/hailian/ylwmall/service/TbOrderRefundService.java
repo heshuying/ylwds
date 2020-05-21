@@ -44,4 +44,11 @@ public interface TbOrderRefundService extends IService<TbOrderRefund> {
      * @return
      */
     Result updateRefundStatus(RefundStatusDto dto);
+
+    /**
+     * 计算退货金额
+     * @param orderGoodsId
+     * @return
+     */
+    Result calRefundAmount(Long orderGoodsId, Integer refundNum);
 }

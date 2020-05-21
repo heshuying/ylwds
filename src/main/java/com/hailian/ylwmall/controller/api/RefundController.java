@@ -108,4 +108,19 @@ public class RefundController {
         return orderRefundService.updateRefundStatus(dto);
     }
 
+    /**
+     * 计算退货金额
+     * @param orderGoodsId
+     * @return
+     */
+    @ApiOperation(value = "计算退货金额")
+    @GetMapping("/refund/calRefundAmount")
+    @ResponseBody
+    public Result calRefundAmount(@RequestParam Long orderGoodsId,
+            @RequestParam Integer refundNum) {
+        NewBeeMallUserVO user = (NewBeeMallUserVO) httpSession.getAttribute(Constants.MALL_USER_SESSION_KEY);
+
+        return orderRefundService.calRefundAmount(orderGoodsId, refundNum);
+    }
+
 }

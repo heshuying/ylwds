@@ -4,11 +4,13 @@ import com.hailian.ylwmall.common.ServiceResultEnum;
 import com.hailian.ylwmall.dto.RefundApplyDto;
 import com.hailian.ylwmall.dto.RefundDeliveryDto;
 import com.hailian.ylwmall.dto.RefundStatusDto;
+import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.entity.TbOrderGoodinfo;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.hailian.ylwmall.entity.TbOrderRefund;
 import com.hailian.ylwmall.dao.TbOrderRefundDao;
 import com.hailian.ylwmall.entity.TbUserAddr;
+import com.hailian.ylwmall.service.GoodsService;
 import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.hailian.ylwmall.service.TbOrderRefundService;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -40,6 +43,8 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     private TbOrderOrderinfoService orderinfoService;
     @Autowired
     private TbUserAddrService userAddrService;
+    @Autowired
+    private GoodsService goodsService;
     /**
      * 发起退货
      * @param userId
@@ -121,5 +126,16 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         tbOrderOrderinfo.setUpdateTime(new Date());
         orderinfoService.updateById(tbOrderOrderinfo);
         return ResultGenerator.genSuccessResult();
+    }
+
+    @Override
+    public Result calRefundAmount(Long orderGoodsId, Integer refundNum) {
+        TbOrderGoodinfo orderGoodinfo = orderGoodinfoService.getById(orderGoodsId);
+        if(refundNum>orderGoodinfo.getNumber()){
+            return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
+        }
+        TbGoodsInfo goodsInfo=goodsService.getById(orderGoodinfo.getGoodId());
+        BigDecimal refundAmount=goodsInfo.getPrice().multiply(new BigDecimal(refundNum));
+        return ResultGenerator.genSuccessResult(refundAmount);
     }
 }

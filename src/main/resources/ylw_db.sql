@@ -374,6 +374,7 @@ alter table tb_order_orderinfo add express_code varchar(80) not null default '' 
 alter table tb_order_goodinfo add has_comment char(1) not null default '0' comment '是否评价';
 alter table tb_order_goodinfo add refund_id bigint(20) not null default 0 comment '退货ID';
 
+
 -- 评价表
 CREATE TABLE `tb_goods_comment` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -417,4 +418,7 @@ CREATE TABLE `tb_order_refund` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+ALTER TABLE tb_user ADD out_tax_code VARCHAR(100) DEFAULT NULL COMMENT 'mdm返回的税号';
+ALTER TABLE tb_user ADD mdm_code VARCHAR(100) DEFAULT NULL COMMENT '采购/供应商mdm编码';
 

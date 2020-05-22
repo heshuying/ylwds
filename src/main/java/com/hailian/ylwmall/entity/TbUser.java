@@ -87,6 +87,10 @@ public class TbUser extends Model<TbUser> {
      */
     private String mdmCode;
 
+    /**
+     * mdm返回的税号
+     */
+    private String outTaxCode;
 
     @Override
     protected Serializable pkVal() {

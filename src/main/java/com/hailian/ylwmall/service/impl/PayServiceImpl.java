@@ -14,6 +14,7 @@ import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
 import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
+import com.hailian.ylwmall.dto.pay.RefundCallBackDto;
 import com.hailian.ylwmall.entity.StockNumDTO;
 import com.hailian.ylwmall.entity.TbOrderPay;
 import com.hailian.ylwmall.entity.TbPayRefund;
@@ -638,20 +639,37 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     }
 
     /**
-     * 退款异步通知
+     * 退款状态变更异步通知
      */
     @Override
     @Transactional
-    public Result tradeRefundAsyncNotify(Map<String, Object> params){
-        log.info("接收到退款回调：{}", JSON.toJSONString(params));
-        TbPayRefund payRefund = payRefundDao.selectOne(new QueryWrapper<TbPayRefund>()
-                .eq("out_trade_no", params.get("outer_trade_no")));
+    public void tradeRefundAsyncNotify(RefundCallBackDto reqBean){
+        log.info("接收到退款回调：{}", JSON.toJSONString(reqBean));
+        log.info("退款状态：{}", reqBean.getRefund_status());
+
+        insertRevLog(reqBean.getOuter_trade_no(), "tradeRefundAsyncNotify", JSON.toJSONString(reqBean), JSON.toJSONString(reqBean));
+        // 更新支付状态
+        TbPayRefund payRefund = payRefundDao.selectOne(new QueryWrapper<TbPayRefund>().eq("orig_out_trade_no", reqBean.getOrig_outer_trade_no()));
         if(payRefund == null){
-            return ResultGenerator.genFailResult("未检索到退款记录");
+            throw new BusinessException("未检索到退款记录");
         }
 
-        return ResultGenerator.genSuccessResult();
+        if("REFUND_FAIL".equalsIgnoreCase(reqBean.getRefund_status())){
+            // 退款失败
+            payRefund.setRefundStatus("F");
+            payRefund.setFailCode(reqBean.getFailCode());
+            payRefund.setFailMsg(reqBean.getFailReason());
+            payRefund.setUpdateTime(new Date());
+            payRefundDao.updateById(payRefund);
+        }else if("REFUND_SUCCESS".equalsIgnoreCase(reqBean.getRefund_status())){
+            // 退款成功
+            payRefund.setRefundStatus("S");
+            payRefund.setUpdateTime(new Date());
+            payRefundDao.updateById(payRefund);
+        }
+
     }
+
 
     /**
      * 商户验签

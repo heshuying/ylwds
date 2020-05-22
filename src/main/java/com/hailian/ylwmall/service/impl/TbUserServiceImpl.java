@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.util.MD5Util;
 import com.hailian.ylwmall.util.ResultGenerator;
 import com.hailian.ylwmall.wsdl.buyer.CreatePlCust2MDM_CreatePlCust2MDMPt_Client;
+import com.hailian.ylwmall.wsdl.supplier.OuterSysVendorToMDMNEW_OuterSysVendorToMDMNEWPt_Client;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,14 +136,18 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
             userAddrService.updateById(tbUserAddr);
         }
 
-        if("02".equals(user.getUserType())){
+        // 调用mdm
+        /*if("02".equals(user.getUserType())){
             // 采购调用mdm
             String mdmCode = CreatePlCust2MDM_CreatePlCust2MDMPt_Client.callMdm(dto);
             user.setMdmCode(mdmCode);
             baseMapper.updateById(user);
         }else if("04".equals(user.getUserType())){
-
-        }
+            Map<String, String> map = OuterSysVendorToMDMNEW_OuterSysVendorToMDMNEWPt_Client.callMdm(dto);
+            user.setMdmCode(map.get("outVENDORCODE"));
+            user.setOutTaxCode(map.get("out_tax_code"));
+            baseMapper.updateById(user);
+        }*/
 
         return ResultGenerator.genSuccessResult();
     }

@@ -119,7 +119,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     @Transactional
     @Override
     public Result refundDelivery(RefundDeliveryDto dto) {
-        TbOrderRefund tbOrderRefund=new TbOrderRefund();
+        TbOrderRefund tbOrderRefund=baseMapper.selectById(dto.getRefundId());
         BeanUtils.copyProperties(dto,tbOrderRefund);
             tbOrderRefund.setId(dto.getRefundId());
             baseMapper.updateById(tbOrderRefund);

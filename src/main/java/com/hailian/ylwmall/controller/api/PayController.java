@@ -6,6 +6,7 @@ import com.hailian.ylwmall.common.pay.KJTConstants;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
+import com.hailian.ylwmall.dto.pay.RefundCallBackDto;
 import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.util.KJTPayUtil;
 import com.hailian.ylwmall.util.Result;
@@ -181,6 +182,28 @@ public class PayController {
             payService.ensureTradeAsyncNotify(callBackDto);
         } catch (Exception e) {
             log.error("支付回调处理失败", e);
+            return KJTConstants.NOTIFY_RET_FAIL;
+        }
+        return KJTConstants.NOTIFY_RET_SUCCESS;
+    }
+
+    @ResponseBody
+    @ApiOperation(value = "退款异步通知接口")
+    @PostMapping("/tradeRefundAsyncNotify")
+    public String tradeRefundAsyncNotify(RefundCallBackDto callBackDto, HttpServletRequest request) {
+        log.info("tradeRefundAsyncNotify收到异步回调: {}", JSON.toJSONString(callBackDto));
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()){
+            log.info("参数名：" + parameterNames.nextElement());
+        }
+        if(callBackDto == null){
+            return KJTConstants.NOTIFY_RET_FAIL;
+        }
+
+        try {
+            payService.tradeRefundAsyncNotify(callBackDto);
+        } catch (Exception e) {
+            log.error("退款回调处理失败", e);
             return KJTConstants.NOTIFY_RET_FAIL;
         }
         return KJTConstants.NOTIFY_RET_SUCCESS;

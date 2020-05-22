@@ -110,6 +110,8 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             TbUserAddr userAddr=userAddrService.getById(tbOrderRefund.getDeliveryId());
             tbOrderRefund.setDeliveryAddr(userAddr.getProvince()+
                     userAddr.getCity()+userAddr.getArea()+userAddr.getDetail());
+            tbOrderRefund.setAcceptor(userAddr.getAcceptor());
+            tbOrderRefund.setAcceptorPhone(userAddr.getPhone());
         }
         return ResultGenerator.genSuccessResult(tbOrderRefund);
     }
@@ -117,7 +119,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     @Transactional
     @Override
     public Result refundDelivery(RefundDeliveryDto dto) {
-        TbOrderRefund tbOrderRefund=new TbOrderRefund();
+        TbOrderRefund tbOrderRefund=baseMapper.selectById(dto.getRefundId());
         BeanUtils.copyProperties(dto,tbOrderRefund);
             tbOrderRefund.setId(dto.getRefundId());
             baseMapper.updateById(tbOrderRefund);

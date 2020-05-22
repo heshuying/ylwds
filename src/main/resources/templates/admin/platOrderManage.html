@@ -22,7 +22,7 @@
             </div><!-- /.container-fluid -->
         </div>
         <!-- Main content -->
-        <div id="app" class="manage-main-page">
+        <div id="app" class="manage-main-page" v-cloak>
             <div class="query-condition-line">
                 <div>
                     <label>订单状态</label>
@@ -139,7 +139,7 @@
                             <span v-if="scope.row.status=='待发货'" class="bg-common blue-bg">{{scope.row.status}}</span>
                             <span v-else-if="scope.row.status=='待结算'" class="bg-common red-bg">{{scope.row.status}}</span>
                             <span v-else-if="scope.row.status=='待支付'||scope.row.status=='待收货'||scope.row.status=='待评价'" class="bg-common green-bg">{{scope.row.status}}</span>
-                            <span v-else class="bg-common gray-bg">{{scope.row.status}}</span>
+                            <span v-else class="bg-common gray-bg" @click="operateOrder(scope.row)">{{scope.row.status}}</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -176,18 +176,18 @@
             <!--退货申请/退货审核-->
             <el-dialog :visible.sync="applyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
                 <div class="plat-return-goods-dia-area">
-                    <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                    <div class="goods-info bold-word">{{refundApplyGoodsName}}</div>
                     <div class="common-line return-info">
                         <span class="bold-word">买家申请退货</span>
-                        <span class="light-word">(购买数量200;退货数量2)</span>
+                        <span class="light-word">(购买数量{{refundApplyBuyNum}};退货数量{{refundApplyRetNum}})</span>
                     </div>
                     <div class="common-line">
                         <div class="common-title light-word">退货原因</div>
-                        <div>不喜欢</div>
+                        <div>{{refundApplyReason}}</div>
                     </div>
                     <div class="common-line bottom-padding">
                         <div class="common-title light-word">详细原因</div>
-                        <div>用不了这么多</div>
+                        <div>{{refundApplyDetail}}</div>
                     </div>
                     <div v-if="!isApply">
                         <div class="common-line seperate-line">
@@ -195,7 +195,7 @@
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">驳回原因</div>
-                            <div>特殊商品，非质量问题不支持退货，望理解</div>
+                            <div>{{refundApplyRejectReason}}</div>
                         </div>
                     </div>
                 </div>

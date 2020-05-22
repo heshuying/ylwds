@@ -1,7 +1,9 @@
 body {
         background-color: #FBFBFC;
     }
-
+    [v-cloak]{
+        display: none;
+    }
     .content-wrapper {
         background: #fbfbfb;
     }

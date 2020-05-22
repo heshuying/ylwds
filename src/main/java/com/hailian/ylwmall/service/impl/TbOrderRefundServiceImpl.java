@@ -169,20 +169,24 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         if(Const.OrderStatus.Refund_Reject.getKey()==dto.getStatus()) {
             //驳回
             updateDto.setRejectReason(dto.getRejectReason());
+            baseMapper.updateById(updateDto);
         }else if(Const.OrderStatus.Refund_Delivery.getKey()==dto.getStatus()){
             //同意退货
             updateDto.setDeliveryId(dto.getDeveryId());
             updateDto.setOpenComment(dto.getComment());
+            baseMapper.updateById(updateDto);
         }else if(Const.OrderStatus.Refund_ConfirmMoney.getKey()==dto.getStatus()){
             //部分退款
-            updateDto.setRefundActualAmount(updateDto.getRefundAmount()
+            updateDto.setRejectReason(dto.getRejectReason());
+            updateDto.setRefundActualAmount(tbOrderRefund.getRefundAmount()
                     .subtract(dto.getContdownAmount()));
-
+            baseMapper.updateById(updateDto);
         }else if(Const.OrderStatus.Refunding.getKey()==dto.getStatus()){
             //全额退款
             updateDto.setRefundActualAmount(updateDto.getRefundAmount());
+            baseMapper.updateById(updateDto);
         }
-        baseMapper.updateById(updateDto);
+
         //更新订单状态
         TbOrderOrderinfo tbOrderOrderinfo=new TbOrderOrderinfo();
         tbOrderOrderinfo.setId(tbOrderRefund.getOrderId());

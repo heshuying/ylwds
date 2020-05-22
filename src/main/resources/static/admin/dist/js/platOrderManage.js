@@ -27,6 +27,12 @@ new Vue({
             // 退货申请/退货审核dialog
             applyMoralShow: false,
             isApply: false,
+            refundApplyGoodsName: '',
+            refundApplyBuyNum: '',
+            refundApplyRetNum: '',
+            refundApplyReason: '',
+            refundApplyDetail: '',
+            refundApplyRejectReason: '',
             // 包裹寄回中dialog
             checkExpressMoralShow:false,
             activities: [{
@@ -154,6 +160,46 @@ new Vue({
                     }
                 }
             });
+        },
+        // 订单操作
+        operateOrder(item) {
+            if(item.status === '退货中待商家确认' || item.status === '退货中商家驳回') {
+                this.applyMoralShow = true;
+                var _this = this;
+                var loading = this.$loading({
+                    lock: true,
+                    text: "拼命加载中, 请稍等...",
+                    spinner: "el-icon-loading",
+                    background: "rgba(0, 0, 0, 0.7)"
+                });
+                $.ajax({
+                    url: '/admin/refund/info?orderId=' + item.id,
+                    type: 'GET',
+                    success: function (result) {
+                        loading.close();
+                        if (result.resultCode == 200) {
+                            _this.refundApplyGoodsName = result.data.goodsName || '';
+                            _this.refundApplyBuyNum = result.data.buyNum || '';
+                            _this.refundApplyRetNum = result.data.refundNum || '';
+                            _this.refundApplyReason = result.data.refundReasonDesc || '';
+                            _this.refundApplyDetail = result.data.refundDetail || '';
+                            _this.refundApplyRejectReason = result.data.rejectReason || '';
+                            _this.applyMoralShow = true;
+                            _this.isApply= true;
+                            if(item.status === '退货中商家驳回') {
+                                _this.isApply= false;
+                            }
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        loading.close();
+                        _this.$message.error('操作失败');
+                    }
+                });
+            }
         }
     }
 })

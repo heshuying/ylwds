@@ -9,11 +9,11 @@
                     {label:'待发货',value: '2'},
                     {label:'待收货',value: '3'},
                     {label:'待评价',value: '4'},
-                    {label:'售后中',value: '5'},
-                    {label:'待结算',value: '6'},
+                    // {label:'售后中',value: '5'},
+                    {label:'待结算',value: '5'},
                     {label:'结算中',value: '7'},
                     {label:'已结算',value: '8'},
-                    {label:'已取消',value: '9'},
+                    {label:'已取消',value: '10'},
                 ],
                 orderDate: [],
                 orderId: '',
@@ -37,39 +37,44 @@
                 pagesize: 10,
                 currentPage: 1,
                 // 退款申请dialog
+                refundOrderId: '',
                 applyMoralShow: false,
+                refundApplyGoodsName: '',
+                refundApplyBuyNum: '',
+                refundApplyRetNum: '',
+                refundApplyReason: '',
+                refundApplyDetail: '',
                 providerOpeateRadio: '', // 卖家退货操作
                 rejectReason: '', // 卖家拒绝退货原因
                 // 地址管理dialog
                 addressMoralShow: false,
                 addressRemark: '',  // 地址备注
-                addressStep: '1',
-                selectedAddress: '',
+                addressStep: '2',
+                refundSelectedAddress: '',
                 currentAddress: {},
-                addressList: [
-                    {addrId: 1,addressAll: '山东省青岛市崂山区海尔路1号海尔工业园', acceptor: '王有钱', phone:'18092429845'},
-                    {addrId: 2,addressAll: '山东省青岛市崂山区海尔路1号海尔工业园山东省青岛市崂山区海尔路1号海尔工业园', acceptor: '王有钱', phone:'18092429848'}
-                ],
+                refundAddressList: [],
+                refundAddressProvince: '',
+                refundAddressCity: '',
+                refundAddressDis: '',
+                refundAddressAcceptor: '',
+                refundAddressPhone: '',
+                refundAddressDetail: '',
                 // 等待买家退回dialog
                 waitBuyerReturnMoralShow: false,
                 // 包裹寄回中查看物流dialog
                 checkExpressMoralShow: false,
-                activities: [{
-                    content: '活动按期开始',
-                    timestamp: '2018-04-15'
-                }, {
-                    content: '通过审核',
-                    timestamp: '2018-04-13'
-                }, {
-                    content: '创建成功',
-                    timestamp: '2018-04-11'
-                }],
+                expressStatums: [],
                 // 编辑退款dialog
                 editReturnMoneyMoralShow: false,
-                returnMoneyTypeRadio: ""
+                returnMoneyTypeRadio: "",
+                isAddressDiaShow: false
             };
         },
+         created() {
+             this.addressMoralShow = true;
+         },
         mounted() {
+            this.addressMoralShow = false;
             this.queryTableData();
         },
         methods: {
@@ -212,18 +217,198 @@
                         isDefault: false,
                         phone: "",
                         province: "",
-                        street: "",
-                        userId: this.$store.state.loginInfo.userId
+                        street: ""
                     };
+                    $("#province").val('');
+                    $("#province").trigger("change");
+                    $("#city").val('');
+                    $("#city").trigger("change");
+                    $("#district").val('');
+                    $("#district").trigger("change");
                 } else if (type === "2") {
                     // 更改地址
                     this.currentAddress = item;
+                    $("#province").val(item.province);
+                    $("#province").trigger("change");
+                    $("#city").val(item.city);
+                    $("#city").trigger("change");
+                    $("#district").val(item.area);
+                    $("#district").trigger("change");
                 }
                 this.addressStep = "2";
             },
+            hangdleProviceChange(val) {
+                this.currentAddress.province = val.target.value;
+                this.currentAddress.city = '';
+                this.currentAddress.area = '';
+            },
+            hangdleCityChange(val) {
+                this.currentAddress.city = val.target.value;
+                this.currentAddress.area = '';
+            },
+            hangdleDisChange(val) {
+                this.currentAddress.area = val.target.value;
+            },
             // 保存地址
             saveAddress() {
-                this.addressStep = "1";
+                var _this = this;
+                var url = "/admin/delivery/add";
+                if (this.currentAddress.addrId) {
+                    url = "/admin/delivery/update";
+                }
+                if(this.currentAddress.area === '' || this.currentAddress.acceptor === '' || this.currentAddress.phone === '' || this.currentAddress.detail === '') {
+                    _this.$message.error('请填写完整地址信息');
+                    return;
+                }
+                $.ajax({
+                    type: "post",
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify(this.currentAddress),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.addressStep = "1";
+                            _this.getAddressList();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            },
+            // 退货申请审核
+            returnCheck(item) {
+                var _this = this;
+                var loading = this.$loading({
+                    lock: true,
+                    text: "拼命加载中, 请稍等...",
+                    spinner: "el-icon-loading",
+                    background: "rgba(0, 0, 0, 0.7)"
+                });
+                this.refundOrderId = item.id;
+                $.ajax({
+                    url: '/admin/refund/info?orderId=' + item.id,
+                    type: 'GET',
+                    success: function (result) {
+                        loading.close();
+                        if (result.resultCode == 200) {
+                            _this.refundApplyGoodsName = result.data.goodsName || '';
+                            _this.refundApplyBuyNum = result.data.buyNum || '';
+                            _this.refundApplyRetNum = result.data.refundNum || '';
+                            _this.refundApplyReason = result.data.refundReasonDesc || '';
+                            _this.refundApplyDetail = result.data.refundDetail || '';
+                            _this.applyMoralShow = true;
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        loading.close();
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 查看物流信息
+            returnExpress(item) {
+                this.checkExpressMoralShow = true;
+                var _this = this;
+                var loading = this.$loading({
+                    lock: true,
+                    text: "拼命加载中, 请稍等...",
+                    spinner: "el-icon-loading",
+                    background: "rgba(0, 0, 0, 0.7)"
+                });
+                $.ajax({
+                    url: '/api/kd100/query?com=jd&num=JD0016164893471',
+                    type: 'GET',
+                    success: function (result) {
+                        loading.close();
+                        if (result.resultCode == 200) {
+                            _this.expressStatums = result.data.data || [];
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        loading.close();
+                        _this.$message.error('操作失败');
+                    }
+                });
+            },
+            // 退款驳回
+            refundReject() {
+                var _this = this;
+                if(this.rejectReason === '') {
+                    this.$message.error('请先输入驳回原因');
+                    return;
+                }
+                var postObj = {
+                    orderId: this.refundOrderId,
+                    status: '12',
+                    rejectReason: this.rejectReason
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/admin/refund/check",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.applyMoralShow = false;
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            },
+            // 退货申请同意
+            refundAgree() {
+                this.applyMoralShow = false;
+                this.addressMoralShow = true;
+                this.isAddressDiaShow = true;
+                this.addressStep = '1';
+                this.getAddressList();
+            },
+            // 获取地址列表
+            getAddressList() {
+                var _this = this;
+                var loading = this.$loading({
+                    lock: true,
+                    text: "拼命加载中, 请稍等...",
+                    spinner: "el-icon-loading",
+                    background: "rgba(0, 0, 0, 0.7)"
+                });
+                $.ajax({
+                    url: '/admin/delivery',
+                    type: 'GET',
+                    success: function (result) {
+                        loading.close();
+                        if (result.resultCode == 200) {
+                            for (var i in result.data) {
+                                result.data[i].addressAll =
+                                    result.data[i].province +
+                                    result.data[i].city +
+                                    result.data[i].area +
+                                    result.data[i].detail;
+                                if (result.data[i].isDefault) {
+                                    _this.refundSelectedAddress = result.data[i].addrId;
+                                }
+                            }
+                            _this.refundAddressList = result.data || [];
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                        ;
+                    },
+                    error: function () {
+                        loading.close();
+                        _this.$message.error('操作失败');
+                    }
+                });
             }
         }
     })

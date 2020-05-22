@@ -22,7 +22,7 @@
             </div><!-- /.container-fluid -->
         </div>
         <!-- Main content -->
-        <div id="app" class="manage-main-page">
+        <div id="app" class="manage-main-page" v-cloak>
             <div class="query-condition-line">
                 <div>
                     <label>订单状态</label>
@@ -160,6 +160,17 @@
                                     type="primary"
                                     @click="singleSendGoods(scope.row)">发货
                             </el-button>
+                            <el-button
+                                    v-if="scope.row.status=='退货待确认'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="returnCheck(scope.row)">审核
+                            </el-button>
+                            <!--<el-button-->
+                                    <!--size="mini"-->
+                                    <!--type="primary"-->
+                                    <!--@click="returnExpress(scope.row)">查看物流-->
+                            <!--</el-button>-->
                         </template>
                     </el-table-column>
                 </el-table>
@@ -201,18 +212,18 @@
                 <!--退款申请-->
                 <el-dialog :visible.sync="applyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
                     <div class="return-goods-dia-area">
-                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="goods-info bold-word">{{refundApplyGoodsName}}</div>
                         <div class="common-line return-info">
                             <span class="bold-word">买家申请退货</span>
-                            <span class="light-word">(购买数量200;退货数量2)</span>
+                            <span class="light-word">(购买数量{{refundApplyBuyNum}};退货数量{{refundApplyRetNum}})</span>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">退货原因</div>
-                            <div>不喜欢</div>
+                            <div>{{refundApplyReason}}</div>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">详细原因</div>
-                            <div>用不了这么多</div>
+                            <div>{{refundApplyDetail}}</div>
                         </div>
                         <div class="common-line">
                             <div class="common-title">卖家操作</div>
@@ -227,33 +238,34 @@
                                 <el-input placeholder="请输入,20字以内" v-model="rejectReason" maxlength="20" show-word-limit></el-input>
                             </div>
                         </div>
-                        <div class="btn-area">
-                            <el-button type="primary" >确定</el-button>
+                        <div class="common-line btn-area">
+                            <el-button type="primary" v-if="providerOpeateRadio=='1'" @click="refundReject">确定</el-button>
+                            <el-button type="primary" v-else @click="refundAgree">下一步</el-button>
                         </div>
                     </div>
                 </el-dialog>
-                <!--退款申请 end-->
+                <!--退款申请 end-->AddressDiaShow
                 <!--选择退货地址-->
-                <el-dialog :visible.sync="addressMoralShow" width="52%" title="退货事项" center :close-on-click-modal="closeBtnShow">
+                <el-dialog :visible.sync="addressMoralShow" width="52%" title="退货事项" center :close-on-click-modal="closeBtnShow" v-show="isAddressDiaShow" >
                     <div class="return-goods-dia-area">
                         <div v-show="addressStep=='1'">
                             <div class="address-list">
-                                <el-radio-group v-model="selectedAddress">
-                                    <el-radio :label="item.addrId" v-for="item in addressList" :key="item.index">
+                                <el-radio-group v-model="refundSelectedAddress">
+                                    <el-radio :label="item.addrId" v-for="item in refundAddressList" :key="item.index">
                                         <div style="display: flex;flex-wrap: wrap;margin-right: 20px;">
                                             {{item.addressAll}}
                                             <span class="name-span">{{item.acceptor}}</span>
                                             <span>{{item.phone}}</span>
                                         </div>
                                         <div>
-                                            <span v-if="selectedAddress==item.addrId" @click="addressChange('2', item)">修改本地址</span>
+                                            <span v-if="refundSelectedAddress==item.addrId" @click="addressChange('2', item)">修改本地址</span>
                                         </div>
                                     </el-radio>
                                 </el-radio-group>
                             </div>
                             <div class="add-address">
                                 <span>+</span>
-                                添加收货地址
+                                <span @click="addressChange('1')">添加收货地址</span>
                             </div>
                             <div class="common-line">
                                 <div class="short-title">备注</div>
@@ -270,25 +282,25 @@
                                 <div class="dia-address-item">
                                     <div class="common-title">收货人</div>
                                     <div>
-                                        <el-input  v-model="addressRemark"></el-input>
+                                        <el-input  v-model="currentAddress.acceptor"></el-input>
                                     </div>
                                 </div>
                                 <div class="dia-address-item">
                                     <div class="common-title">手机号码</div>
                                     <div>
-                                        <el-input  v-model="addressRemark"></el-input>
+                                        <el-input  v-model="currentAddress.phone"></el-input>
                                     </div>
                                 </div>
                             </div>
-                            <div data-toggle="distpicker" class="select-area-dia">
-                                <select data-province="---- 选择省 ----"></select>
-                                <select data-city="---- 选择市 ----"></select>
-                                <select data-district="---- 选择区 ----"></select>
+                            <div data-toggle="distpicker" id="distpickerItem" class="select-area-dia">
+                                <select data-province="---- 选择省 ----" id="province" @change="hangdleProviceChange"></select>
+                                <select data-city="---- 选择市 ----" id="city" @change="hangdleCityChange"></select>
+                                <select data-district="---- 选择区 ----" id="district" @change="hangdleDisChange"></select>
                             </div>
                             <div class="common-line">
                                 <div class="common-title">详细地址</div>
                                 <div class="input-item">
-                                    <el-input placeholder="如区、道路、门牌号、公司名等" v-model="addressRemark"></el-input>
+                                    <el-input placeholder="如区、道路、门牌号、公司名等" v-model="currentAddress.detail"></el-input>
                                 </div>
                             </div>
                             <div class="common-line btn-area">
@@ -336,10 +348,11 @@
                         <div class="express-info">
                             <el-timeline>
                                 <el-timeline-item
-                                        v-for="(activity, index) in activities"
+                                        v-for="(activity, index) in expressStatums"
                                         :key="index"
-                                        :timestamp="activity.timestamp"
-                                >{{activity.content}}</el-timeline-item>
+                                        :timestamp="activity.time">
+                                    {{activity.context}}
+                                </el-timeline-item>
                             </el-timeline>
                         </div>
                     </div>

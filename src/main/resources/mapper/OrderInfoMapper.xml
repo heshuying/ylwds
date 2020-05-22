@@ -9,6 +9,7 @@
     <result column="delivery_address" property="deliveryAddress" jdbcType="VARCHAR" />
     <result column="express_company" property="expressCompany" jdbcType="VARCHAR" />
     <result column="express_id" property="expressId" jdbcType="VARCHAR" />
+    <result column="express_code" property="expressCode" jdbcType="VARCHAR" />
     <result column="user_remark" property="userRemark" jdbcType="VARCHAR" />
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
     <result column="supplier_id" property="supplierId" jdbcType="INTEGER" />
@@ -20,7 +21,7 @@
     <result column="real_price" property="realPrice" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, status, update_time, create_time, delivery_address, express_company, express_id, 
+    id, status, update_time, create_time, delivery_address, express_company, express_id, express_code,
     user_remark, customer_id, supplier_id, cut_down, total_price, gross_profit, buying_price, 
     real_price,delivery_id
   </sql>

@@ -26,7 +26,7 @@ public class OrderInfoVo implements Serializable {
     private String expressCompany;
 
     private String expressId;
-
+    private String expressCode;
     private String userRemark;
 
     private Long customerId;

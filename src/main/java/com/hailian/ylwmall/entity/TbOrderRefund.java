@@ -115,6 +115,10 @@ public class TbOrderRefund extends Model<TbOrderRefund> {
     private Long deliveryId;
     @TableField(exist = false)
     private String deliveryAddr;
+    @TableField(exist = false)
+    private String acceptor;
+    @TableField(exist = false)
+    private String acceptorPhone;
     /**
      * 快递公司编码
      */

@@ -21,7 +21,7 @@ import javax.xml.ws.Service;
                   wsdlLocation = "",
                   targetNamespace = "http://xmlns.oracle.com/Interface/OuterSysVendorToMDM_NEW/OuterSysVendorToMDM_NEW")
 public class OutersysvendortomdmNewClientEp extends Service {
-    static String wsdlUrl = "http://10.135.16.46:8001/soa-infra/services/interface/OuterSysVendorToMDM_NEW/outersysvendortomdm_new_client_ep?WSDL"; //SpringContextUtils.getBean(WSDLConfig .class).getSupplierWSDL();
+    static String wsdlUrl = SpringContextUtils.getBean(WSDLConfig .class).getSupplierWSDL(); // "http://10.135.16.46:8001/soa-infra/services/interface/OuterSysVendorToMDM_NEW/outersysvendortomdm_new_client_ep?WSDL";
     public final static URL WSDL_LOCATION;
 
     public final static QName SERVICE = new QName("http://xmlns.oracle.com/Interface/OuterSysVendorToMDM_NEW/OuterSysVendorToMDM_NEW", "outersysvendortomdm_new_client_ep");

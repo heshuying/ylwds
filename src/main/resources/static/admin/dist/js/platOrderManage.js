@@ -24,6 +24,7 @@ new Vue({
             pagesize: 10,
             currentPage: 1,
             closeBtnShow: false,
+            refundOrderId: '',
             // 退货申请/退货审核dialog
             applyMoralShow: false,
             isApply: false,
@@ -35,25 +36,36 @@ new Vue({
             refundApplyRejectReason: '',
             // 包裹寄回中dialog
             checkExpressMoralShow:false,
-            activities: [{
-                content: '活动按期开始',
-                timestamp: '2018-04-15'
-            }, {
-                content: '通过审核',
-                timestamp: '2018-04-13'
-            }, {
-                content: '创建成功',
-                timestamp: '2018-04-11'
-            }],
+            expressStatums: [],
+            expressCompany : '',
+            expressId: '',
             // 待买家确认退款金额/买家申诉/退款明细dialog
             mutiMoralShow: false,
+            isMutiTitleShow: false,
+            isMutiBtnShow: false,
             mutiTitle: '待买家确认退款金额',
+            mutiEditReason: '',
+            mutiRefundAmount: '',
+            mutiRefundCutAmount: '',
+            mutiRefundActualAmount: '',
         };
     },
     mounted() {
         this.queryTableData();
     },
     methods: {
+        // 复制地址
+        copyAddress(address) {
+            var input = document.createElement('input');
+            document.body.appendChild(input);
+            input.setAttribute('value', address);
+            input.select();
+            if (document.execCommand('copy')) {
+                document.execCommand('copy');
+                this.$message.success('复制完成');
+            }
+            document.body.removeChild(input);
+        },
         // 表格数据勾选修改
         handleTableSelectionChange(val) {
             this.multipleSelection = val;
@@ -163,43 +175,116 @@ new Vue({
         },
         // 订单操作
         operateOrder(item) {
-            if(item.status === '退货中待商家确认' || item.status === '退货中商家驳回') {
-                this.applyMoralShow = true;
-                var _this = this;
-                var loading = this.$loading({
-                    lock: true,
-                    text: "拼命加载中, 请稍等...",
-                    spinner: "el-icon-loading",
-                    background: "rgba(0, 0, 0, 0.7)"
-                });
-                $.ajax({
-                    url: '/admin/refund/info?orderId=' + item.id,
-                    type: 'GET',
-                    success: function (result) {
-                        loading.close();
-                        if (result.resultCode == 200) {
-                            _this.refundApplyGoodsName = result.data.goodsName || '';
-                            _this.refundApplyBuyNum = result.data.buyNum || '';
-                            _this.refundApplyRetNum = result.data.refundNum || '';
-                            _this.refundApplyReason = result.data.refundReasonDesc || '';
-                            _this.refundApplyDetail = result.data.refundDetail || '';
-                            _this.refundApplyRejectReason = result.data.rejectReason || '';
-                            _this.applyMoralShow = true;
-                            _this.isApply= true;
-                            if(item.status === '退货中商家驳回') {
-                                _this.isApply= false;
-                            }
-                        } else {
-                            _this.$message.error(result.message);
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            this.refundOrderId = item.id;
+            $.ajax({
+                url: '/admin/refund/info?orderId=' + item.id,
+                type: 'GET',
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.refundApplyGoodsName = result.data.goodsName || '';
+                        _this.refundApplyBuyNum = result.data.buyNum || '';
+                        _this.refundApplyRetNum = result.data.refundNum || '';
+                        _this.refundApplyReason = result.data.refundReasonDesc || '';
+                        _this.refundApplyDetail = result.data.refundDetail || '';
+                        _this.refundApplyRejectReason = result.data.rejectReason || '';
+                        _this.isApply= true;
+                        if(item.status == '12') {
+                            _this.isApply= false;
                         }
-                        ;
-                    },
-                    error: function () {
-                        loading.close();
-                        _this.$message.error('操作失败');
+                        if(item.status == '11' || item.status == '12') {
+                            _this.applyMoralShow = true;
+                        } else if (item.status == '14') {
+                            _this.expressCompany = result.data.expressCompany || '';
+                            _this.expressId = result.data.expressId || '';
+                            _this.checkExpressMoralShow = true;
+                            _this.returnExpressService(result.data.expressCode, result.data.expressId);
+                        } else if (item.status == '16' || item.status == '17' || item.status == '18') {
+                            _this.mutiMoralShow = true;
+                            if(item.status == '17') {
+                                _this.isMutiBtnShow = true;
+                                _this.mutiTitle = '买家申诉';
+                            }
+                            if(item.status == '18') {
+                                _this.isMutiTitleShow = true;
+                                _this.mutiTitle = '退款明细';
+                            }
+                            _this.mutiEditReason = result.data.rejectReason || '';
+                            _this.mutiRefundAmount = result.data.refundAmount || '';
+                            _this.mutiRefundCutAmount = parseFloat(result.data.refundAmount) - parseFloat(result.data.refundActualAmount);
+                            _this.mutiRefundActualAmount = result.data.refundActualAmount || '';
+                        }
+                    } else {
+                        _this.$message.error(result.message);
                     }
-                });
+                    ;
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
+        },
+        // 查看物流信息
+        returnExpressService(expressCode, expressId) {
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                url: '/api/kd100/query?com='+expressCode+'&num='+expressId,
+                type: 'GET',
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.expressStatums = result.data.data || [];
+                    } else {
+                        _this.$message.error(result.message);
+                    }
+                    ;
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
+        },
+        // 平台处理申诉
+        handleAppeal(type) {
+            var _this = this;
+            var status = '18';
+            if(type && type==='1') {
+                status = '15';
             }
+            var postObj = {
+                orderId: this.refundOrderId,
+                status: status
+            };
+            $.ajax({
+                type: "post",
+                url: "/admin/refund/check",
+                contentType: "application/json",
+                data: JSON.stringify(postObj),
+                success: function (result) {
+                    if (result.resultCode == 200) {
+                        _this.$message.success('操作成功');
+                        _this.mutiMoralShow = false;
+                        _this.queryTableData();
+                    } else {
+                        _this.$message.error(result.message);
+                    }
+                }
+            });
         }
     }
 })

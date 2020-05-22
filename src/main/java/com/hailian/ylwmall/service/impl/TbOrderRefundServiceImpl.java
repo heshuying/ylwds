@@ -178,7 +178,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             updateDto.setRefundActualAmount(updateDto.getRefundAmount()
                     .subtract(dto.getContdownAmount()));
 
-        }else if(Const.OrderStatus.Refund_Edit.getKey()==dto.getStatus()){
+        }else if(Const.OrderStatus.Refunding.getKey()==dto.getStatus()){
             //全额退款
             updateDto.setRefundActualAmount(updateDto.getRefundAmount());
         }

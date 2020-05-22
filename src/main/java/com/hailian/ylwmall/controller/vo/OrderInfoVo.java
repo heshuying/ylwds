@@ -11,8 +11,8 @@ import java.util.List;
 public class OrderInfoVo implements Serializable {
     private Long id;
 
-    private String status;
-
+    private Integer status;
+    private String statusDesc;
     private String createTimeString;
 
     private String updateTimeString;

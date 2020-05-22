@@ -81,7 +81,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             }
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(Const.OrderStatus.getByKey(info.getStatus()).getSupplierDesc());
+            vo.setStatusDesc(Const.OrderStatus.getByKey(info.getStatus()).getSupplierDesc());
+            vo.setStatus(info.getStatus());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);
@@ -115,7 +116,8 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
             OrderInfoVo vo = JSONObject.parseObject(s, OrderInfoVo.class);
             vo.setCreateTimeString(sdf.format(vo.getCreateTime()));
             vo.setUpdateTimeString(sdf.format(vo.getUpdateTime()));
-            vo.setStatus(Const.OrderStatus.getByKey(info.getStatus()).getPlateDesc());
+            vo.setStatus(info.getStatus());
+            vo.setStatusDesc(Const.OrderStatus.getByKey(info.getStatus()).getPlateDesc());
             //查询订单的商品信息
             List<OrderGoodInfoVo> orderGoodInfos = orderGoodInfoMapper.selectByOrderId(info.getId());
             vo.setGoods(orderGoodInfos);

@@ -106,7 +106,7 @@ new Vue({
                             result.data.list[i].totalPriceShow = '¥' + totalTemp;
                             var formatGross = result.data.list[i].grossProfit === null ?  '' : result.data.list[i].grossProfit;
                             result.data.list[i].grossProfitShow = '¥' + formatGross;
-                            result.data.list[i].cutDownDis = result.data.list[i].status == '待支付'? false : true;
+                            result.data.list[i].cutDownDis = result.data.list[i].status == '1'? false : true;
                         }
                         _this.tableData = result.data.list || [];
                     } else {

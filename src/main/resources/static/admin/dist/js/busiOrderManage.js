@@ -73,6 +73,8 @@
                 refundCutDownMoney: '',
                 cutdownReason: '',
                 returnMoneyTypeRadio: "",
+                editRealRefund: "",
+                editSettleMoney: '',
                 isAddressDiaShow: false
             };
         },
@@ -315,6 +317,8 @@
                                 _this.editReturnMoneyMoralShow = true;
                                 _this.refundOrderMoney = result.data.orderAmount || '';
                                 _this.refundRetMoney = result.data.refundAmount || '';
+                            } else if(type && type === 'agreeRefund') {
+                                _this.waitBuyerReturnMoralShow = true;
                             } else {
                                 _this.applyMoralShow = true;
                             }
@@ -328,6 +332,10 @@
                         _this.$message.error('操作失败');
                     }
                 });
+            },
+            // 查看已同意退货信息
+            checkAgreeRefund(item) {
+                this.returnCheck(item, 'agreeRefund');
             },
             // 查看物流信息
             returnExpress(item) {
@@ -503,6 +511,16 @@
                         }
                     }
                 });
+            },
+            // 计算金额
+            calEditMoney() {
+                if(parseFloat(this.refundCutDownMoney) > parseFloat(this.refundRetMoney)) {
+                    this.$message.error('扣除金额不能多于退款金额');
+                    this.refundCutDownMoney = '';
+                    return;
+                }
+                this.editRealRefund = parseFloat(this.refundRetMoney) - parseFloat(this.refundCutDownMoney);
+                this.editSettleMoney = parseFloat(this.refundOrderMoney) - parseFloat(this.refundCutDownMoney);
             }
         }
     })

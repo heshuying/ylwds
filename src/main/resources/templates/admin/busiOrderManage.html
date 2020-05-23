@@ -167,6 +167,12 @@
                                     @click="returnCheck(scope.row)">审核
                             </el-button>
                             <el-button
+                                    v-if="scope.row.status=='13'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="checkAgreeRefund(scope.row)">查看
+                            </el-button>
+                            <el-button
                                     v-if="scope.row.status=='14' && scope.row.expressStatus != '3'"
                                     size="mini"
                                     type="primary"
@@ -326,18 +332,18 @@
                 <!--待买家退回-->
                 <el-dialog :visible.sync="waitBuyerReturnMoralShow" width="45%" title="待买家退回" center :close-on-click-modal="closeBtnShow">
                     <div class="return-goods-dia-area">
-                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="goods-info bold-word">{{refundApplyGoodsName}}</div>
                         <div class="common-line return-info">
                             <span class="bold-word">买家申请退货</span>
-                            <span class="light-word">(购买数量200;退货数量2)</span>
+                            <span class="light-word">(购买数量{{refundApplyBuyNum}};退货数量{{refundApplyRetNum}})</span>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">退货原因</div>
-                            <div>不喜欢</div>
+                            <div>{{refundApplyReason}}</div>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">详细原因</div>
-                            <div>用不了这么多</div>
+                            <div>{{refundApplyDetail}}</div>
                         </div>
                         <div class="common-line btn-area">
                             <el-button type="primary" disabled>已同意</el-button>
@@ -389,16 +395,16 @@
                             <div class="common-line">
                                 <div class="common-title">扣除损失</div>
                                 <div>
-                                    <el-input v-model="refundCutDownMoney"></el-input>
+                                    <el-input v-model="refundCutDownMoney" @change="calEditMoney"></el-input>
                                 </div>
                             </div>
                             <div class="common-line">
                                 <div class="common-title light-word">实际退款</div>
-                                <div>20元</div>
+                                <div>{{editRealRefund}}元</div>
                             </div>
                             <div class="common-line">
                                 <div class="light-word">本商品结算金额</div>
-                                <div style="margin-left: 15px">140元</div>
+                                <div style="margin-left: 15px">{{editSettleMoney}}元</div>
                                 <div style="margin-left: 10px">
                                     <el-tooltip class="item" effect="light" content="结算金额=本商品未退货部分的结算金额+损失金额" placement="right">
                                         <img th:src="@{/admin/image/question.png}" />

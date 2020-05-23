@@ -91,7 +91,7 @@
                                     </span>
                                 </el-input>
                                 <div>
-                                    <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
+                                    <img v-if="scope.row.status=='1'" th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
                                     <el-upload
                                             class="icon-select"
                                             action="/api/file/uploadFile"
@@ -99,7 +99,7 @@
                                             :show-file-list="false"
                                             :on-success="function(response, file, fileList){handleUploadSuccess(response, file, fileList,scope.row)}"
                                     >
-                                        <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/photo.png}" alt="">
+                                        <img v-if="scope.row.status=='1'" th:src="@{/admin/image/photo.png}" alt="">
                                     </el-upload>
                                 </div>
                             </div>

@@ -101,7 +101,7 @@ public class KD100Controller {
      * @param resultv2 开通区域解析功能：0-关闭；1-开通
      * @return
      */
-    public String synQueryData(String com, String num, String phone, String from, String to, int resultv2) {
+    public String synQueryData(String com, String num, String phone, String from, String to, int resultv2) throws Exception{
 
         StringBuilder param = new StringBuilder("{");
         param.append("\"com\":\"").append(com).append("\"");
@@ -128,7 +128,7 @@ public class KD100Controller {
     /**
      * 发送post请求
      */
-    public String post(Map<String, String> params) {
+    public String post(Map<String, String> params) throws Exception{
         StringBuffer response = new StringBuffer("");
 
         BufferedReader reader = null;
@@ -164,6 +164,7 @@ public class KD100Controller {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 if (null != reader) {

@@ -91,7 +91,7 @@
                                     </span>
                                 </el-input>
                                 <div>
-                                    <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
+                                    <img v-if="scope.row.status=='1'" th:src="@{/admin/image/success.png}" alt="" @click="cutDownService(scope.row)">
                                     <el-upload
                                             class="icon-select"
                                             action="/api/file/uploadFile"
@@ -99,7 +99,7 @@
                                             :show-file-list="false"
                                             :on-success="function(response, file, fileList){handleUploadSuccess(response, file, fileList,scope.row)}"
                                     >
-                                        <img v-if="scope.row.status=='待支付'" th:src="@{/admin/image/photo.png}" alt="">
+                                        <img v-if="scope.row.status=='1'" th:src="@{/admin/image/photo.png}" alt="">
                                     </el-upload>
                                 </div>
                             </div>
@@ -136,10 +136,10 @@
                             width="80"
                             show-overflow-tooltip>
                         <template slot-scope="scope">
-                            <span v-if="scope.row.status=='待发货'" class="bg-common blue-bg">{{scope.row.status}}</span>
-                            <span v-else-if="scope.row.status=='待结算'" class="bg-common red-bg">{{scope.row.status}}</span>
-                            <span v-else-if="scope.row.status=='待支付'||scope.row.status=='待收货'||scope.row.status=='待评价'" class="bg-common green-bg">{{scope.row.status}}</span>
-                            <span v-else class="bg-common gray-bg" @click="operateOrder(scope.row)">{{scope.row.status}}</span>
+                            <span v-if="scope.row.status=='2'" class="bg-common blue-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else-if="scope.row.status=='5'" class="bg-common red-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else-if="scope.row.status=='1'||scope.row.status=='3'||scope.row.status=='4'" class="bg-common green-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else class="bg-common gray-bg" @click="operateOrder(scope.row)">{{scope.row.statusDesc}}</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -210,17 +210,18 @@
                             退货中
                         </div>
                         <div class="express-no">
-                            中通快递：7312 3356 3354 5789
-                            <span class="copy-btn">复制</span>
+                            {{expressCompany}}：{{expressId}}
+                            <span class="copy-btn" @click="copyAddress(expressId)">复制</span>
                         </div>
                     </div>
                     <div class="express-info">
                         <el-timeline>
                             <el-timeline-item
-                                    v-for="(activity, index) in activities"
+                                    v-for="(activity, index) in expressStatums"
                                     :key="index"
-                                    :timestamp="activity.timestamp"
-                            >{{activity.content}}</el-timeline-item>
+                                    :timestamp="activity.time">
+                                {{activity.context}}
+                            </el-timeline-item>
                         </el-timeline>
                     </div>
                 </div>
@@ -229,36 +230,36 @@
             <!--待买家确认退款金额/买家申诉/退款明细-->
             <el-dialog :visible.sync="mutiMoralShow" width="45%" :title="mutiTitle" center :close-on-click-modal="closeBtnShow">
                 <div class="plat-return-goods-dia-area">
-                    <div class="light-word" style="text-align: center;margin-bottom: 15px">买卖双方协商一致，退款进行中</div>
+                    <div class="light-word" style="text-align: center;margin-bottom: 15px" v-if="isMutiTitleShow">买卖双方协商一致，退款进行中</div>
                     <div class="bold-word">商家修改退款金额</div>
-                    <div class="light-word bottom-padding">修改原因：丢失一件，另有一件包装破损影响二次销售</div>
+                    <div class="light-word bottom-padding">修改原因：{{mutiEditReason}}</div>
                     <div class="common-line seperate-line">
                         <div class="mid-width-title light-word">退货商品全额</div>
                         <div>
-                            180元
+                            {{mutiRefundAmount}}元
                         </div>
                     </div>
                     <div class="common-line">
                         <div class="mid-width-title light-word">扣款金额</div>
                         <div>
-                            10元
+                            {{mutiRefundCutAmount}}元
                         </div>
                     </div>
                     <div class="common-line">
                         <div class="mid-width-title light-word">实际退款</div>
                         <div>
-                            170元
+                            {{mutiRefundActualAmount}}元
                         </div>
                     </div>
                     <div class="common-line">
                         <div class="mid-width-title light-word">结算金额</div>
                         <div>
-                            10元+未退货商品结算金额
+                            {{mutiRefundCutAmount}}元+未退货商品结算金额
                         </div>
                     </div>
-                    <div class="common-line btn-area big-btn-width">
-                        <el-button type="plain">打回商家重新填写</el-button>
-                        <el-button type="primary">发起退款</el-button>
+                    <div class="common-line btn-area big-btn-width" v-if="isMutiBtnShow">
+                        <el-button type="plain" @click="handleAppeal('1')">打回商家重新填写</el-button>
+                        <el-button type="primary" @click="handleAppeal">发起退款</el-button>
                     </div>
                 </div>
             </el-dialog>

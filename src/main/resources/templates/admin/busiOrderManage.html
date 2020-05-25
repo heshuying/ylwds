@@ -146,31 +146,50 @@
                             width="80"
                             show-overflow-tooltip>
                         <template slot-scope="scope">
-                            <span v-if="scope.row.status=='待发货'" class="bg-common blue-bg">{{scope.row.status}}</span>
-                            <span v-else-if="scope.row.status=='待结算'" class="bg-common red-bg">{{scope.row.status}}</span>
-                            <span v-else-if="scope.row.status=='待支付'||scope.row.status=='待收货'||scope.row.status=='待评价'" class="bg-common green-bg">{{scope.row.status}}</span>
-                            <span v-else class="bg-common gray-bg">{{scope.row.status}}</span>
+                            <span v-if="scope.row.status=='2'" class="bg-common blue-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else-if="scope.row.status=='5'" class="bg-common red-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else-if="scope.row.status=='1'||scope.row.status=='3'||scope.row.status=='4'" class="bg-common green-bg">{{scope.row.statusDesc}}</span>
+                            <span v-else class="bg-common gray-bg">{{scope.row.statusDesc}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center" width="80">
+                    <el-table-column label="操作" align="center" width="100">
                         <template slot-scope="scope">
                             <el-button
-                                    v-if="scope.row.status=='待发货'"
+                                    v-if="scope.row.status=='2'"
                                     size="mini"
                                     type="primary"
                                     @click="singleSendGoods(scope.row)">发货
                             </el-button>
                             <el-button
-                                    v-if="scope.row.status=='退货待确认'"
+                                    v-if="scope.row.status=='11'"
                                     size="mini"
                                     type="primary"
                                     @click="returnCheck(scope.row)">审核
                             </el-button>
-                            <!--<el-button-->
-                                    <!--size="mini"-->
-                                    <!--type="primary"-->
-                                    <!--@click="returnExpress(scope.row)">查看物流-->
-                            <!--</el-button>-->
+                            <el-button
+                                    v-if="scope.row.status=='13'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="checkAgreeRefund(scope.row)">查看
+                            </el-button>
+                            <el-button
+                                    v-if="scope.row.status=='14' && scope.row.expressStatus != '3'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="returnExpress(scope.row)">查看物流
+                            </el-button>
+                            <el-button
+                                    v-if="scope.row.status=='14'&& scope.row.expressStatus == '3'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="editReturnMoney(scope.row)">编辑金额
+                            </el-button>
+                            <el-button
+                                    v-if="scope.row.status=='15'"
+                                    size="mini"
+                                    type="primary"
+                                    @click="editReturnMoney(scope.row)">编辑金额
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -253,8 +272,8 @@
                                 <el-radio-group v-model="refundSelectedAddress">
                                     <el-radio :label="item.addrId" v-for="item in refundAddressList" :key="item.index">
                                         <div style="display: flex;flex-wrap: wrap;margin-right: 20px;">
-                                            {{item.addressAll}}
-                                            <span class="name-span">{{item.acceptor}}</span>
+                                            {{item.addressAll}}/
+                                            <span class="name-span">{{item.acceptor}}/</span>
                                             <span>{{item.phone}}</span>
                                         </div>
                                         <div>
@@ -274,7 +293,7 @@
                                 </div>
                             </div>
                             <div class="common-line btn-area">
-                                <el-button type="primary" >确定</el-button>
+                                <el-button type="primary" @click="refundAddressSelect">确定</el-button>
                             </div>
                         </div>
                         <div v-show="addressStep=='2'" class="address-info-area">
@@ -313,18 +332,18 @@
                 <!--待买家退回-->
                 <el-dialog :visible.sync="waitBuyerReturnMoralShow" width="45%" title="待买家退回" center :close-on-click-modal="closeBtnShow">
                     <div class="return-goods-dia-area">
-                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="goods-info bold-word">{{refundApplyGoodsName}}</div>
                         <div class="common-line return-info">
                             <span class="bold-word">买家申请退货</span>
-                            <span class="light-word">(购买数量200;退货数量2)</span>
+                            <span class="light-word">(购买数量{{refundApplyBuyNum}};退货数量{{refundApplyRetNum}})</span>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">退货原因</div>
-                            <div>不喜欢</div>
+                            <div>{{refundApplyReason}}</div>
                         </div>
                         <div class="common-line">
                             <div class="common-title light-word">详细原因</div>
-                            <div>用不了这么多</div>
+                            <div>{{refundApplyDetail}}</div>
                         </div>
                         <div class="common-line btn-area">
                             <el-button type="primary" disabled>已同意</el-button>
@@ -341,8 +360,8 @@
                                 退货中
                             </div>
                             <div class="express-no">
-                                中通快递：7312 3356 3354 5789
-                                <span class="copy-btn">复制</span>
+                                {{expressCompany}}：{{expressId}}
+                                <span class="copy-btn" @click="copyAddress(expressId)">复制</span>
                             </div>
                         </div>
                         <div class="express-info">
@@ -361,9 +380,9 @@
                 <!--编辑退款-->
                 <el-dialog :visible.sync="editReturnMoneyMoralShow" width="45%" title="退货申请" center :close-on-click-modal="closeBtnShow">
                     <div class="return-goods-dia-area">
-                        <div class="goods-info bold-word">奶渍污渍不残留，婴儿木瓜酵素洗衣皂150g</div>
+                        <div class="goods-info bold-word">{{refundApplyGoodsName}}</div>
                         <div class="common-line return-info">
-                            <span class="light-word">订单总额180元;退货金额40元</span>
+                            <span class="light-word">订单总额{{refundOrderMoney}}元;退货金额{{refundRetMoney}}元</span>
                         </div>
                         <div class="common-line">
                             <div class="common-title">卖家操作</div>
@@ -376,16 +395,16 @@
                             <div class="common-line">
                                 <div class="common-title">扣除损失</div>
                                 <div>
-                                    <el-input v-model="rejectReason"></el-input>
+                                    <el-input v-model="refundCutDownMoney" @change="calEditMoney"></el-input>
                                 </div>
                             </div>
                             <div class="common-line">
                                 <div class="common-title light-word">实际退款</div>
-                                <div>20元</div>
+                                <div>{{editRealRefund}}元</div>
                             </div>
                             <div class="common-line">
                                 <div class="light-word">本商品结算金额</div>
-                                <div style="margin-left: 15px">140元</div>
+                                <div style="margin-left: 15px">{{editSettleMoney}}元</div>
                                 <div style="margin-left: 10px">
                                     <el-tooltip class="item" effect="light" content="结算金额=本商品未退货部分的结算金额+损失金额" placement="right">
                                         <img th:src="@{/admin/image/question.png}" />
@@ -395,12 +414,12 @@
                             <div class="common-line">
                                 <div class="common-title">扣款原因</div>
                                 <div class="input-item">
-                                    <el-input type="textarea" placeholder="请输入详细原因" v-model="rejectReason" rows="4"></el-input>
+                                    <el-input type="textarea" placeholder="请输入详细原因" v-model="cutdownReason" rows="4"></el-input>
                                 </div>
                             </div>
                         </div>
                         <div class="common-line btn-area">
-                            <el-button type="primary" >确定</el-button>
+                            <el-button type="primary" @click="editMoneyUpdateStatus">确定</el-button>
                         </div>
                     </div>
                 </el-dialog>

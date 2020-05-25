@@ -64,9 +64,17 @@
                 // 包裹寄回中查看物流dialog
                 checkExpressMoralShow: false,
                 expressStatums: [],
+                expressCompany : '',
+                expressId: '',
                 // 编辑退款dialog
                 editReturnMoneyMoralShow: false,
+                refundOrderMoney: '',
+                refundRetMoney: '',
+                refundCutDownMoney: '',
+                cutdownReason: '',
                 returnMoneyTypeRadio: "",
+                editRealRefund: "",
+                editSettleMoney: '',
                 isAddressDiaShow: false
             };
         },
@@ -86,7 +94,7 @@
                 input.select();
                 if (document.execCommand('copy')) {
                     document.execCommand('copy');
-                    this.$message.success('地址已复制');
+                    this.$message.success('复制完成');
                 }
                 document.body.removeChild(input);
             },
@@ -190,6 +198,9 @@
                             _this.total = result.data.totalCount || 0;
                             for (var i in result.data.list) {
                                 result.data.list[i].totalPriceShow = '¥' + result.data.list[i].totalPrice;
+                                if(result.data.list[i].status == '14') {
+                                    _this.returnExpressService(result.data.list[i].expressCode, result.data.list[i].expressId, result.data.list[i]);
+                                }
                             }
                             _this.tableData = result.data.list || [];
                         } else {
@@ -277,7 +288,7 @@
                 });
             },
             // 退货申请审核
-            returnCheck(item) {
+            returnCheck(item, type) {
                 var _this = this;
                 var loading = this.$loading({
                     lock: true,
@@ -297,7 +308,20 @@
                             _this.refundApplyRetNum = result.data.refundNum || '';
                             _this.refundApplyReason = result.data.refundReasonDesc || '';
                             _this.refundApplyDetail = result.data.refundDetail || '';
-                            _this.applyMoralShow = true;
+                            if(type && type === 'express') {
+                                _this.expressCompany = result.data.expressCompany || '';
+                                _this.expressId = result.data.expressId || '';
+                                _this.returnExpressService(result.data.expressCode, result.data.expressId);
+                                _this.checkExpressMoralShow = true;
+                            } else if(type && type === 'editMoney') {
+                                _this.editReturnMoneyMoralShow = true;
+                                _this.refundOrderMoney = result.data.orderAmount || '';
+                                _this.refundRetMoney = result.data.refundAmount || '';
+                            } else if(type && type === 'agreeRefund') {
+                                _this.waitBuyerReturnMoralShow = true;
+                            } else {
+                                _this.applyMoralShow = true;
+                            }
                         } else {
                             _this.$message.error(result.message);
                         }
@@ -309,9 +333,16 @@
                     }
                 });
             },
+            // 查看已同意退货信息
+            checkAgreeRefund(item) {
+                this.returnCheck(item, 'agreeRefund');
+            },
             // 查看物流信息
             returnExpress(item) {
-                this.checkExpressMoralShow = true;
+                this.returnCheck(item, 'express');
+            },
+            // 查看物流信息
+            returnExpressService(expressCode, expressId, obj) {
                 var _this = this;
                 var loading = this.$loading({
                     lock: true,
@@ -320,12 +351,15 @@
                     background: "rgba(0, 0, 0, 0.7)"
                 });
                 $.ajax({
-                    url: '/api/kd100/query?com=jd&num=JD0016164893471',
+                    url: '/api/kd100/query?com='+expressCode+'&num='+expressId,
                     type: 'GET',
                     success: function (result) {
                         loading.close();
                         if (result.resultCode == 200) {
                             _this.expressStatums = result.data.data || [];
+                            if(obj) {
+                                _this.$set(obj, 'expressStatus', result.data.state);
+                            }
                         } else {
                             _this.$message.error(result.message);
                         }
@@ -409,6 +443,84 @@
                         _this.$message.error('操作失败');
                     }
                 });
+            },
+            // 退款地址维护
+            refundAddressSelect() {
+                var _this = this;
+                var postObj = {
+                    orderId: this.refundOrderId,
+                    status: '13',
+                    rejectReason: '',
+                    comment: this.addressRemark,
+                    deveryId: this.refundSelectedAddress
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/admin/refund/check",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.addressMoralShow = false;
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            },
+            // 编辑退款金额
+            editReturnMoney(item) {
+                this.returnCheck(item, 'editMoney');
+            },
+            // 编辑金额确定按钮
+            editMoneyUpdateStatus() {
+                var _this = this;
+                var postObj = {};
+                if(this.returnMoneyTypeRadio == '1') {
+                    postObj = {
+                        orderId: this.refundOrderId,
+                        status: '18',
+                        contdownAmount: 0
+                    }
+                } else if(this.returnMoneyTypeRadio == '2') {
+                    if(this.refundCutDownMoney === '' || this.cutdownReason === '') {
+                        _this.$message.error('扣除损失及扣款原因不能为空');
+                        return;
+                    }
+                    postObj = {
+                        orderId: this.refundOrderId,
+                        status: '16',
+                        contdownAmount: this.refundCutDownMoney,
+                        rejectReason: this.cutdownReason
+                    }
+                }
+                $.ajax({
+                    type: "post",
+                    url: "/admin/refund/check",
+                    contentType: "application/json",
+                    data: JSON.stringify(postObj),
+                    success: function (result) {
+                        if (result.resultCode == 200) {
+                            _this.$message.success('操作成功');
+                            _this.editReturnMoneyMoralShow = false;
+                            _this.queryTableData();
+                        } else {
+                            _this.$message.error(result.message);
+                        }
+                    }
+                });
+            },
+            // 计算金额
+            calEditMoney() {
+                if(parseFloat(this.refundCutDownMoney) > parseFloat(this.refundRetMoney)) {
+                    this.$message.error('扣除金额不能多于退款金额');
+                    this.refundCutDownMoney = '';
+                    return;
+                }
+                this.editRealRefund = parseFloat(this.refundRetMoney) - parseFloat(this.refundCutDownMoney);
+                this.editSettleMoney = parseFloat(this.refundOrderMoney) - parseFloat(this.refundCutDownMoney);
             }
         }
     })

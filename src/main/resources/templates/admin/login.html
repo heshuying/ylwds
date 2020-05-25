@@ -176,5 +176,16 @@
     storage.setItem("baseUrl",urlWithPort);
     var regUrl = url + "outer/#/registerbus/busIndex";
     $('#regBtn').attr('href',regUrl);
+    var redirect = [[${redirect}]];
+    if(redirect) {
+        var redirectUrl = url + 'outer/#/registerbus/busCompany?userId=' + redirect;
+        var a = document.createElement("a");
+        console.log(redirectUrl);
+        a.setAttribute("href", redirectUrl);
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+    }
+
 </script>
 </html>

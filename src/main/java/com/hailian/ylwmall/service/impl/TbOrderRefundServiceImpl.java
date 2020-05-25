@@ -183,7 +183,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             baseMapper.updateById(updateDto);
         }else if(Const.OrderStatus.Refunding.getKey()==dto.getStatus()){
             //全额退款
-            updateDto.setRefundActualAmount(updateDto.getRefundAmount());
+            updateDto.setRefundActualAmount(tbOrderRefund.getRefundAmount());
             baseMapper.updateById(updateDto);
         }
 

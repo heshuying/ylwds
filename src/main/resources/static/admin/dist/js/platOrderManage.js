@@ -218,7 +218,7 @@ new Vue({
                             }
                             _this.mutiEditReason = result.data.rejectReason || '';
                             _this.mutiRefundAmount = result.data.refundAmount || '';
-                            _this.mutiRefundCutAmount = parseFloat(result.data.refundAmount) - parseFloat(result.data.refundActualAmount);
+                            _this.mutiRefundCutAmount = (parseFloat(result.data.refundAmount) - parseFloat(result.data.refundActualAmount)).toFixed(2);
                             _this.mutiRefundActualAmount = result.data.refundActualAmount || '';
                         }
                     } else {

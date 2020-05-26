@@ -519,8 +519,8 @@
                     this.refundCutDownMoney = '';
                     return;
                 }
-                this.editRealRefund = parseFloat(this.refundRetMoney) - parseFloat(this.refundCutDownMoney);
-                this.editSettleMoney = parseFloat(this.refundOrderMoney) - parseFloat(this.refundCutDownMoney);
+                this.editRealRefund = (parseFloat(this.refundRetMoney) - parseFloat(this.refundCutDownMoney)).toFixed(2);
+                this.editSettleMoney = (parseFloat(this.refundOrderMoney) - parseFloat(this.editRealRefund)).toFixed(2);
             }
         }
     })

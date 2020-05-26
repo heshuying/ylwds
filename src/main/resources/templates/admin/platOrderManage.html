@@ -231,8 +231,8 @@
             <el-dialog :visible.sync="mutiMoralShow" width="45%" :title="mutiTitle" center :close-on-click-modal="closeBtnShow">
                 <div class="plat-return-goods-dia-area">
                     <div class="light-word" style="text-align: center;margin-bottom: 15px" v-if="isMutiTitleShow">买卖双方协商一致，退款进行中</div>
-                    <div class="bold-word">商家修改退款金额</div>
-                    <div class="light-word bottom-padding">修改原因：{{mutiEditReason}}</div>
+                    <div class="bold-word" v-if="parseFloat(mutiRefundCutAmount) > 0">商家修改退款金额</div>
+                    <div class="light-word bottom-padding" v-if="parseFloat(mutiRefundCutAmount) > 0">修改原因：{{mutiEditReason}}</div>
                     <div class="common-line seperate-line">
                         <div class="mid-width-title light-word">退货商品全额</div>
                         <div>

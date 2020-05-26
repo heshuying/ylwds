@@ -192,6 +192,7 @@ public class TbUserServiceImpl extends ServiceImpl<TbUserDao, TbUser> implements
         if(params.containsKey("userStatus")){
             queryDto.setUserStatus(Integer.valueOf((String)params.get("userStatus")));
         }
+
         IPage<UserListDto> result= baseMapper.queryUser(
                 new Query<UserListDto>().getPage(params),
                 queryDto);

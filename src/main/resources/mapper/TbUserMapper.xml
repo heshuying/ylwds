@@ -52,7 +52,7 @@
             <if test='dto.userStatus!=null'>
                 and tu.user_status=#{dto.userStatus}
             </if>
-
+            order by tu.user_id desc
     </select>
 
 

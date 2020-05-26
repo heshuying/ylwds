@@ -38,7 +38,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallOrderController {
+public class OrderController {
 
     @Resource
     private NewBeeMallOrderService newBeeMallOrderService;

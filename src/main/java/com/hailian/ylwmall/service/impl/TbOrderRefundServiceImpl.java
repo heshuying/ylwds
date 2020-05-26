@@ -21,13 +21,17 @@ import com.hailian.ylwmall.service.TbUserAddrService;
 import com.hailian.ylwmall.util.Const;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,6 +41,7 @@ import java.util.Date;
  * @author 19012964
  * @since 2020-05-20
  */
+@Slf4j
 @Service
 public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOrderRefund> implements TbOrderRefundService {
     @Autowired
@@ -150,12 +155,105 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
 
     @Override
     public Result calRefundAmount(Long orderGoodsId, Integer refundNum) {
-        TbOrderGoodinfo orderGoodinfo = orderGoodinfoService.getById(orderGoodsId);
-        if(refundNum>orderGoodinfo.getNumber()){
+        TbOrderGoodinfo currentRefundGoods = orderGoodinfoService.getById(orderGoodsId);
+        if(refundNum>currentRefundGoods.getNumber()){
             return ResultGenerator.genFailResult(ServiceResultEnum.FAIL_ILLEGAL.getResult());
         }
-        TbGoodsInfo goodsInfo=goodsService.getById(orderGoodinfo.getGoodId());
-        BigDecimal refundAmount=goodsInfo.getPrice().multiply(new BigDecimal(refundNum));
+        log.info("计算退货金额，订单ID：{}，订单商品ID：{}，退货数量：{}",
+                currentRefundGoods.getOrderId(),currentRefundGoods.getId(), refundNum
+        );
+        BigDecimal refundAmount=BigDecimal.ZERO;
+        //判断订单是否存在减免
+        TbOrderOrderinfo orderInfo=orderinfoService.getById(currentRefundGoods.getOrderId());
+        if(orderInfo.getCutDown().compareTo(BigDecimal.ZERO)==0){
+            //无减免
+            TbGoodsInfo goodsInfo=goodsService.getById(currentRefundGoods.getGoodId());
+            refundAmount=goodsInfo.getPrice().multiply(new BigDecimal(refundNum));
+            log.info("计算退货金额，订单ID：{}无减免，退货金额：{}",
+                    currentRefundGoods.getOrderId(), refundAmount
+            );
+        }else{
+            //存在减免
+            //获取订单所有商品
+            List<TbOrderGoodinfo> orderGoods=orderGoodinfoService.list(
+                    new QueryWrapper<TbOrderGoodinfo>().eq("order_id", currentRefundGoods.getOrderId())
+            );
+            if(orderGoods.size()==1&&refundNum==currentRefundGoods.getNumber()){
+                //1个商品，全部退货
+                refundAmount=orderInfo.getRealPrice();
+                log.info("计算退货金额，订单ID：{},单个商品全部退货，退货金额：{}",
+                        currentRefundGoods.getOrderId(), refundAmount);
+            }else if(orderGoods.size()==1&&refundNum<currentRefundGoods.getNumber()){
+                //1个商品，部分退货
+                BigDecimal singleCoutdown=orderInfo.getCutDown().divide(
+                        BigDecimal.valueOf(currentRefundGoods.getNumber()) ,2, BigDecimal.ROUND_HALF_UP
+                );
+                TbGoodsInfo goodsInfo=goodsService.getById(currentRefundGoods.getGoodId());
+
+                refundAmount=goodsInfo.getPrice().multiply(BigDecimal.valueOf(refundNum)).subtract(
+                        singleCoutdown.multiply(BigDecimal.valueOf(refundNum))
+                ) ;
+                log.info("计算退货金额，订单ID：{},单个商品部分退货，退货金额：{}",
+                        currentRefundGoods.getOrderId(), refundAmount);
+            }else{
+                //多个商品，部分退货
+                //尚未退货的商品
+                List<TbOrderGoodinfo> unRefunds=orderGoods.stream().filter(
+                        m->m.getRefundId()==0
+                                &&m.getId()!=currentRefundGoods.getId()
+                ).collect(Collectors.toList());
+                if(unRefunds!=null&&unRefunds.size()>0){
+                    //还存在尚未退货的商品，不采用减法
+                    //当前订单商品 总额
+                    TbGoodsInfo goodsInfo=goodsService.getById(currentRefundGoods.getGoodId());
+                    BigDecimal currentAmount=goodsInfo.getPrice().multiply(BigDecimal.valueOf(currentRefundGoods.getNumber()));
+                    //当前订单商品减免分摊金额=订单商品总额/订单金额（减免前）*减免金额
+                    BigDecimal currentCoutdownAmount=currentAmount.divide(
+                            orderInfo.getTotalPrice(),2, BigDecimal.ROUND_HALF_UP
+                    ).multiply(orderInfo.getCutDown());
+
+                    refundAmount=goodsInfo.getPrice().multiply(BigDecimal.valueOf(refundNum)).subtract(
+                            currentCoutdownAmount.multiply(BigDecimal.valueOf(refundNum).divide(
+                                    BigDecimal.valueOf(currentRefundGoods.getNumber()),2, BigDecimal.ROUND_HALF_UP
+                            ))
+                    ) ;
+                    log.info("计算退货金额，订单ID：{},多个商品部分退货，退货金额：{}，" +
+                                    "当前退货商品分摊减免金额：{}",
+                            currentRefundGoods.getOrderId(), refundAmount,currentCoutdownAmount);
+                }else{
+                    //减法计算最后一个订单商品的减免分摊金额
+                    //计算其他订单商品分摊减免金额之和
+                    BigDecimal sumRefund=BigDecimal.ZERO;
+                    List<TbOrderGoodinfo> refunded=orderGoods.stream().filter(
+                            m->m.getId()!=currentRefundGoods.getId()
+                    ).collect(Collectors.toList());
+                    for(TbOrderGoodinfo tem:refunded){
+                        TbGoodsInfo goodsInfo=goodsService.getById(tem.getGoodId());
+                        BigDecimal currentAmount=goodsInfo.getPrice().multiply(BigDecimal.valueOf(currentRefundGoods.getNumber()));
+
+                        sumRefund.add(currentAmount.divide(
+                                orderInfo.getTotalPrice(),2, BigDecimal.ROUND_HALF_UP
+                        ).multiply(orderInfo.getCutDown()));
+                    }
+                    //当前订单商品减免分摊金额=订单减免金额-订单其他商品的减免分摊金额
+                    BigDecimal currentCoutdownAmount=orderInfo.getCutDown().subtract(sumRefund);
+
+                    TbGoodsInfo goodsInfo=goodsService.getById(currentRefundGoods.getGoodId());
+                    refundAmount=goodsInfo.getPrice().multiply(BigDecimal.valueOf(refundNum)).subtract(
+                            currentCoutdownAmount.multiply(BigDecimal.valueOf(refundNum).divide(
+                                    BigDecimal.valueOf(currentRefundGoods.getNumber()),2, BigDecimal.ROUND_HALF_UP
+                            ))
+                    ) ;
+                    log.info("计算退货金额，订单ID：{},多个商品最后一个商品退货，退货金额：{}，" +
+                                    "当前退货商品分摊减免金额：{}",
+                            currentRefundGoods.getOrderId(), refundAmount,currentCoutdownAmount);
+
+                }
+            }
+
+        }
+
+
         return ResultGenerator.genSuccessResult(refundAmount);
     }
 

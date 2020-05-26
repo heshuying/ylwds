@@ -19,7 +19,7 @@ import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin")
-public class NewBeeMallGoodsIndexConfigController {
+public class GoodsIndexConfigController {
 
     @Resource
     private NewBeeMallIndexConfigService newBeeMallIndexConfigService;

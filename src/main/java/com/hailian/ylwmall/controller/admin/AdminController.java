@@ -55,7 +55,7 @@ public class AdminController {
     public String login(@RequestParam("userName") String userName,
                         @RequestParam("password") String password,
                         @RequestParam("verifyCode") String verifyCode,
-                        HttpSession session) {
+                        HttpSession session, HttpServletRequest request) {
         if (StringUtils.isEmpty(verifyCode)) {
             session.setAttribute("errorMsg", "验证码不能为空");
             return "admin/login";
@@ -97,7 +97,8 @@ public class AdminController {
 
         if("04".equals(adminUser.getUserType())
                 && adminUser.getUserStatus()==3){
-            return "redirect:http://106.53.192.56/outer/#/registerbus/busCompany?userId=" + adminUser.getUserId();
+            request.setAttribute("redirect", adminUser.getUserId());
+            return "admin/login";
         }
         //session过期时间设置为7200秒 即两小时
         //session.setMaxInactiveInterval(60 * 60 * 2);

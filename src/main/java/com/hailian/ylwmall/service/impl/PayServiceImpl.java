@@ -92,16 +92,25 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setUpdateTime(new Date());
             orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
             orderPayDao.insert(orderPay);
+        }else {
+            // 更新（有可能后台改价格）
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
         }
+
+        BigDecimal payMoney = orderPay.getPayMoney();
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
         tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
-        tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
-        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
+        tradeInfo.setPrice(payMoney.toString());//单价，精确到两位小数 5000.00
+        tradeInfo.setEnsureAmount(payMoney.toString());
         tradeInfo.setQuantity("1");//数量
-        tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
+        tradeInfo.setTotalAmount(payMoney.toString());//交易金额
         tradeInfo.setPayeeIdentityType("1");
         tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
         tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
@@ -117,7 +126,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
         tradeBizContent.setTradeInfo(tradeInfo);
         // 支付方式设置
-        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), orderInfo.getRealPrice());
+        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), payMoney);
         // 终端信息设置
         Map<String,String> terminalInfo = new HashMap<>();
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
@@ -165,16 +174,24 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setUpdateTime(new Date());
             orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
             orderPayDao.insert(orderPay);
+        }else {
+            // 更新（有可能后台改价格）
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
         }
 
+        BigDecimal payMoney = orderPay.getPayMoney();
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
         tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
-        tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
-        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
+        tradeInfo.setPrice(payMoney.toString());//单价，精确到两位小数 5000.00
+        tradeInfo.setEnsureAmount(payMoney.toString());
         tradeInfo.setQuantity("1");//数量
-        tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
+        tradeInfo.setTotalAmount(payMoney.toString());//交易金额
         tradeInfo.setPayeeIdentityType("1");
         tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
         tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
@@ -190,7 +207,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
         tradeBizContent.setTradeInfo(tradeInfo);
         // 支付方式设置
-        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), orderInfo.getRealPrice());
+        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), payMoney);
         // 终端信息设置
         Map<String,String> terminalInfo = new HashMap<>();
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑
@@ -269,16 +286,25 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             orderPay.setUpdateTime(new Date());
             orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
             orderPayDao.insert(orderPay);
+        }else {
+            // 更新（有可能后台改价格）
+            String outTradeNo = GetCodeUtil.getOrderId(user.getUserId());
+            orderPay.setOutTradeNo(outTradeNo);
+            orderPay.setPayMoney(orderInfo.getRealPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+            orderPay.setUpdateTime(new Date());
+            orderPayDao.updateById(orderPay);
         }
+
+        BigDecimal payMoney = orderPay.getPayMoney();
 
         // 交易信息
         TradeInfo tradeInfo = new TradeInfo();
         tradeInfo.setOutTradeNo(orderPay.getOutTradeNo());//平台（商户）单号
         tradeInfo.setSubject(orderGoodInfoVos == null || orderGoodInfoVos.isEmpty() ? "未知商品名称": orderGoodInfoVos.get(0).getGoodName());//商品名称
-        tradeInfo.setPrice(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//单价，精确到两位小数 5000.00
-        tradeInfo.setEnsureAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));
+        tradeInfo.setPrice(payMoney.toString());//单价，精确到两位小数 5000.00
+        tradeInfo.setEnsureAmount(payMoney.toString());
         tradeInfo.setQuantity("1");//数量
-        tradeInfo.setTotalAmount(ArithmeticUtil.strRound(orderInfo.getRealPrice().toString(),2));//交易金额
+        tradeInfo.setTotalAmount(payMoney.toString());//交易金额
         tradeInfo.setPayeeIdentityType("1");
         tradeInfo.setPayeeIdentity(kjtConfig.getPayeeidentity());//卖家会员id或登录账号
         tradeInfo.setNotifyUrl(kjtConfig.getEnsureTradeAsyncNotify());//服务器异步通知地址
@@ -294,7 +320,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         tradeBizContent.setTimeoutExpress("2h");//订单付款码2h有效
         tradeBizContent.setTradeInfo(tradeInfo);
         // 支付方式设置
-        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), orderInfo.getRealPrice());
+        tradeBizContent = setPay(tradeBizContent, reqBean, user.getUserId(), payMoney);
         // 终端信息设置
         Map<String,String> terminalInfo = new HashMap<>();
         terminalInfo.put("terminal_type", Terminal.computer.getCode());//电脑

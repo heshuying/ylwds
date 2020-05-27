@@ -422,7 +422,12 @@
                     success: function (result) {
                         loading.close();
                         if (result.resultCode == 200) {
+                            var errorIndex = -1;
                             for (var i in result.data) {
+                                if(result.data[i].province === '') {
+                                    errorIndex = i;
+                                    continue;
+                                }
                                 result.data[i].addressAll =
                                     result.data[i].province +
                                     result.data[i].city +
@@ -431,6 +436,9 @@
                                 if (result.data[i].isDefault) {
                                     _this.refundSelectedAddress = result.data[i].addrId;
                                 }
+                            }
+                            if(errorIndex > -1) {
+                                result.data.splice(errorIndex,1);
                             }
                             _this.refundAddressList = result.data || [];
                         } else {

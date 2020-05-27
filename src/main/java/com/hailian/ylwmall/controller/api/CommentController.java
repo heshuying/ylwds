@@ -84,7 +84,7 @@ public class CommentController {
      * @return
      */
     @GetMapping("/list")
-    public Result getModuleDetails(@RequestParam Map<String, Object> params){
+    public Result list(@RequestParam Map<String, Object> params){
         if (org.springframework.util.StringUtils.isEmpty(params.get("page"))
                 || org.springframework.util.StringUtils.isEmpty(params.get("limit"))
                 || org.springframework.util.StringUtils.isEmpty(params.get("goodsId"))){

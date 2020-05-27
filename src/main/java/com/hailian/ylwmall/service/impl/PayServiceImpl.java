@@ -11,14 +11,12 @@ import com.hailian.ylwmall.common.OrderStatusEnum;
 import com.hailian.ylwmall.common.pay.*;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
+import com.hailian.ylwmall.dao.TbOrderRefundDao;
 import com.hailian.ylwmall.dto.pay.EnsureTradeBean;
 import com.hailian.ylwmall.dto.pay.EnsureTradeCallBackDto;
 import com.hailian.ylwmall.dto.pay.EnsureTradeReq;
 import com.hailian.ylwmall.dto.pay.RefundCallBackDto;
-import com.hailian.ylwmall.entity.StockNumDTO;
-import com.hailian.ylwmall.entity.TbOrderPay;
-import com.hailian.ylwmall.entity.TbPayRefund;
-import com.hailian.ylwmall.entity.TbUserPay;
+import com.hailian.ylwmall.entity.*;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.service.PayService;
@@ -33,6 +31,7 @@ import com.kjtpay.gateway.common.enums.Terminal;
 import com.kjtpay.gateway.common.util.security.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +51,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class PayServiceImpl extends PayServiceBase implements PayService {
+
+    @Autowired
+    TbOrderRefundDao orderRefundDao;
 
     /**
      * 担保支付
@@ -482,12 +484,17 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             return ResultGenerator.genFailResult("已申请过退款");
         }
 
+        List<TbOrderRefund> orderRefunds = orderRefundDao.selectList(new QueryWrapper<TbOrderRefund>().eq("order_id", orderId));
+        if(orderRefunds == null || orderRefunds.isEmpty()){
+            return ResultGenerator.genFailResult("未检索到退款记录");
+        }
+
         String outTradeNo = GetCodeUtil.getOrderId(userId);
         payRefund = new TbPayRefund();
         payRefund.setOrderId(orderPay.getOrderId());
         payRefund.setOrigOutTradeNo(orderPay.getOutTradeNo());
         payRefund.setOutTradeNo(outTradeNo);
-        payRefund.setRefundAmount(orderPay.getPayMoney());
+        payRefund.setRefundAmount(orderRefunds.get(0).getRefundActualAmount());
         payRefund.setRefundStatus(PayRefundStatusEnum.REFUND_Q.getCode());
         payRefund.setCreateTime(new Date());
         payRefund.setUpdateTime(new Date());
@@ -496,7 +503,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         TradeRefundReq tradeRefundReq = new TradeRefundReq();
         tradeRefundReq.setOutTradeNo(outTradeNo);//退款流水
         tradeRefundReq.setOrigOutTradeNo(orderPay.getOutTradeNo());//原始订单号
-        tradeRefundReq.setRefundAmount(orderPay.getPayMoney().toString());//退款金额
+        tradeRefundReq.setRefundAmount(orderRefunds.get(0).getRefundActualAmount().toString());//退款金额
         tradeRefundReq.setNotifyUrl(kjtConfig.getTradeRefundAsyncNotify());//回调接口地址
         RequestBase requestBase = genRequestBase(gson.toJson(tradeRefundReq), outTradeNo, KJTConstants.SERVICE_TRADE_REFUND);
         ResponseParameter result = callKjt(requestBase);

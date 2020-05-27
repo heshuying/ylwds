@@ -11,13 +11,16 @@ import com.hailian.ylwmall.entity.TbOrderGoodinfo;
 import com.hailian.ylwmall.entity.TbOrderOrderinfo;
 import com.hailian.ylwmall.entity.TbOrderRefund;
 import com.hailian.ylwmall.dao.TbOrderRefundDao;
+import com.hailian.ylwmall.entity.TbUser;
 import com.hailian.ylwmall.entity.TbUserAddr;
 import com.hailian.ylwmall.service.GoodsService;
+import com.hailian.ylwmall.service.PayService;
 import com.hailian.ylwmall.service.TbOrderGoodinfoService;
 import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.hailian.ylwmall.service.TbOrderRefundService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.service.TbUserAddrService;
+import com.hailian.ylwmall.service.TbUserService;
 import com.hailian.ylwmall.util.Const;
 import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
@@ -51,7 +54,11 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
     @Autowired
     private TbUserAddrService userAddrService;
     @Autowired
+    private TbUserService userService;
+    @Autowired
     private GoodsService goodsService;
+    @Autowired
+    private PayService payService;
     /**
      * 发起退货
      * @param userId
@@ -279,10 +286,16 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
             updateDto.setRefundActualAmount(tbOrderRefund.getRefundAmount()
                     .subtract(dto.getContdownAmount()));
             baseMapper.updateById(updateDto);
+            payService.tradeRefund(dto.getOrderId().toString(),userId);
         }else if(Const.OrderStatus.Refunding.getKey()==dto.getStatus()){
             //全额退款
-            updateDto.setRefundActualAmount(tbOrderRefund.getRefundAmount());
-            baseMapper.updateById(updateDto);
+            //判断用户类型，如果是平台则不更新价格
+            TbUser user=userService.getById(userId);
+            if(user.getUserType().toString().equals(Const.UserType.Supplier.getKey())) {
+                updateDto.setRefundActualAmount(tbOrderRefund.getRefundAmount());
+                baseMapper.updateById(updateDto);
+            }
+            payService.tradeRefund(dto.getOrderId().toString(),userId);
         }
 
         //更新订单状态

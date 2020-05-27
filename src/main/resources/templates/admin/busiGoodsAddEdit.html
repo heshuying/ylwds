@@ -442,6 +442,7 @@
                     var tempPhotoUrl = this.baseUrl + this.detailPhotoList[j];
                     this.detailPhotoListShow.push(tempPhotoUrl);
                 }
+
                 var tempGoodPhotoList = [];
                 if (returnGoods.goodsCarousel) {
                     tempGoodPhotoList = returnGoods.goodsCarousel.split(',');
@@ -556,7 +557,6 @@
                     this.$message.error('请维护完整4张商品图片');
                     return;
                 }
-                console.log(hasBlankImage);
                 if(this.detailPhotoList.length < 1) {
                     this.$message.error('请先维护图文详情');
                     return;
@@ -581,7 +581,12 @@
                 var detailPhotoStr = '';
                 for(var k in this.detailPhotoList) {
                     if(this.detailPhotoList.length === 1) {
-                        detailPhotoStr = this.detailPhotoList[0][0];
+                        var imageType = typeof this.detailPhotoList[0];
+                        if(imageType === 'string') {
+                            detailPhotoStr = this.detailPhotoList[0];
+                        } else {
+                            detailPhotoStr = this.detailPhotoList[0][0];
+                        }
                     } else if(detailPhotoStr === '') {
                         detailPhotoStr = this.detailPhotoList[k];
                     } else {

@@ -1,8 +1,11 @@
 package com.hailian.ylwmall.dao;
 
+import com.hailian.ylwmall.dto.GoodsQueryDto;
+import com.hailian.ylwmall.dto.GoodsSimpleDto;
 import com.hailian.ylwmall.dto.ModuleDetailRes;
 import com.hailian.ylwmall.entity.TbModuleDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +25,5 @@ public interface TbModuleDetailDao extends BaseMapper<TbModuleDetail> {
 
     List<ModuleDetailRes>  getAllModule();
 
+    List<GoodsSimpleDto> getSimpleGoods(@Param("dto") GoodsQueryDto dto);
 }

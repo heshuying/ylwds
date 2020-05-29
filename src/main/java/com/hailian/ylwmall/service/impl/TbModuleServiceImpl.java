@@ -2,6 +2,7 @@ package com.hailian.ylwmall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.dao.TbModuleDao;
+import com.hailian.ylwmall.dto.GoodsQueryDto;
 import com.hailian.ylwmall.dto.ModuleDetailRes;
 import com.hailian.ylwmall.service.TbModuleDetailService;
 import com.hailian.ylwmall.service.TbModuleService;
@@ -12,6 +13,7 @@ import com.hailian.ylwmall.entity.TbModule;
 import com.hailian.ylwmall.entity.TbModuleDetail;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hailian.ylwmall.util.ResultGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

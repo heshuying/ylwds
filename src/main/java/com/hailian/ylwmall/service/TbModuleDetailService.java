@@ -1,10 +1,12 @@
 package com.hailian.ylwmall.service;
 
+import com.hailian.ylwmall.dto.GoodsQueryDto;
 import com.hailian.ylwmall.dto.ModuleDetailRes;
 import com.hailian.ylwmall.util.PageResult;
 import com.hailian.ylwmall.entity.TbModuleDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hailian.ylwmall.util.PageQueryUtil;
+import com.hailian.ylwmall.util.Result;
 
 import java.util.List;
 
@@ -21,4 +23,6 @@ public interface TbModuleDetailService extends IService<TbModuleDetail> {
     PageResult getModuleDetails(PageQueryUtil pageUtil);
 
     List<ModuleDetailRes> getModeleDetails();
+
+    Result getSimpleGoods(GoodsQueryDto dto);
 }

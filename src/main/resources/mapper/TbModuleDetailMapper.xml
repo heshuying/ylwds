@@ -30,6 +30,17 @@
         <result column="original_price" property="originalPrice" />
     </resultMap>
 
+    <resultMap id="simpleGoodsMapper" type="com.hailian.ylwmall.dto.GoodsSimpleDto" >
+        <result column="goods_id" property="goodsId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="goods_intro" property="goodsIntro" />
+
+        <result column="selling_price" property="sellingPrice" />
+        <result column="profit" property="profit" />
+        <result column="price" property="price" />
+        <result column="original_price" property="originalPrice" />
+    </resultMap>
+
     <select id="getAllModule"  resultMap="detailListResultMap">
         SELECT
         md.*,
@@ -43,7 +54,29 @@
         tb_module_detail md
         JOIN tb_goods_info g
         ON md.`goods_id` = g.`goods_id`
-        where md.is_deleted=0
+        where md.is_deleted=0 and g.goods_sell_status=3
+        order by md.mod_rank asc, md.id desc
+    </select>
+
+    <select id="getSimpleGoods"  resultMap="simpleGoodsMapper"
+        parameterType="com.hailian.ylwmall.dto.GoodsQueryDto">
+        SELECT
+        goods_id,
+        goods_name,
+        goods_intro,
+        selling_price,
+        price,
+        original_price,
+        profit
+        FROM tb_goods_info
+        where goods_sell_status=3
+        <if test="dto.goodsName != null and dto.goodsName != ''">
+            and goods_name LIKE CONCAT('%',#{dto.goodsName},'%')
+        </if>
+        <if test="dto.category != null and dto.category != 0">
+            and goods_category_id = #{dto.category}
+        </if>
+        order by #{dto.orderby}
     </select>
 
     <select id="getModuleDetailList" parameterType="map" resultMap="detailListResultMap">

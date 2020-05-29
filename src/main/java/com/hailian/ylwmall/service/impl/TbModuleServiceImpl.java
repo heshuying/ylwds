@@ -61,15 +61,14 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
                 .orderByDesc("mod_rank")
         );
         List<Long> ids=tbModules.stream().map(m->m.getId()).collect(Collectors.toList());
-        List<ModuleDetailRes> details=tbModuleDetailService.getModeleDetails();
+
         List<ModuleListDto> list=new ArrayList<>();
         for (TbModule module: tbModules
              ) {
             ModuleListDto dto=new ModuleListDto();
             BeanUtils.copyProperties(module, dto);
 
-            List<ModuleDetailRes> currDetails=details.stream().filter(m->module.getId()
-                    .compareTo(m.getModId())==0).collect(Collectors.toList());
+            List<ModuleDetailRes> currDetails= tbModuleDetailService.getModeleDetails(module.getId(), 5);
             //专区产品
             List<ModuleDetailRes> nonHead=currDetails.stream().filter(m->m.getIsHead().equals("0"))
                     .sorted(Comparator.comparing(TbModuleDetail::getModRank))

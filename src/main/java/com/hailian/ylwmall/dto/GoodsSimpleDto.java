@@ -12,6 +12,8 @@ public class GoodsSimpleDto {
 
     private String  goodsIntro;
 
+    private String  goodsCarousel;
+
     /**
      * 平台利润
      */

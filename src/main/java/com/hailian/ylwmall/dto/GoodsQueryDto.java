@@ -13,5 +13,9 @@ public class GoodsQueryDto {
     private Long moduleId;
     private Long category;
     private String goodsName;
+    private boolean dispStock=false;
+    private boolean isDesc =false;
+    private int orderCond;//0-综合 1-价格 2-销量
+
     private String orderby;
 }

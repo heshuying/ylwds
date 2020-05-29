@@ -9,7 +9,7 @@ public class ModuleDetailRes extends TbModuleDetail {
     private String goodsName;
 
     private String  goodsIntro;
-
+    private String goodsCarousel;
     /**
      * 平台利润
      */

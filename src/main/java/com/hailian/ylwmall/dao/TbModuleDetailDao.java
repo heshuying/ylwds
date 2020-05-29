@@ -23,7 +23,8 @@ public interface TbModuleDetailDao extends BaseMapper<TbModuleDetail> {
 
     List<ModuleDetailRes> getModuleDetailList(Map map);
 
-    List<ModuleDetailRes>  getAllModule();
-
+    List<ModuleDetailRes>  getModultProduct(@Param("moduleId") Long moduleId,
+                                            @Param("limitNum") int limitNum);
+    List<GoodsSimpleDto> getProductByModule(@Param("dto") GoodsQueryDto dto);
     List<GoodsSimpleDto> getSimpleGoods(@Param("dto") GoodsQueryDto dto);
 }

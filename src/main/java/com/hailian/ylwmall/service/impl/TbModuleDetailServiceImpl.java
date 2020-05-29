@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,16 +41,33 @@ public class TbModuleDetailServiceImpl extends ServiceImpl<TbModuleDetailDao, Tb
     }
 
     @Override
-    public List<ModuleDetailRes> getModeleDetails() {
-        return moduleDetailDao.getAllModule();
+    public List<ModuleDetailRes> getModeleDetails(Long modId, Integer limitNum) {
+        return moduleDetailDao.getModultProduct(modId, limitNum);
     }
 
     @Override
     public Result getSimpleGoods(GoodsQueryDto dto) {
-        if(dto==null|| StringUtils.isBlank(dto.getOrderby())){
+        if(dto==null|| dto.getOrderCond()==0){
             dto.setOrderby(" goods_id desc ");
+        }else if(dto.getOrderCond()==1){
+            if(dto.isDesc()) {
+                dto.setOrderby(" price desc ");
+            }else{
+                dto.setOrderby(" price asc ");
+            }
+        }else{
+            if(dto.isDesc()) {
+                dto.setOrderby(" sale_total  desc ");
+            }else{
+                dto.setOrderby(" sale_total  asc ");
+            }
         }
-        List<GoodsSimpleDto> list=baseMapper.getSimpleGoods(dto);
+        List<GoodsSimpleDto> list=new ArrayList<>();
+        if(dto.getModuleId()>0){
+            list= baseMapper.getProductByModule(dto);
+        }else{
+            list=baseMapper.getSimpleGoods(dto);
+        }
         return ResultGenerator.genSuccessResult(list);
     }
 }

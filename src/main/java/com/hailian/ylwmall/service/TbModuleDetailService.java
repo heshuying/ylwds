@@ -22,7 +22,7 @@ public interface TbModuleDetailService extends IService<TbModuleDetail> {
 
     PageResult getModuleDetails(PageQueryUtil pageUtil);
 
-    List<ModuleDetailRes> getModeleDetails();
+    List<ModuleDetailRes> getModeleDetails(Long modId, Integer limitNum);
 
     Result getSimpleGoods(GoodsQueryDto dto);
 }

@@ -23,7 +23,7 @@
     <resultMap id="detailListResultMap" type="com.hailian.ylwmall.dto.ModuleDetailRes" extends="BaseResultMap">
         <result column="goods_name" property="goodsName" />
         <result column="goods_intro" property="goodsIntro" />
-
+        <result column="goods_carousel" property="goodsCarousel" />
         <result column="selling_price" property="sellingPrice" />
         <result column="profit" property="profit" />
         <result column="price" property="price" />
@@ -34,14 +34,14 @@
         <result column="goods_id" property="goodsId" />
         <result column="goods_name" property="goodsName" />
         <result column="goods_intro" property="goodsIntro" />
-
+        <result column="goods_carousel" property="goodsCarousel" />
         <result column="selling_price" property="sellingPrice" />
         <result column="profit" property="profit" />
         <result column="price" property="price" />
         <result column="original_price" property="originalPrice" />
     </resultMap>
 
-    <select id="getAllModule"  resultMap="detailListResultMap">
+    <select id="getModultProduct"  resultMap="detailListResultMap">
         SELECT
         md.*,
         g.`goods_name`,
@@ -55,7 +55,41 @@
         JOIN tb_goods_info g
         ON md.`goods_id` = g.`goods_id`
         where md.is_deleted=0 and g.goods_sell_status=3
-        order by md.mod_rank asc, md.id desc
+        <if test="moduleId != null and moduleId>0">
+            and md.mod_id =#{moduleId}
+        </if>
+        order by md.is_head desc, md.mod_rank desc
+        <if test="limitNum>0">
+            limit #{limitNum}
+        </if>
+    </select>
+
+    <select id="getProductByModule"  resultMap="simpleGoodsMapper"
+            parameterType="com.hailian.ylwmall.dto.GoodsQueryDto">
+        SELECT
+        g.`goods_id`,
+        g.`goods_name`,
+        g.`goods_intro`,
+        g.`selling_price`,
+        g.goods_carousel,
+        g.`price`,
+        g.`original_price`,
+        g.`profit`
+        FROM
+        tb_module_detail md
+        JOIN tb_goods_info g
+        ON md.`goods_id` = g.`goods_id`
+        where md.is_deleted=0 and g.goods_sell_status=3 and md.mod_id =#{dto.moduleId}
+        <if test="dto.goodsName != null and dto.goodsName != ''">
+            and  g.goods_name LIKE CONCAT('%',#{dto.goodsName},'%')
+        </if>
+        <if test="dto.category != null and dto.category != 0">
+            and g.goods_category_id = #{dto.category}
+        </if>
+        <if test="dto.dispStock ">
+            and g.stock_num>0
+        </if>
+        order by #{dto.orderby}
     </select>
 
     <select id="getSimpleGoods"  resultMap="simpleGoodsMapper"
@@ -63,6 +97,7 @@
         SELECT
         goods_id,
         goods_name,
+        goods_carousel,
         goods_intro,
         selling_price,
         price,
@@ -75,6 +110,9 @@
         </if>
         <if test="dto.category != null and dto.category != 0">
             and goods_category_id = #{dto.category}
+        </if>
+        <if test="dto.dispStock ">
+            and stock_num>0
         </if>
         order by #{dto.orderby}
     </select>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/platRunBanner.css}">
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="manage-main-page" v-cloak>
+            <div class="top-header">
+                <div class="checked-style">轮播大图</div>
+                <div>专区</div>
+            </div>
+            <div class="show-main-content">
+                <div class="add-banner-area">
+                    <div>
+                        共
+                        <span class="banner-count">{{bannerCount}}</span>
+                        条轮播记录
+                    </div>
+                    <div>
+                        <el-button type="plain">+ 新增轮播</el-button>
+                    </div>
+                </div>
+                <div>
+                    <el-table
+                            ref="multipleTable"
+                            :data="tableData"
+                            tooltip-effect="dark"
+                            style="width: 100%"
+                            :header-cell-style="{background:'#F5F6F8'}">
+                        <el-table-column
+                                prop="img"
+                                label="轮播图片"
+                                align="center">
+                            <template slot-scope="scope">
+                                <div class="photo-item">
+                                    <img :src="scope.row.img" />
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="url"
+                                label="跳转链接"
+                                align="center">
+                            <template slot-scope="scope">
+                                <div class="edit-btn" @click="clickUrl(scope.row.url)">
+                                    <span>{{scope.row.url}}</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="order"
+                                label="排序值"
+                                align="center"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column
+                                prop="createDate"
+                                label="创建时间"
+                                align="center"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <div class="edit-btn">
+                                    <span>
+                                        <i class="el-icon-edit"></i>
+                                    </span>
+                                    <span>编辑</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <div class="index-show-area">
+                    <el-popover
+                            placement="left-end"
+                            width="200"
+                            trigger="manual"
+                            v-model="visible">
+                        <div class="pop-div">
+                            <div>
+                                <div></div>
+                            </div>
+                        </div>
+                        <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
+                    </el-popover>
+                </div>
+                <div class="save-btn-area">
+                    <el-button type="primary">保存</el-button>
+                </div>
+            </div>
+        </div>
+        <!-- /.content-wrapper -->
+    </div>
+    <!-- jQuery -->
+    <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+    <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+    <!-- 引入组件库 -->
+    <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+    <script th:src="@{/admin/dist/js/platRunBanner.js}"></script>
+</body>
+</html>

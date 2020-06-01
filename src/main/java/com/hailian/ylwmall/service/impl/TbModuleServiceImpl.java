@@ -67,6 +67,7 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
              ) {
             ModuleListDto dto=new ModuleListDto();
             BeanUtils.copyProperties(module, dto);
+            dto.setModId(module.getId());
 
             List<ModuleDetailRes> currDetails= tbModuleDetailService.getModeleDetails(module.getId(), 5);
             //专区产品

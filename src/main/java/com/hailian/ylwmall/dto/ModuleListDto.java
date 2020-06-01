@@ -10,6 +10,7 @@ import java.util.List;
  */
 @Data
 public class ModuleListDto {
+    private Long modId;
     private String modKey;
     private String modName;
     private String modDesc;

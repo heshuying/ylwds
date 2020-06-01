@@ -216,7 +216,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
                 wrapper.eq("status",Integer.valueOf(status));
             }
         }
-
+        wrapper.orderByDesc("create_time");
         IPage<TbOrderOrderinfo> orders=baseMapper.selectPage(
                 new Query<TbOrderOrderinfo>().getPage(params),
                 wrapper

@@ -1,0 +1,85 @@
+body {
+    background-color: #FBFBFC;
+}
+
+[v-cloak]{
+    display: none;
+}
+
+.content-wrapper {
+    background: #fbfbfb;
+}
+
+.manage-main-page {
+    padding: 0 30px;
+    font-size: 14px;
+}
+
+.top-header {
+    padding-bottom: 15px;
+    display: flex;
+}
+.top-header > div {
+    padding: 5px 15px;
+}
+.top-header > div:hover {
+    cursor: pointer;
+}
+.top-header .checked-style {
+    background-color: #477FFF;
+    color: #fff;
+    border-radius: 15px;
+    margin-right: 15px;
+}
+.add-banner-area {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 15px;
+}
+.add-banner-area .banner-count {
+    color: #477FFF;
+}
+.add-banner-area > div:first-child {
+    margin-right: 15px;
+}
+.edit-btn {
+    color: #477fff;
+    cursor: pointer;
+}
+.index-show-area {
+    padding-top: 15px;
+    text-align: right;
+}
+.pop-div {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pop-div > div {
+    width: 120px;
+    height: 200px;
+    background-color: #EBEBEB;
+}
+.pop-div > div > div {
+    width: 100%;
+    height: 30px;
+    /*margin-top: 30px;*/
+    background-color: #477FFF;
+}
+.save-btn-area {
+    padding-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+.index-show-area .el-button,.save-btn-area .el-button {
+    width: 120px;
+}
+.photo-item img {
+    width: 150px;
+}
+
+
+
+

@@ -71,7 +71,7 @@
         g.`goods_name`,
         g.`goods_intro`,
         g.`selling_price`,
-        g.goods_carousel,
+        g.goods_cover_img as 'goods_carousel',
         g.`price`,
         g.`original_price`,
         g.`profit`
@@ -97,7 +97,7 @@
         SELECT
         goods_id,
         goods_name,
-        goods_carousel,
+        goods_cover_img as 'goods_carousel',
         goods_intro,
         selling_price,
         price,

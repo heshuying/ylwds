@@ -19,6 +19,10 @@ public class OrderDetailDto {
      */
     private BigDecimal total;
     /**
+     * 平台减免金额
+     */
+    private BigDecimal cutDown;
+    /**
      * 运费
      */
     private BigDecimal expressFee;

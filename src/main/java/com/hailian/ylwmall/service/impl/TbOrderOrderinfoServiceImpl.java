@@ -116,6 +116,7 @@ public class TbOrderOrderinfoServiceImpl extends ServiceImpl<TbOrderOrderinfoDao
         orderDetailDto.setTotal(orderInfo.getRealPrice());
         orderDetailDto.setExpressFee(orderInfo.getDeliveryFee());
         orderDetailDto.setOrderNo(orderInfo.getId());
+        orderDetailDto.setCutDown(orderInfo.getCutDown());
         List<ShoppingGoodsDto> list=new ArrayList<>();
         for (TbOrderGoodinfo orderGoodinfo:orderGoods){
             ShoppingGoodsDto goodsDto=new ShoppingGoodsDto();

@@ -603,6 +603,26 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         return ResultGenerator.genFailResult("交易查询接口请求失败");
     }
 
+    @Override
+    public Result tradeQueryDB(String orderId, String payType){
+        Map<String, Object> data = new HashMap<>();
+        TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
+                .eq("order_id", orderId)
+                .eq("is_deleted", "0")
+                .eq("pay_type", payType));
+        if(orderPay == null){
+            return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+
+        if(orderPay.getPayStatus() < 2){
+            data.put("status", "WAIT_BUYER_PAY");
+            return ResultGenerator.genSuccessResult(data);
+        }else{
+            data.put("status", "PAY_FINISHED");
+            return ResultGenerator.genSuccessResult(data);
+        }
+    }
+
     /**
      * 支付状态变更异步通知
      */

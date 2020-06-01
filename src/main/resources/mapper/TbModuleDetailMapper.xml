@@ -89,7 +89,7 @@
         <if test="dto.dispStock ">
             and g.stock_num>0
         </if>
-        order by #{dto.orderby}
+        order by ${dto.orderby}
     </select>
 
     <select id="getSimpleGoods"  resultMap="simpleGoodsMapper"
@@ -114,7 +114,7 @@
         <if test="dto.dispStock ">
             and stock_num>0
         </if>
-        order by #{dto.orderby}
+        order by ${dto.orderby}
     </select>
 
     <select id="getModuleDetailList" parameterType="map" resultMap="detailListResultMap">

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <!-- 引入样式 -->
     <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
-    <link rel="stylesheet" th:href="@{/admin/dist/css/platRunBanner.css}">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/platRunSpeArea.css}">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -23,21 +23,41 @@
         </div>
         <!-- Main content -->
         <div id="app" class="manage-main-page" v-cloak>
-            <div class="top-header">
-                <div class="checked-style">轮播大图</div>
-                <div @click="goSpeArea">专区</div>
+            <div class="top-line">
+                <div class="top-header">
+                    <div @click="goBannerArea">轮播大图</div>
+                    <div class="checked-style">专区</div>
+                </div>
+                <div class="top-tab">
+                    <el-tabs v-model="activeName" type="card" @tab-click="handleTabClick">
+                        <el-tab-pane :label="item.label" :name="item.name" v-for="item in areaList" :key="item.index"></el-tab-pane>
+                    </el-tabs>
+                </div>
             </div>
             <div class="show-main-content">
-                <div class="add-banner-area">
+                <div class="add-spe-area">
                     <div>
-                        共
-                        <span class="banner-count">{{tableData.length}}</span>
-                        条轮播记录
+                        <span class="spe-name">鞋联网</span>
+                        <span class="spe-intro">以温度的名义，与时间为敌</span>
+                        <span class="spe-edit">
+                            <span>
+                                <i class="el-icon-edit"></i>
+                            </span>
+                            <span @click="editSpeArea">编辑</span>
+                        </span>
                     </div>
-                    <div>
-                        <el-button type="plain" @click="addBanner">+ 新增轮播</el-button>
+                    <div class="spe-right">
+                        <div>
+                            此专区共
+                            <span class="banner-count">{{tableData.length}}</span>
+                            条记录
+                        </div>
+                        <div>
+                            <el-button type="plain" @click="addSpeGoods">+ 新增</el-button>
+                        </div>
                     </div>
                 </div>
+
                 <div>
                     <el-table
                             ref="multipleTable"
@@ -47,7 +67,7 @@
                             :header-cell-style="{background:'#F5F6F8'}">
                         <el-table-column
                                 prop="img"
-                                label="轮播图片"
+                                label="图片"
                                 align="center">
                             <template slot-scope="scope">
                                 <div class="photo-item">
@@ -57,7 +77,7 @@
                         </el-table-column>
                         <el-table-column
                                 prop="url"
-                                label="跳转链接"
+                                label="商品"
                                 align="center">
                             <template slot-scope="scope">
                                 <div class="edit-btn" @click="clickUrl(scope.row.url)">
@@ -67,13 +87,25 @@
                         </el-table-column>
                         <el-table-column
                                 prop="order"
-                                label="排序值"
+                                label="供货价"
+                                align="center"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column
+                                prop="order"
+                                label="毛利润"
+                                align="center"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column
+                                prop="order"
+                                label="供货价"
                                 align="center"
                                 show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
                                 prop="createDate"
-                                label="创建时间"
+                                label="排序值"
                                 align="center"
                                 show-overflow-tooltip>
                         </el-table-column>
@@ -83,7 +115,7 @@
                                     <span>
                                         <i class="el-icon-edit"></i>
                                     </span>
-                                    <span @click="editBanner(scope.row)">编辑</span>
+                                    <span @click="editSpeGoods(scope.row)">编辑</span>
                                 </div>
                             </template>
                         </el-table-column>
@@ -103,34 +135,72 @@
                         <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
                     </el-popover>
                 </div>
+                <div style="text-align: center;padding: 15px 0;">
+                    <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            :page-size="pagesize"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
                 <div class="save-btn-area">
                     <el-button type="primary">保存</el-button>
                 </div>
             </div>
-            <!--待买家退回-->
+            <!--专区信息-->
+            <el-dialog :visible.sync="speInfoMoralShow" width="40%" title="编辑专区" center :close-on-click-modal="closeBtnShow">
+                <div class="dia-body">
+                    <div class="dia-common-line">
+                        <div class="label-width bold-font">专区名称</div>
+                        <div>
+                            <el-input v-model="diaSpeName"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width bold-font">小编寄语</div>
+                        <div>
+                            <el-input type="textarea" v-model="diaSpeTip" rows="4"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-btn-area">
+                        <el-button type="primary" @click="saveSpeInfo">确定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--专区信息 end-->
+            <!--专区产品-->
             <el-dialog :visible.sync="moralShow" width="40%" :title="moralTitle" center :close-on-click-modal="closeBtnShow">
                 <div class="dia-body">
                     <div class="dia-img-area">
-                        <img v-if="wholeUrl" :src="wholeUrl" />
-                    </div>
-                    <div class="dia-common-line">
-                        <div class="label-width">上传图片</div>
-                        <div>
-                            <el-upload
-                                    class="upload-demo"
-                                    action="/api/file/uploadFile"
-                                    :limit="5"
-                                    :show-file-list="false"
-                                    :on-success="handleUploadSuccess"
-                            >
-                                <el-button type="plain">选择文件</el-button>
-                            </el-upload>
-                        </div>
+                        <el-upload
+                                class="upload-demo"
+                                action="/api/file/uploadFile"
+                                :limit="5"
+                                :show-file-list="false"
+                                :on-success="handleUploadSuccess"
+                        >
+                            <img v-if="wholeUrl" :src="wholeUrl" />
+                            <div v-else class="add-spe-img">
+                                <div>
+                                    <i class="el-icon-circle-plus-outline"></i>
+                                </div>
+                                <div>
+                                    选择文件
+                                </div>
+                            </div>
+                        </el-upload>
                     </div>
                     <div class="dia-common-line">
                         <div class="label-width">跳转链接</div>
                         <div>
                             <el-input v-model="jumpUrl"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">商品名称</div>
+                        <div>
+                            <el-input v-model="speGoodsName"></el-input>
                         </div>
                     </div>
                     <div class="dia-common-line">
@@ -140,11 +210,11 @@
                         </div>
                     </div>
                     <div class="dia-btn-area">
-                        <el-button type="primary" @click="saveBanner">确定</el-button>
+                        <el-button type="primary">确定</el-button>
                     </div>
                 </div>
             </el-dialog>
-            <!--待买家退回 end-->
+            <!--专区产品 end-->
         </div>
         <!-- /.content-wrapper -->
     </div>
@@ -153,6 +223,6 @@
     <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
     <!-- 引入组件库 -->
     <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
-    <script th:src="@{/admin/dist/js/platRunBanner.js}"></script>
+    <script th:src="@{/admin/dist/js/platRunSpeArea.js}"></script>
 </body>
 </html>

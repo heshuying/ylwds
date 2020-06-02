@@ -48,6 +48,7 @@ public class ModuleController {
      */
     @GetMapping("/platRunBanner")
     public String platRunBanner(HttpServletRequest request) {
+        request.setAttribute("path", "newbee_mall_run_banner");
         return "admin/platRunBanner";
     }
 
@@ -58,6 +59,7 @@ public class ModuleController {
      */
     @GetMapping("/platRunSpeArea")
     public String platRunSpeArea(HttpServletRequest request) {
+        request.setAttribute("path", "newbee_mall_run_banner");
         return "admin/platRunSpeArea";
     }
 

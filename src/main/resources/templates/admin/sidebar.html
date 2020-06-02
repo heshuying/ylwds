@@ -115,6 +115,14 @@
                         </p>
                     </a>
                 </li>
+                <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
+                    <a th:href="@{/admin/module/platRunBanner}" th:class="${path}=='newbee_mall_run_banner'?'nav-link active':'nav-link'">
+                        <i class="nav-icon fa fa-plus" aria-hidden="true"></i>
+                        <p>
+                            运营管理
+                        </p>
+                    </a>
+                </li>
                 <li th:class="${session.loginType}=='03'?'nav-header':'hide-item'">系统管理</li>
                 <li th:class="${session.loginType}=='03'?'nav-item':'hide-item'">
                     <a th:href="@{/admin/profile}"

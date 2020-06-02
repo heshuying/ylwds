@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -38,6 +39,26 @@ public class ModuleController {
     private TbModuleDetailService moduleDetailService;
     @Autowired
     private GoodsService goodsService;
+
+    /**
+     * 轮播页面
+     * @param request
+     * @return
+     */
+    @GetMapping("/platRunBanner")
+    public String platRunBanner(HttpServletRequest request) {
+        return "admin/platRunBanner";
+    }
+
+    /**
+     * 专区页面
+     * @param request
+     * @return
+     */
+    @GetMapping("/platRunSpeArea")
+    public String platRunSpeArea(HttpServletRequest request) {
+        return "admin/platRunSpeArea";
+    }
 
     /**
      * 专区新增及修改

@@ -31,11 +31,11 @@
                 <div class="add-banner-area">
                     <div>
                         共
-                        <span class="banner-count">{{bannerCount}}</span>
+                        <span class="banner-count">{{tableData.length}}</span>
                         条轮播记录
                     </div>
                     <div>
-                        <el-button type="plain">+ 新增轮播</el-button>
+                        <el-button type="plain" @click="addBanner">+ 新增轮播</el-button>
                     </div>
                 </div>
                 <div>
@@ -83,7 +83,7 @@
                                     <span>
                                         <i class="el-icon-edit"></i>
                                     </span>
-                                    <span>编辑</span>
+                                    <span @click="editBanner(scope.row)">编辑</span>
                                 </div>
                             </template>
                         </el-table-column>
@@ -107,6 +107,44 @@
                     <el-button type="primary">保存</el-button>
                 </div>
             </div>
+            <!--待买家退回-->
+            <el-dialog :visible.sync="moralShow" width="40%" :title="moralTitle" center :close-on-click-modal="closeBtnShow">
+                <div class="dia-body">
+                    <div class="dia-img-area">
+                        <img v-if="wholeUrl" :src="wholeUrl" />
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">上传图片</div>
+                        <div>
+                            <el-upload
+                                    class="upload-demo"
+                                    action="/api/file/uploadFile"
+                                    :limit="5"
+                                    :show-file-list="false"
+                                    :on-success="handleUploadSuccess"
+                            >
+                                <el-button type="plain">选择文件</el-button>
+                            </el-upload>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">跳转链接</div>
+                        <div>
+                            <el-input v-model="jumpUrl"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">排序值</div>
+                        <div>
+                            <el-input type="number" v-model="sortNum"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-btn-area">
+                        <el-button type="primary" @click="saveBanner">确定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--待买家退回 end-->
         </div>
         <!-- /.content-wrapper -->
     </div>

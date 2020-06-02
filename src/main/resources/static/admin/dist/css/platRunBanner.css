@@ -73,11 +73,43 @@ body {
     display: flex;
     justify-content: center;
 }
-.index-show-area .el-button,.save-btn-area .el-button {
+.index-show-area .el-button,.save-btn-area .el-button , .dia-body .el-button{
     width: 120px;
 }
 .photo-item img {
     width: 150px;
+}
+.dia-body {
+    /*padding: 10px;*/
+}
+.dia-body .dia-img-area {
+    width: 100%;
+    height: 100px;
+    background-color: #D5DADF;
+}
+.dia-body .dia-img-area img {
+    width: 100%;
+    height: 100px;
+}
+.dia-body .dia-common-line {
+    display: flex;
+    align-items: center;
+    line-height: 40px;
+    padding-top: 15px;
+}
+.dia-body .label-width {
+    width: 70px;
+    text-align: left;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+.dia-body .label-width ~ div {
+    width: 100%;
+}
+.dia-body .dia-btn-area {
+    padding-top: 15px;
+    display: flex;
+    justify-content: center;
 }
 
 

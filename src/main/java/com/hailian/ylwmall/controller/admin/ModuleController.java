@@ -17,6 +17,7 @@ import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ import java.util.Objects;
  * 运营专区
  * @author 19033323
  */
-@RestController
+@Controller
 @RequestMapping("/admin/module")
 public class ModuleController {
     @Autowired
@@ -65,6 +66,7 @@ public class ModuleController {
      * @param reqBean
      * @return
      */
+    @ResponseBody
     @PostMapping("/save")
     public Result save(@RequestBody ModuleReq reqBean, HttpServletRequest request){
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
@@ -91,6 +93,7 @@ public class ModuleController {
      * @param moduleId
      * @return
      */
+    @ResponseBody
     @GetMapping("getModuleInfo/{moduleId}")
     public Result getModuleInfo(@PathVariable("moduleId") Long moduleId){
         TbModule module = moduleService.getById(moduleId);
@@ -101,6 +104,7 @@ public class ModuleController {
      * 专区列表
      * @return
      */
+    @ResponseBody
     @GetMapping("getModules")
     public Result getModules(){
         return ResultGenerator.genSuccessResult(moduleService.getModuleList());
@@ -111,6 +115,7 @@ public class ModuleController {
      * @param reqBean
      * @return
      */
+    @ResponseBody
     @PostMapping("/saveModelDetail")
     public Result saveModelDetail(@RequestBody ModuleDetailReq reqBean, HttpServletRequest request){
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
@@ -142,6 +147,7 @@ public class ModuleController {
     /**
      * 专区内容详情
      */
+    @ResponseBody
     @GetMapping("getModuleDetailInfo/{id}")
     public Result getModuleDetailInfo(@PathVariable("id") Long id){
         ModuleDetailAddRes res = new ModuleDetailAddRes();
@@ -166,6 +172,7 @@ public class ModuleController {
      * 专区详情列表
      * @return
      */
+    @ResponseBody
     @GetMapping("getModuleDetails")
     public Result getModuleDetails(@RequestParam Map<String, Object> params){
         if (org.springframework.util.StringUtils.isEmpty(params.get("page"))

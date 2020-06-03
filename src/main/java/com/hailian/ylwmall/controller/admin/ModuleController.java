@@ -1,5 +1,6 @@
 package com.hailian.ylwmall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.dto.ModuleDetailReq;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.util.CommonUtil;
@@ -125,7 +126,6 @@ public class ModuleController {
             return ResultGenerator.genFailResult("未登录！");
         }
         if(reqBean == null
-                || StringUtils.isEmpty(reqBean.getIsHead())
                 || StringUtils.isEmpty(reqBean.getModId())){
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -137,6 +137,38 @@ public class ModuleController {
         }
 
         TbModuleDetail module = CommonUtil.convertBean(reqBean, TbModuleDetail.class);
+        module.setCreateUser(userId.intValue());
+        module.setUpdateUser(userId.intValue());
+        module.setUpdateTime(new Date());
+        if(moduleDetailService.saveOrUpdate(module)){
+            return ResultGenerator.genSuccessResult();
+        }
+        return ResultGenerator.genFailResult("保存失败");
+    }
+
+    /**
+     * 专区内容新增修改
+     * @param reqBean
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/saveBannerDetail")
+    public Result saveBannerDetail(@RequestBody ModuleDetailReq reqBean, HttpServletRequest request){
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        TbModule tbModule=moduleService.getOne(new QueryWrapper<TbModule>()
+                .eq("mod_key", Const.Mod_Banner_Key));
+        if(tbModule == null){
+            return ResultGenerator.genFailResult("轮播区域不存在");
+        }
+        if(StringUtils.isEmpty(reqBean.getJumpUrl()) || StringUtils.isEmpty(reqBean.getImgUrl())){
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+
+        TbModuleDetail module = CommonUtil.convertBean(reqBean, TbModuleDetail.class);
+        module.setModId(tbModule.getId());
         module.setCreateUser(userId.intValue());
         module.setUpdateUser(userId.intValue());
         module.setUpdateTime(new Date());

@@ -187,4 +187,14 @@ public class ModuleController {
         return ResultGenerator.genSuccessResult(moduleDetailService.getModuleDetails(pageUtil));
     }
 
+    /**
+     * 轮播列表
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("getBannerDetails")
+    public Result getBannerDetails(){
+        return moduleService.getBannerAll();
+    }
+
 }

@@ -54,6 +54,22 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
     }
 
     @Override
+    public Result getBannerAll() {
+        TbModule tbModule=baseMapper.selectOne(new QueryWrapper<TbModule>()
+                .eq("mod_key", Const.Mod_Banner_Key));
+
+        List<TbModuleDetail> list=tbModuleDetailService.list(
+                new QueryWrapper<TbModuleDetail>()
+                        .eq("mod_id",tbModule.getId())
+                        .eq("is_deleted", 0)
+                        .orderByDesc("mod_rank")
+        );
+        Result result= ResultGenerator.genSuccessResult();
+        result.setData(list);
+        return result;
+    }
+
+    @Override
     public Result getModules() {
         List<TbModule> tbModules=baseMapper.selectList(new QueryWrapper<TbModule>()
                 .eq("mod_key", Const.Mod_Module_Key)
@@ -95,7 +111,7 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
     @Override
     public List<TbModule> getModuleList(){
         List<TbModule> tbModules=baseMapper.selectList(new QueryWrapper<TbModule>()
-//                .eq("mod_key", Const.Mod_Module_Key)
+                .eq("mod_key", Const.Mod_Module_Key)
                 .eq("is_deleted", 0)
                 .orderByDesc("mod_rank")
         );

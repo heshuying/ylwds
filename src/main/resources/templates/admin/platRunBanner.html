@@ -46,33 +46,31 @@
                             style="width: 100%"
                             :header-cell-style="{background:'#F5F6F8'}">
                         <el-table-column
-                                prop="img"
                                 label="轮播图片"
                                 align="center">
                             <template slot-scope="scope">
                                 <div class="photo-item">
-                                    <img :src="scope.row.img" />
+                                    <img :src="scope.row.imgUrlShow" />
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="url"
                                 label="跳转链接"
                                 align="center">
                             <template slot-scope="scope">
-                                <div class="edit-btn" @click="clickUrl(scope.row.url)">
-                                    <span>{{scope.row.url}}</span>
+                                <div class="edit-btn" @click="clickUrl(scope.row.jumpUrl)">
+                                    <span>{{scope.row.jumpUrl}}</span>
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="order"
+                                prop="modRank"
                                 label="排序值"
                                 align="center"
                                 show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
-                                prop="createDate"
+                                prop="createTime"
                                 label="创建时间"
                                 align="center"
                                 show-overflow-tooltip>
@@ -103,15 +101,15 @@
                         <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
                     </el-popover>
                 </div>
-                <div class="save-btn-area">
+                <div class="save-btn-area" v-if="false">
                     <el-button type="primary">保存</el-button>
                 </div>
             </div>
-            <!--待买家退回-->
+            <!--轮播图新增修改dialog-->
             <el-dialog :visible.sync="moralShow" width="40%" :title="moralTitle" center :close-on-click-modal="closeBtnShow">
                 <div class="dia-body">
                     <div class="dia-img-area">
-                        <img v-if="wholeUrl" :src="wholeUrl" />
+                        <img v-if="postInfo.imgUrlShow" :src="postInfo.imgUrlShow" />
                     </div>
                     <div class="dia-common-line">
                         <div class="label-width">上传图片</div>
@@ -130,13 +128,13 @@
                     <div class="dia-common-line">
                         <div class="label-width">跳转链接</div>
                         <div>
-                            <el-input v-model="jumpUrl"></el-input>
+                            <el-input v-model="postInfo.jumpUrl"></el-input>
                         </div>
                     </div>
                     <div class="dia-common-line">
                         <div class="label-width">排序值</div>
                         <div>
-                            <el-input type="number" v-model="sortNum"></el-input>
+                            <el-input type="number" v-model="postInfo.modRank"></el-input>
                         </div>
                     </div>
                     <div class="dia-btn-area">
@@ -144,7 +142,7 @@
                     </div>
                 </div>
             </el-dialog>
-            <!--待买家退回 end-->
+            <!--轮播图新增修改dialog end-->
         </div>
         <!-- /.content-wrapper -->
     </div>

@@ -29,16 +29,16 @@
                     <div class="checked-style">专区</div>
                 </div>
                 <div class="top-tab">
-                    <el-tabs v-model="activeName" type="card" @tab-click="handleTabClick">
-                        <el-tab-pane :label="item.label" :name="item.name" v-for="item in areaList" :key="item.index"></el-tab-pane>
+                    <el-tabs v-model="activeName" @tab-click="handleTabClick">
+                        <el-tab-pane :label="item.modName" :name="item.id + ''" v-for="item in areaList" :key="item.index"></el-tab-pane>
                     </el-tabs>
                 </div>
             </div>
             <div class="show-main-content">
                 <div class="add-spe-area">
                     <div>
-                        <span class="spe-name">鞋联网</span>
-                        <span class="spe-intro">以温度的名义，与时间为敌</span>
+                        <span class="spe-name">{{currAreaInfo.modName}}</span>
+                        <span class="spe-intro">{{currAreaInfo.modDesc}}</span>
                         <span class="spe-edit">
                             <span>
                                 <i class="el-icon-edit"></i>
@@ -66,46 +66,68 @@
                             style="width: 100%"
                             :header-cell-style="{background:'#F5F6F8'}">
                         <el-table-column
-                                prop="img"
                                 label="图片"
                                 align="center">
                             <template slot-scope="scope">
                                 <div class="photo-item">
-                                    <img :src="scope.row.img" />
+                                    <img :src="scope.row.imgUrlShow" />
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="url"
                                 label="商品"
                                 align="center">
                             <template slot-scope="scope">
-                                <div class="edit-btn" @click="clickUrl(scope.row.url)">
-                                    <span>{{scope.row.url}}</span>
+                                <div class="edit-btn" @click="clickUrl(scope.row.jumpUrl)" v-if="scope.row.isHead==='1'">
+                                    <span>{{scope.row.jumpUrl}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>{{scope.row.goodsName}}</span>
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="order"
                                 label="供货价"
                                 align="center"
                                 show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>¥{{scope.row.sellingPrice}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
                         </el-table-column>
                         <el-table-column
-                                prop="order"
                                 label="毛利润"
                                 align="center"
                                 show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>¥{{scope.row.profit}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
                         </el-table-column>
                         <el-table-column
-                                prop="order"
-                                label="供货价"
+                                label="排序值"
                                 align="center"
                                 show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>¥{{scope.row.modRank}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
                         </el-table-column>
                         <el-table-column
-                                prop="createDate"
-                                label="排序值"
+                                prop="createTime"
+                                label="创建时间"
                                 align="center"
                                 show-overflow-tooltip>
                         </el-table-column>
@@ -129,7 +151,7 @@
                             v-model="visible">
                         <div class="pop-div">
                             <div>
-                                <div></div>
+                                <div :style="{ marginTop: showPosition + 'px' }"></div>
                             </div>
                         </div>
                         <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
@@ -144,7 +166,7 @@
                             @current-change="current_change">
                     </el-pagination>
                 </div>
-                <div class="save-btn-area">
+                <div class="save-btn-area" v-if="false">
                     <el-button type="primary">保存</el-button>
                 </div>
             </div>
@@ -154,13 +176,13 @@
                     <div class="dia-common-line">
                         <div class="label-width bold-font">专区名称</div>
                         <div>
-                            <el-input v-model="diaSpeName"></el-input>
+                            <el-input v-model="speInfoName"></el-input>
                         </div>
                     </div>
                     <div class="dia-common-line">
                         <div class="label-width bold-font">小编寄语</div>
                         <div>
-                            <el-input type="textarea" v-model="diaSpeTip" rows="4"></el-input>
+                            <el-input type="textarea" v-model="speInfoDesc" rows="4"></el-input>
                         </div>
                     </div>
                     <div class="dia-btn-area">

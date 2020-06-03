@@ -48,7 +48,7 @@ body {
     cursor: pointer;
 }
 .index-show-area {
-    padding-top: 15px;
+    padding: 15px 0;
     text-align: right;
 }
 .pop-div {

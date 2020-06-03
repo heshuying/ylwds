@@ -3,24 +3,15 @@ new Vue({
     data() {
         return {
             baseUrl: '',
-            tableData: [{
-                img: 'http://localhost:8080/upload/20200513/1ad78b7fd874435593fa7b20be689290.png',
-                imgOri: '/upload/20200513/1ad78b7fd874435593fa7b20be689290.png',
-                url: 'https://lanhuapp.com/web/#/item/project/board?pid=292c8f-5942-43cd-a335-f8b43c95',
-                order: '12',
-                createDate: '2020/03/03'
-            }],
-            areaList: [
-                {label: '鞋联网', name: '1', intro: '以温度的名义，与时间为敌'},
-                {label: '个护清洁', name: '2', intro: '爱干净，爱自己'},
-                {label: '宠物用品', name: '3', intro: '漂亮宠物小宝贝'},
-            ],
+            tableData: [],
+            areaList: [], // 专区列表
+            currAreaInfo: {}, // 当前专区
             visible: false,
-            showBtnWord: '收起',
+            showBtnWord: '展示位置',
             // 专区信息dialog
             speInfoMoralShow: false,
-            diaSpeName: '',
-            diaSpeTip: '',
+            speInfoName: '',
+            speInfoDesc: '',
             // 专区产品dialog
             moralTitle: '新增轮播',
             moralShow: false,
@@ -32,16 +23,80 @@ new Vue({
             total: 0,
             pagesize: 10,
             currentPage: 1,
-            activeName: '1'
+            activeName: '',
+            showPosition: 30 // 展示位置
         };
     },
     mounted() {
         this.baseUrl = window.localStorage.getItem("baseUrl");
-        this.visible = true;
+        this.getSpeList();
     },
     methods: {
+        // 获取专区列表--鞋联网等
+        getSpeList() {
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                url: '/admin/module/getModules',
+                type: 'GET',
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.areaList = result.data || [];
+                        if(result.data && result.data.length > 0) {
+                            _this.currAreaInfo =  result.data[0];
+                            _this.activeName = result.data[0].id + '';
+                            _this.speInfoName = result.data[0].modName + '';
+                            _this.speInfoDesc = result.data[0].modDesc + '';
+                            _this.getSpeGoods(result.data[0].id);
+                        }
+                    } else {
+                        _this.$message.error(result.message);
+                    };
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
+        },
+        // 获取某个专区中的商品
+        getSpeGoods(id) {
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                url: '/admin/module/getModuleDetails?modId='+ id + '&limit=' + this.pagesize + '&page='+ this.currentPage,
+                type: 'GET',
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.total = result.data.totalCount || 0;
+                        for(var i in result.data.list) {
+                            result.data.list[i].imgUrlShow = _this.baseUrl + result.data.list[i].imgUrl;
+                        }
+                        _this.tableData = result.data.list || [];
+                    } else {
+                        _this.$message.error(result.message);
+                    };
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
+        },
         clickUrl(url) {
-            console.log(url);
+            window.open(url,'_blank');
         },
         // 跳转到轮播图页面
         goBannerArea() {
@@ -70,10 +125,42 @@ new Vue({
         },
         // 保存专区信息
         saveSpeInfo() {
-            if(this.diaSpeName === '' || this.diaSpeTip === '') {
+            if(this.speInfoName === '' || this.speInfoDesc === '') {
                 this.$message.error('请填写完整信息后重试!');
                 return;
             }
+            var postObj = {
+                id: this.activeName,
+                modName: this.speInfoName,
+                modDesc: this.speInfoDesc
+            }
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                type: 'post',
+                url: '/admin/module/save',
+                contentType: "application/json",
+                data: JSON.stringify(postObj),
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.$message.success('操作成功');
+                        _this.getSpeList();
+                        _this.speInfoMoralShow = false;
+                    } else {
+                        _this.$message.error(result.message);
+                    };
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
         },
         // 新增专区产品
         addSpeGoods() {
@@ -97,7 +184,13 @@ new Vue({
         },
         // 切换tab
         handleTabClick(val) {
-            console.log(val);
+            this.visible = false;
+            this.showBtnWord = '展示位置';
+            this.showPosition = parseInt(val.index) * 30 + 30;
+            this.currAreaInfo = this.areaList[val.index];
+            this.speInfoName = this.currAreaInfo.modName;
+            this.speInfoDesc = this.currAreaInfo.modDesc;
+            this.getSpeGoods(this.currAreaInfo.id);
         }
     }
 })

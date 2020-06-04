@@ -264,6 +264,7 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
         return ResultGenerator.genSuccessResult(refundAmount);
     }
 
+    @Transactional
     @Override
     public Result checkRefund(Long userId, RefundCheckDto dto) {
 

@@ -52,7 +52,7 @@
         g.`profit`
         FROM
         tb_module_detail md
-        JOIN tb_goods_info g
+        left JOIN tb_goods_info g
         ON md.`goods_id` = g.`goods_id`
         where md.is_deleted=0 and g.goods_sell_status=3
         <if test="moduleId != null and moduleId>0">
@@ -71,7 +71,7 @@
         g.`goods_name`,
         g.`goods_intro`,
         g.`selling_price`,
-        g.goods_cover_img as 'goods_carousel',
+        md.img_url as 'goods_carousel',
         g.`price`,
         g.`original_price`,
         g.`profit`

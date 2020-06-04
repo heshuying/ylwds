@@ -132,7 +132,7 @@
                 and md.mod_id = #{modId}
             </if>
         </where>
-        ORDER BY md.mod_rank,md.is_head DESC
+        ORDER BY md.is_head DESC, md.mod_rank DESC
         <if test="start!=null and limit!=null">
             limit #{start},#{limit}
         </if>

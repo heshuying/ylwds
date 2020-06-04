@@ -16,7 +16,6 @@ new Vue({
             moralTitle: '新增轮播',
             moralShow: false,
             closeBtnShow: false,
-            wholeUrl: '',
             jumpUrl: '',
             speGoodsName: '',
             sortNum: '',
@@ -24,12 +23,16 @@ new Vue({
             pagesize: 10,
             currentPage: 1,
             activeName: '',
-            showPosition: 30 // 展示位置
+            showPosition: 30, // 展示位置
+            currSpeGoods: {}, // 当前选中商品
+            goodsList: [], // 添加--编辑专区商品中的商品列表
+            state2: '',
         };
     },
     mounted() {
         this.baseUrl = window.localStorage.getItem("baseUrl");
         this.getSpeList();
+        this.getGoodsList();
     },
     methods: {
         // 获取专区列表--鞋联网等
@@ -55,6 +58,46 @@ new Vue({
                             _this.speInfoDesc = result.data[0].modDesc + '';
                             _this.getSpeGoods(result.data[0].id);
                         }
+                    } else {
+                        _this.$message.error(result.message);
+                    };
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
+        },
+        querySearch(queryString, cb) {
+            var restaurants = this.goodsList;
+            var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+            // 调用 callback 返回建议列表的数据
+            cb(results);
+        },
+        createFilter(queryString) {
+            return function(restaurant) {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
+        },
+        // 获取商品列表
+        getGoodsList() {
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                url: "/admin/goods/listsimple?goodsName=",
+                type: 'GET',
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        for(var i in result.data) {
+                            result.data[i].value = result.data[i].goodsName;
+                        }
+                        _this.goodsList = result.data || [];
                     } else {
                         _this.$message.error(result.message);
                     };
@@ -114,7 +157,8 @@ new Vue({
         handleUploadSuccess(res) {
             if (res.resultCode == "200") {
                 this.$message.success('上传成功');
-                this.wholeUrl = this.baseUrl + res.data;
+                this.currSpeGoods.imgUrl = res.data;
+                this.currSpeGoods.imgUrlShow = this.baseUrl + res.data;
             } else {
                 this.$message.error("上传失败，" + res.msg);
             }
@@ -164,23 +208,79 @@ new Vue({
         },
         // 新增专区产品
         addSpeGoods() {
+            this.currSpeGoods = {
+                goodsId: "",
+                imgUrl: "",
+                imgUrlShow: "",
+                isHead: "0",
+                jumpUrl: "",
+                modId: this.currAreaInfo.id,
+                modRank: ""
+            }
             this.moralTitle = '新增';
             this.moralShow = true;
-            this.wholeUrl = '';
-            this.jumpUrl = '';
-            this.sortNum = '';
         },
         // 修改专区产品
         editSpeGoods(item) {
+            this.currSpeGoods = {
+                goodsName: item.goodsName,
+                goodsId: item.goodsId,
+                id: item.id,
+                imgUrl: item.imgUrl,
+                imgUrlShow: item.imgUrlShow,
+                isHead: item.isHead,
+                jumpUrl: item.jumpUrl,
+                modId: item.modId,
+                modRank: item.modRank
+            }
             this.moralTitle = '编辑';
             this.moralShow = true;
-            this.wholeUrl = this.baseUrl + item.imgOri;
-            this.jumpUrl = item.url;
-            this.sortNum = item.order;
+        },
+        // 保存专区产品
+        saveSpeGoods() {
+            if(this.currSpeGoods.isHead === '0'){
+                if(this.currSpeGoods.imgUrl === '' || this.currSpeGoods.goodsId === '' || this.currSpeGoods.modRank === ''){
+                    this.$message.error('请维护完整信息后重试');
+                    return;
+                }
+            } else if(this.currSpeGoods.isHead === '1') {
+                if(this.currSpeGoods.imgUrl === '' || this.currSpeGoods.jumpUrl === ''){
+                    this.$message.error('请维护完整信息后重试');
+                    return;
+                }
+            }
+            var _this = this;
+            var loading = this.$loading({
+                lock: true,
+                text: "拼命加载中, 请稍等...",
+                spinner: "el-icon-loading",
+                background: "rgba(0, 0, 0, 0.7)"
+            });
+            $.ajax({
+                type: 'post',
+                url: '/admin/module/saveModelDetail',
+                contentType: "application/json",
+                data: JSON.stringify(this.currSpeGoods),
+                success: function (result) {
+                    loading.close();
+                    if (result.resultCode == 200) {
+                        _this.$message.success('操作成功');
+                        _this.getSpeGoods(_this.currAreaInfo.id);
+                        _this.moralShow = false;
+                    } else {
+                        _this.$message.error(result.message);
+                    };
+                },
+                error: function () {
+                    loading.close();
+                    _this.$message.error('操作失败');
+                }
+            });
         },
         // 换页
-        current_change() {
-
+        current_change(currentPage) {
+            this.currentPage = currentPage;
+            this.getSpeGoods(this.currAreaInfo.id);
         },
         // 切换tab
         handleTabClick(val) {
@@ -191,6 +291,10 @@ new Vue({
             this.speInfoName = this.currAreaInfo.modName;
             this.speInfoDesc = this.currAreaInfo.modDesc;
             this.getSpeGoods(this.currAreaInfo.id);
+        },
+        // 商品名称--带提示输入框值发生改变
+        handleGoodsSelect(val) {
+            this.currSpeGoods.goodsId = val.goodsId;
         }
     }
 })

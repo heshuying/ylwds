@@ -39,17 +39,17 @@
                     <div>
                         <span class="spe-name">{{currAreaInfo.modName}}</span>
                         <span class="spe-intro">{{currAreaInfo.modDesc}}</span>
-                        <span class="spe-edit">
+                        <span class="spe-edit" @click="editSpeArea">
                             <span>
                                 <i class="el-icon-edit"></i>
                             </span>
-                            <span @click="editSpeArea">编辑</span>
+                            <span>编辑</span>
                         </span>
                     </div>
                     <div class="spe-right">
                         <div>
                             此专区共
-                            <span class="banner-count">{{tableData.length}}</span>
+                            <span class="banner-count">{{total}}</span>
                             条记录
                         </div>
                         <div>
@@ -118,7 +118,7 @@
                                 show-overflow-tooltip>
                             <template slot-scope="scope">
                                 <div v-if="scope.row.isHead==='0'">
-                                    <span>¥{{scope.row.modRank}}</span>
+                                    <span>{{scope.row.modRank}}</span>
                                 </div>
                                 <div v-else>
                                     <span>--</span>
@@ -134,10 +134,12 @@
                         <el-table-column label="操作" align="center">
                             <template slot-scope="scope">
                                 <div class="edit-btn">
-                                    <span>
-                                        <i class="el-icon-edit"></i>
+                                    <span @click="editSpeGoods(scope.row)">
+                                        <span>
+                                            <i class="el-icon-edit"></i>
+                                        </span>
+                                        <span>编辑</span>
                                     </span>
-                                    <span @click="editSpeGoods(scope.row)">编辑</span>
                                 </div>
                             </template>
                         </el-table-column>
@@ -202,7 +204,7 @@
                                 :show-file-list="false"
                                 :on-success="handleUploadSuccess"
                         >
-                            <img v-if="wholeUrl" :src="wholeUrl" />
+                            <img v-if="currSpeGoods.imgUrlShow" :src="currSpeGoods.imgUrlShow" />
                             <div v-else class="add-spe-img">
                                 <div>
                                     <i class="el-icon-circle-plus-outline"></i>
@@ -213,26 +215,33 @@
                             </div>
                         </el-upload>
                     </div>
-                    <div class="dia-common-line">
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '1'">
                         <div class="label-width">跳转链接</div>
                         <div>
-                            <el-input v-model="jumpUrl"></el-input>
+                            <el-input v-model="currSpeGoods.jumpUrl"></el-input>
                         </div>
                     </div>
-                    <div class="dia-common-line">
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '0'">
                         <div class="label-width">商品名称</div>
                         <div>
-                            <el-input v-model="speGoodsName"></el-input>
+                            <el-autocomplete
+                                    class="inline-input"
+                                    v-model="currSpeGoods.goodsName"
+                                    :fetch-suggestions="querySearch"
+                                    placeholder="请输入内容"
+                                    :trigger-on-focus="false"
+                                    @select="handleGoodsSelect"
+                            ></el-autocomplete>
                         </div>
                     </div>
-                    <div class="dia-common-line">
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '0'">
                         <div class="label-width">排序值</div>
                         <div>
-                            <el-input type="number" v-model="sortNum"></el-input>
+                            <el-input type="number" v-model="currSpeGoods.modRank"></el-input>
                         </div>
                     </div>
                     <div class="dia-btn-area">
-                        <el-button type="primary">确定</el-button>
+                        <el-button type="primary" @click="saveSpeGoods">确定</el-button>
                     </div>
                 </div>
             </el-dialog>

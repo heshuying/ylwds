@@ -157,11 +157,11 @@ public class PayController {
     @GetMapping("/tradeQuery/{orderId}/{payType}")
     public Result tradeQuery(@PathVariable String orderId, @PathVariable String payType, HttpServletRequest request) {
         log.info("tradeQuery请求参数orderId：{}, payType:{}", orderId, payType);
-        if(StringUtils.isBlank(orderId)){
+        if(StringUtils.isBlank(orderId) || StringUtils.isBlank(payType)){
             return ResultGenerator.genFailResult("请求参数错误");
         }
 
-        Result result = payService.tradeQuery(orderId, payType);
+        Result result = payService.tradeQueryDB(orderId, payType);
         return result;
     }
 

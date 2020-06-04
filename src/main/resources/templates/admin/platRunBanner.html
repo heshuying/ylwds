@@ -25,17 +25,17 @@
         <div id="app" class="manage-main-page" v-cloak>
             <div class="top-header">
                 <div class="checked-style">轮播大图</div>
-                <div>专区</div>
+                <div @click="goSpeArea">专区</div>
             </div>
             <div class="show-main-content">
                 <div class="add-banner-area">
                     <div>
                         共
-                        <span class="banner-count">{{bannerCount}}</span>
+                        <span class="banner-count">{{tableData.length}}</span>
                         条轮播记录
                     </div>
                     <div>
-                        <el-button type="plain">+ 新增轮播</el-button>
+                        <el-button type="plain" @click="addBanner">+ 新增轮播</el-button>
                     </div>
                 </div>
                 <div>
@@ -46,33 +46,31 @@
                             style="width: 100%"
                             :header-cell-style="{background:'#F5F6F8'}">
                         <el-table-column
-                                prop="img"
                                 label="轮播图片"
                                 align="center">
                             <template slot-scope="scope">
                                 <div class="photo-item">
-                                    <img :src="scope.row.img" />
+                                    <img :src="scope.row.imgUrlShow" />
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="url"
                                 label="跳转链接"
                                 align="center">
                             <template slot-scope="scope">
-                                <div class="edit-btn" @click="clickUrl(scope.row.url)">
-                                    <span>{{scope.row.url}}</span>
+                                <div class="edit-btn" @click="clickUrl(scope.row.jumpUrl)">
+                                    <span>{{scope.row.jumpUrl}}</span>
                                 </div>
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="order"
+                                prop="modRank"
                                 label="排序值"
                                 align="center"
                                 show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
-                                prop="createDate"
+                                prop="createTime"
                                 label="创建时间"
                                 align="center"
                                 show-overflow-tooltip>
@@ -80,10 +78,12 @@
                         <el-table-column label="操作" align="center">
                             <template slot-scope="scope">
                                 <div class="edit-btn">
-                                    <span>
-                                        <i class="el-icon-edit"></i>
+                                    <span @click="editBanner(scope.row)">
+                                        <span>
+                                            <i class="el-icon-edit"></i>
+                                        </span>
+                                        <span>编辑</span>
                                     </span>
-                                    <span>编辑</span>
                                 </div>
                             </template>
                         </el-table-column>
@@ -103,10 +103,48 @@
                         <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
                     </el-popover>
                 </div>
-                <div class="save-btn-area">
+                <div class="save-btn-area" v-if="false">
                     <el-button type="primary">保存</el-button>
                 </div>
             </div>
+            <!--轮播图新增修改dialog-->
+            <el-dialog :visible.sync="moralShow" width="40%" :title="moralTitle" center :close-on-click-modal="closeBtnShow">
+                <div class="dia-body">
+                    <div class="dia-img-area">
+                        <img v-if="postInfo.imgUrlShow" :src="postInfo.imgUrlShow" />
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">上传图片</div>
+                        <div>
+                            <el-upload
+                                    class="upload-demo"
+                                    action="/api/file/uploadFile"
+                                    :limit="5"
+                                    :show-file-list="false"
+                                    :on-success="handleUploadSuccess"
+                            >
+                                <el-button type="plain">选择文件</el-button>
+                            </el-upload>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">跳转链接</div>
+                        <div>
+                            <el-input v-model="postInfo.jumpUrl"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width">排序值</div>
+                        <div>
+                            <el-input type="number" v-model="postInfo.modRank"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-btn-area">
+                        <el-button type="primary" @click="saveBanner">确定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--轮播图新增修改dialog end-->
         </div>
         <!-- /.content-wrapper -->
     </div>

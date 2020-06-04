@@ -22,6 +22,8 @@ public interface TbModuleService extends IService<TbModule> {
      */
     Result getBanner();
 
+    Result getBannerAll();
+
     /**
      * 获取分区
      * @return

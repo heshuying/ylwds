@@ -1,5 +1,6 @@
 package com.hailian.ylwmall.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hailian.ylwmall.dto.ModuleDetailReq;
 import com.hailian.ylwmall.entity.TbGoodsInfo;
 import com.hailian.ylwmall.util.CommonUtil;
@@ -17,10 +18,12 @@ import com.hailian.ylwmall.util.Result;
 import com.hailian.ylwmall.util.ResultGenerator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +32,7 @@ import java.util.Objects;
  * 运营专区
  * @author 19033323
  */
-@RestController
+@Controller
 @RequestMapping("/admin/module")
 public class ModuleController {
     @Autowired
@@ -40,10 +43,33 @@ public class ModuleController {
     private GoodsService goodsService;
 
     /**
+     * 轮播页面
+     * @param request
+     * @return
+     */
+    @GetMapping("/platRunBanner")
+    public String platRunBanner(HttpServletRequest request) {
+        request.setAttribute("path", "newbee_mall_run_banner");
+        return "admin/platRunBanner";
+    }
+
+    /**
+     * 专区页面
+     * @param request
+     * @return
+     */
+    @GetMapping("/platRunSpeArea")
+    public String platRunSpeArea(HttpServletRequest request) {
+        request.setAttribute("path", "newbee_mall_run_banner");
+        return "admin/platRunSpeArea";
+    }
+
+    /**
      * 专区新增及修改
      * @param reqBean
      * @return
      */
+    @ResponseBody
     @PostMapping("/save")
     public Result save(@RequestBody ModuleReq reqBean, HttpServletRequest request){
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
@@ -70,6 +96,7 @@ public class ModuleController {
      * @param moduleId
      * @return
      */
+    @ResponseBody
     @GetMapping("getModuleInfo/{moduleId}")
     public Result getModuleInfo(@PathVariable("moduleId") Long moduleId){
         TbModule module = moduleService.getById(moduleId);
@@ -80,6 +107,7 @@ public class ModuleController {
      * 专区列表
      * @return
      */
+    @ResponseBody
     @GetMapping("getModules")
     public Result getModules(){
         return ResultGenerator.genSuccessResult(moduleService.getModuleList());
@@ -90,6 +118,7 @@ public class ModuleController {
      * @param reqBean
      * @return
      */
+    @ResponseBody
     @PostMapping("/saveModelDetail")
     public Result saveModelDetail(@RequestBody ModuleDetailReq reqBean, HttpServletRequest request){
         Long userId = (Long)request.getSession().getAttribute("loginUserId");
@@ -97,7 +126,6 @@ public class ModuleController {
             return ResultGenerator.genFailResult("未登录！");
         }
         if(reqBean == null
-                || StringUtils.isEmpty(reqBean.getIsHead())
                 || StringUtils.isEmpty(reqBean.getModId())){
             return ResultGenerator.genFailResult("参数异常！");
         }
@@ -119,8 +147,41 @@ public class ModuleController {
     }
 
     /**
+     * 专区内容新增修改
+     * @param reqBean
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/saveBannerDetail")
+    public Result saveBannerDetail(@RequestBody ModuleDetailReq reqBean, HttpServletRequest request){
+        Long userId = (Long)request.getSession().getAttribute("loginUserId");
+        if(Objects.isNull(userId)){
+            return ResultGenerator.genFailResult("未登录！");
+        }
+        TbModule tbModule=moduleService.getOne(new QueryWrapper<TbModule>()
+                .eq("mod_key", Const.Mod_Banner_Key));
+        if(tbModule == null){
+            return ResultGenerator.genFailResult("轮播区域不存在");
+        }
+        if(StringUtils.isEmpty(reqBean.getJumpUrl()) || StringUtils.isEmpty(reqBean.getImgUrl())){
+            return ResultGenerator.genFailResult("参数异常！");
+        }
+
+        TbModuleDetail module = CommonUtil.convertBean(reqBean, TbModuleDetail.class);
+        module.setModId(tbModule.getId());
+        module.setCreateUser(userId.intValue());
+        module.setUpdateUser(userId.intValue());
+        module.setUpdateTime(new Date());
+        if(moduleDetailService.saveOrUpdate(module)){
+            return ResultGenerator.genSuccessResult();
+        }
+        return ResultGenerator.genFailResult("保存失败");
+    }
+
+    /**
      * 专区内容详情
      */
+    @ResponseBody
     @GetMapping("getModuleDetailInfo/{id}")
     public Result getModuleDetailInfo(@PathVariable("id") Long id){
         ModuleDetailAddRes res = new ModuleDetailAddRes();
@@ -145,6 +206,7 @@ public class ModuleController {
      * 专区详情列表
      * @return
      */
+    @ResponseBody
     @GetMapping("getModuleDetails")
     public Result getModuleDetails(@RequestParam Map<String, Object> params){
         if (org.springframework.util.StringUtils.isEmpty(params.get("page"))
@@ -155,6 +217,16 @@ public class ModuleController {
 
         PageQueryUtil pageUtil = new PageQueryUtil(params);
         return ResultGenerator.genSuccessResult(moduleDetailService.getModuleDetails(pageUtil));
+    }
+
+    /**
+     * 轮播列表
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("getBannerDetails")
+    public Result getBannerDetails(){
+        return moduleService.getBannerAll();
     }
 
 }

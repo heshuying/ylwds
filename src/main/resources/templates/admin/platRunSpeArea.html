@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:replace="admin/header::header-fragment">
+</header>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" th:href="@{/admin/plugins/element-ui/lib/theme-chalk/index.css}">
+    <link rel="stylesheet" th:href="@{/admin/dist/css/platRunSpeArea.css}">
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- 引入页面头header-fragment -->
+    <div th:replace="admin/header::header-nav"></div>
+    <!-- 引入工具栏sidebar-fragment -->
+    <div th:replace="admin/sidebar::sidebar-fragment(${path})"></div>
+    <!-- Content Wrapper. Contains 图标content -->
+    <div class="content-wrapper">
+        <!-- Content Header (图标header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- Main content -->
+        <div id="app" class="manage-main-page" v-cloak>
+            <div class="top-line">
+                <div class="top-header">
+                    <div @click="goBannerArea">轮播大图</div>
+                    <div class="checked-style">专区</div>
+                </div>
+                <div class="top-tab">
+                    <el-tabs v-model="activeName" @tab-click="handleTabClick">
+                        <el-tab-pane :label="item.modName" :name="item.id + ''" v-for="item in areaList" :key="item.index"></el-tab-pane>
+                    </el-tabs>
+                </div>
+            </div>
+            <div class="show-main-content">
+                <div class="add-spe-area">
+                    <div>
+                        <span class="spe-name">{{currAreaInfo.modName}}</span>
+                        <span class="spe-intro">{{currAreaInfo.modDesc}}</span>
+                        <span class="spe-edit" @click="editSpeArea">
+                            <span>
+                                <i class="el-icon-edit"></i>
+                            </span>
+                            <span>编辑</span>
+                        </span>
+                    </div>
+                    <div class="spe-right">
+                        <div>
+                            此专区共
+                            <span class="banner-count">{{total}}</span>
+                            条记录
+                        </div>
+                        <div>
+                            <el-button type="plain" @click="addSpeGoods">+ 新增</el-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <el-table
+                            ref="multipleTable"
+                            :data="tableData"
+                            tooltip-effect="dark"
+                            style="width: 100%"
+                            :header-cell-style="{background:'#F5F6F8'}">
+                        <el-table-column
+                                label="图片"
+                                align="center">
+                            <template slot-scope="scope">
+                                <div class="photo-item">
+                                    <img :src="scope.row.imgUrlShow" />
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="商品"
+                                align="center">
+                            <template slot-scope="scope">
+                                <div class="edit-btn" @click="clickUrl(scope.row.jumpUrl)" v-if="scope.row.isHead==='1'">
+                                    <span>{{scope.row.jumpUrl}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>{{scope.row.goodsName}}</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="供货价"
+                                align="center"
+                                show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>¥{{scope.row.sellingPrice}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="毛利润"
+                                align="center"
+                                show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>¥{{scope.row.profit}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="排序值"
+                                align="center"
+                                show-overflow-tooltip>
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.isHead==='0'">
+                                    <span>{{scope.row.modRank}}</span>
+                                </div>
+                                <div v-else>
+                                    <span>--</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="createTime"
+                                label="创建时间"
+                                align="center"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <div class="edit-btn">
+                                    <span @click="editSpeGoods(scope.row)">
+                                        <span>
+                                            <i class="el-icon-edit"></i>
+                                        </span>
+                                        <span>编辑</span>
+                                    </span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <div class="index-show-area">
+                    <el-popover
+                            placement="left-end"
+                            width="200"
+                            trigger="manual"
+                            v-model="visible">
+                        <div class="pop-div">
+                            <div>
+                                <div :style="{ marginTop: showPosition + 'px' }"></div>
+                            </div>
+                        </div>
+                        <el-button slot="reference" type="plain" @click="showOrHideArea">{{showBtnWord}}</el-button>
+                    </el-popover>
+                </div>
+                <div style="text-align: center;padding: 15px 0;">
+                    <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            :total="total"
+                            :page-size="pagesize"
+                            @current-change="current_change">
+                    </el-pagination>
+                </div>
+                <div class="save-btn-area" v-if="false">
+                    <el-button type="primary">保存</el-button>
+                </div>
+            </div>
+            <!--专区信息-->
+            <el-dialog :visible.sync="speInfoMoralShow" width="40%" title="编辑专区" center :close-on-click-modal="closeBtnShow">
+                <div class="dia-body">
+                    <div class="dia-common-line">
+                        <div class="label-width bold-font">专区名称</div>
+                        <div>
+                            <el-input v-model="speInfoName"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line">
+                        <div class="label-width bold-font">小编寄语</div>
+                        <div>
+                            <el-input type="textarea" v-model="speInfoDesc" rows="4"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-btn-area">
+                        <el-button type="primary" @click="saveSpeInfo">确定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--专区信息 end-->
+            <!--专区产品-->
+            <el-dialog :visible.sync="moralShow" width="40%" :title="moralTitle" center :close-on-click-modal="closeBtnShow">
+                <div class="dia-body">
+                    <div class="dia-img-area">
+                        <el-upload
+                                class="upload-demo"
+                                action="/api/file/uploadFile"
+                                :limit="5"
+                                :show-file-list="false"
+                                :on-success="handleUploadSuccess"
+                        >
+                            <img v-if="currSpeGoods.imgUrlShow" :src="currSpeGoods.imgUrlShow" />
+                            <div v-else class="add-spe-img">
+                                <div>
+                                    <i class="el-icon-circle-plus-outline"></i>
+                                </div>
+                                <div>
+                                    选择文件
+                                </div>
+                            </div>
+                        </el-upload>
+                    </div>
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '1'">
+                        <div class="label-width">跳转链接</div>
+                        <div>
+                            <el-input v-model="currSpeGoods.jumpUrl"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '0'">
+                        <div class="label-width">商品名称</div>
+                        <div>
+                            <el-autocomplete
+                                    class="inline-input"
+                                    v-model="currSpeGoods.goodsName"
+                                    :fetch-suggestions="querySearch"
+                                    placeholder="请输入内容"
+                                    :trigger-on-focus="false"
+                                    @select="handleGoodsSelect"
+                            ></el-autocomplete>
+                        </div>
+                    </div>
+                    <div class="dia-common-line" v-if="currSpeGoods.isHead === '0'">
+                        <div class="label-width">排序值</div>
+                        <div>
+                            <el-input type="number" v-model="currSpeGoods.modRank"></el-input>
+                        </div>
+                    </div>
+                    <div class="dia-btn-area">
+                        <el-button type="primary" @click="saveSpeGoods">确定</el-button>
+                    </div>
+                </div>
+            </el-dialog>
+            <!--专区产品 end-->
+        </div>
+        <!-- /.content-wrapper -->
+    </div>
+    <!-- jQuery -->
+    <script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+    <script th:src="@{/admin/plugins/vue/dist/vue.js}"></script>
+    <!-- 引入组件库 -->
+    <script th:src="@{/admin/plugins/element-ui/lib/index.js}"></script>
+    <script th:src="@{/admin/dist/js/platRunSpeArea.js}"></script>
+</body>
+</html>

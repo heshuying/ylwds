@@ -53,8 +53,8 @@
         FROM
         tb_module_detail md
         left JOIN tb_goods_info g
-        ON md.`goods_id` = g.`goods_id`
-        where md.is_deleted=0 and g.goods_sell_status=3
+        ON md.`goods_id` = g.`goods_id` and g.goods_sell_status=3
+        where md.is_deleted=0
         <if test="moduleId != null and moduleId>0">
             and md.mod_id =#{moduleId}
         </if>

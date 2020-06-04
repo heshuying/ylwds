@@ -88,7 +88,6 @@ public class TbModuleServiceImpl extends ServiceImpl<TbModuleDao, TbModule> impl
             List<ModuleDetailRes> currDetails= tbModuleDetailService.getModeleDetails(module.getId(), 5);
             //专区产品
             List<ModuleDetailRes> nonHead=currDetails.stream().filter(m->m.getIsHead().equals("0"))
-                    .sorted(Comparator.comparing(TbModuleDetail::getModRank))
                     .limit(4).collect(Collectors.toList());
 
             dto.setList(nonHead);

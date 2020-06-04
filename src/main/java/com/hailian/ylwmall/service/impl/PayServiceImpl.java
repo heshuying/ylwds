@@ -3,12 +3,13 @@ package com.hailian.ylwmall.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.gson.Gson;
-import com.hailian.ylwmall.common.B2BMallException;
 import com.hailian.ylwmall.common.Constants;
 import com.hailian.ylwmall.common.OrderStatusEnum;
-import com.hailian.ylwmall.common.pay.*;
+import com.hailian.ylwmall.common.pay.KJTConstants;
+import com.hailian.ylwmall.common.pay.PayRefundStatusEnum;
+import com.hailian.ylwmall.common.pay.PayStatusEnum;
+import com.hailian.ylwmall.common.pay.ProductCodeEnum;
 import com.hailian.ylwmall.controller.vo.NewBeeMallUserVO;
 import com.hailian.ylwmall.controller.vo.OrderGoodInfoVo;
 import com.hailian.ylwmall.dao.TbOrderRefundDao;
@@ -20,7 +21,10 @@ import com.hailian.ylwmall.entity.*;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.service.PayService;
-import com.hailian.ylwmall.util.*;
+import com.hailian.ylwmall.util.GetCilentIP;
+import com.hailian.ylwmall.util.GetCodeUtil;
+import com.hailian.ylwmall.util.Result;
+import com.hailian.ylwmall.util.ResultGenerator;
 import com.kjtpay.gateway.common.domain.VerifyResult;
 import com.kjtpay.gateway.common.domain.base.RequestBase;
 import com.kjtpay.gateway.common.domain.base.ResponseParameter;
@@ -500,13 +504,14 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     public Result tradeRefund(String orderId, Long userId){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
-                .eq("is_deleted", "0"));
+                .eq("is_deleted", "0")
+                .isNotNull("pay_time"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
         }
 
-        TbPayRefund payRefund = payRefundDao.selectOne(new QueryWrapper<TbPayRefund>().eq("order_id", orderId));
-        if(payRefund != null){
+        List<TbPayRefund> payRefundList = payRefundDao.selectList(new QueryWrapper<TbPayRefund>().eq("order_id", orderId).eq("refund_status", "S"));
+        if(payRefundList != null && !payRefundList.isEmpty()){
             return ResultGenerator.genFailResult("已申请过退款");
         }
 
@@ -516,7 +521,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         }
 
         String outTradeNo = GetCodeUtil.getOrderId(userId);
-        payRefund = new TbPayRefund();
+        TbPayRefund payRefund = new TbPayRefund();
         payRefund.setOrderId(orderPay.getOrderId());
         payRefund.setOrigOutTradeNo(orderPay.getOutTradeNo());
         payRefund.setOutTradeNo(outTradeNo);

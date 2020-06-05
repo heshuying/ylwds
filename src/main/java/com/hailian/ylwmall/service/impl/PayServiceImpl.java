@@ -398,6 +398,9 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
         }
+        if(orderPay.getPayStatus() >= 3){
+            return ResultGenerator.genSuccessResult("已达成");
+        }
 
         String outTradeNo = GetCodeUtil.getOrderId(userId);
         Map<String,String> bizContent = new HashMap<>();

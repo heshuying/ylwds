@@ -393,9 +393,13 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     public Result tradeSettle(String orderId, Long userId){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
-                .eq("is_deleted", "0"));
+                .eq("is_deleted", "0")
+                .isNotNull("pay_time"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
+        }
+        if(orderPay.getPayStatus() >= 3){
+            return ResultGenerator.genSuccessResult("已达成");
         }
 
         String outTradeNo = GetCodeUtil.getOrderId(userId);
@@ -446,7 +450,8 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
     public Result agreementPayConfirm(Long userId, String orderId, String phoneCheckCode){
         TbOrderPay orderPay = orderPayDao.selectOne(new QueryWrapper<TbOrderPay>()
                 .eq("order_id", orderId)
-                .eq("is_deleted", "0"));
+                .eq("is_deleted", "0")
+                .eq("pay_type", "2"));
         if(orderPay == null){
             return ResultGenerator.genFailResult("未检索到支付记录");
         }

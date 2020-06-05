@@ -288,6 +288,9 @@ public class TbOrderRefundServiceImpl extends ServiceImpl<TbOrderRefundDao, TbOr
                     .subtract(dto.getContdownAmount()));
             baseMapper.updateById(updateDto);
 
+            //触发交易达成
+            payService.tradeSettle(dto.getOrderId().toString(), userId);
+
         }else if(Const.OrderStatus.Refunding.getKey()==dto.getStatus()){
             //全额退款
             //判断用户类型，如果是平台则不更新价格

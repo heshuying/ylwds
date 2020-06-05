@@ -21,6 +21,7 @@ import com.hailian.ylwmall.entity.*;
 import com.hailian.ylwmall.entity.order.OrderInfo;
 import com.hailian.ylwmall.exception.BusinessException;
 import com.hailian.ylwmall.service.PayService;
+import com.hailian.ylwmall.service.TbOrderOrderinfoService;
 import com.hailian.ylwmall.util.GetCilentIP;
 import com.hailian.ylwmall.util.GetCodeUtil;
 import com.hailian.ylwmall.util.Result;
@@ -58,6 +59,8 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
     @Autowired
     TbOrderRefundDao orderRefundDao;
+    @Autowired
+    private TbOrderOrderinfoService orderinfoService;
 
     /**
      * 担保支付
@@ -574,6 +577,13 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             payRefund.setTradeNo(jsonObject.getString("trade_no"));
             payRefund.setUpdateTime(new Date());
             payRefundDao.updateById(payRefund);
+
+            // 更新订单状态
+//            TbOrderOrderinfo tbOrderOrderinfo=new TbOrderOrderinfo();
+//            tbOrderOrderinfo.setId(Long.parseLong(orderId));
+//            tbOrderOrderinfo.setStatus(19);
+//            tbOrderOrderinfo.setUpdateTime(new Date());
+//            orderinfoService.updateById(tbOrderOrderinfo);
             return ResultGenerator.genSuccessResult(jsonObject);
         }
         return ResultGenerator.genFailResult("退款失败");
@@ -712,7 +722,7 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
 
         insertRevLog(reqBean.getOuter_trade_no(), "tradeRefundAsyncNotify", JSON.toJSONString(reqBean), JSON.toJSONString(reqBean));
         // 更新支付状态
-        TbPayRefund payRefund = payRefundDao.selectOne(new QueryWrapper<TbPayRefund>().eq("orig_out_trade_no", reqBean.getOrig_outer_trade_no()));
+        TbPayRefund payRefund = payRefundDao.selectOne(new QueryWrapper<TbPayRefund>().eq("out_trade_no", reqBean.getOuter_trade_no()));
         if(payRefund == null){
             throw new BusinessException("未检索到退款记录");
         }
@@ -729,6 +739,13 @@ public class PayServiceImpl extends PayServiceBase implements PayService {
             payRefund.setRefundStatus("S");
             payRefund.setUpdateTime(new Date());
             payRefundDao.updateById(payRefund);
+
+            // 更新订单状态
+            TbOrderOrderinfo tbOrderOrderinfo=new TbOrderOrderinfo();
+            tbOrderOrderinfo.setId(payRefund.getOrderId());
+            tbOrderOrderinfo.setStatus(19);
+            tbOrderOrderinfo.setUpdateTime(new Date());
+            orderinfoService.updateById(tbOrderOrderinfo);
         }
 
     }
